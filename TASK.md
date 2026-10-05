@@ -70,10 +70,22 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - `app/not-found.tsx`: 404 Page Not Found with food-first narrative, category shortcut pills, and recovery actions
   - `app/error.tsx`: 500 Server Error boundary with retry mechanism (`reset()`), error logging, and direct links
   - `app/global-error.tsx`: Root-level error boundary with self-contained HTML/body shell for catastrophic errors
+- [x] Privacy Policy Page (`app/privacy/page.tsx`):
+  - Simple, transparent privacy declaration stating zero personal data collection, zero cross-site tracking, and optional newsletter unsubscribe rights
+  - Linked to site footer and added to `app/sitemap.ts`
+- [x] Terms of Service Page (`app/terms/page.tsx`):
+  - Clear guidelines for personal culinary use, recipe attribution, copyright, and dietary/allergen disclaimers
+  - Linked to site footer and added to `app/sitemap.ts`
+- [x] Contact Page (`app/contact/page.tsx`):
+  - Minimal, lightweight form with only essential fields (name, email, message) and interactive confirmation state
+  - Direct kitchen contact information, response time expectations, linked to site footer, and added to `app/sitemap.ts`
 
 ### Phase 5: Verification & Quality Assurance
 
 - [ ] Accessibility audit (WCAG AA contrast, touch targets >= 44px, keyboard navigation, focus rings)
 - [ ] End-to-end linting and build validation
+
+
+
 
 
