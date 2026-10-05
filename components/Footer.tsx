@@ -84,7 +84,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 border-t border-ink/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-ui text-[11px] uppercase tracking-wider text-muted">
-            &copy; {new Date().getFullYear()} Scrumptious. Crafted with love for Sri Lankan cuisine.
+            &copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span> Scrumptious. Crafted with love for Sri Lankan cuisine.
           </p>
           <div className="flex items-center gap-6 font-ui text-[11px] uppercase tracking-wider text-muted">
             <Link href="/privacy" className="hover:text-ink">
