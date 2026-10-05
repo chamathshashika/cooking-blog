@@ -5,6 +5,7 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 ---
 
 ## Current Status
+
 - **Active Phase**: Phase 4 - Recipe & Category Pages
 - **Last Updated**: 2026-10-05
 
@@ -13,12 +14,14 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 ## Milestones & Tasks
 
 ### Phase 1: Foundation & Design System Setup
+
 - [x] Install missing dependencies (`lucide-react`) via `pnpm`
 - [x] Configure Tailwind CSS v4 design tokens in `app/globals.css` (Cream, Sunshine Yellow, Sage Green, Ink, typography variables)
 - [x] Set up Google fonts (`DM Serif Display` and `Montserrat`) in `app/layout.tsx`
 - [x] Configure Next.js image domain for Unsplash in `next.config.ts`
 
 ### Phase 2: Core Shared Components
+
 - [x] `Header`: Cream background, yellow top accent line, wordmark logo, uppercase navigation, search toggle, social icons, mobile navigation drawer
 - [x] `StarRating`: Gold star rating with accessible `aria-label`
 - [x] `RecipeCard`: 3:4 & 4:3 ratios, category pill tag, serif title, rating, subtle zoom hover
@@ -31,6 +34,7 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] `Footer`: Cream/yellow color scheme matching the header with brand narrative and links
 
 ### Phase 3: Home Page Assembly
+
 - [x] Assemble `app/page.tsx` with all sections in order:
   1. `Header` with cream background & yellow top accent
   2. Hero with `h1` and `FeaturedRow` (overlapping cream backdrop into white)
@@ -42,10 +46,17 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Verified responsive structure (mobile, tablet, desktop)
 
 ### Phase 4: Recipe & Category Pages
-- [ ] Recipe listing page (`app/recipes/page.tsx`)
+
+- [x] Recipe listing page (`app/recipes/page.tsx`) with live search, real-time category filtering pills, and URL query support (`?category=...`, `?search=...`)
 - [x] Recipe detail page (`app/recipes/[slug]/page.tsx`) with ingredients checklist, numbered steps, tips, JSON-LD structured data
-- [ ] Category page (`app/category/[slug]/page.tsx`)
+- [x] Category overview page (`app/category/page.tsx`) and dynamic category detail page (`app/category/[slug]/page.tsx`) with category avatar, description, recipe grid, and carousel
+- [x] Header navigation routing:
+  - `RECIPES` dropdown: `ALL RECIPES` (`/recipes`), `BREAKFAST DISHES` (`/category/breakfast`), `CURRIES & DINNERS` (`/category/dinner`), `SWEETS & TREATS` (`/category/desserts`)
+  - `CATEGORIES` dropdown: `ALL CATEGORIES` (`/category`) and all 8 categories
+  - Global search bar routing to `/recipes?search=...`
 
 ### Phase 5: Verification & Quality Assurance
+
 - [ ] Accessibility audit (WCAG AA contrast, touch targets >= 44px, keyboard navigation, focus rings)
 - [ ] End-to-end linting and build validation
+
