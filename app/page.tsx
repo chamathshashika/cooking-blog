@@ -1,69 +1,78 @@
-import Image from "next/image";
+import Header from "@/components/Header";
+import FeaturedRow from "@/components/FeaturedRow";
+import SubscribeBanner from "@/components/SubscribeBanner";
+import CategoryCarousel from "@/components/CategoryCarousel";
+import SectionHeading from "@/components/SectionHeading";
+import RecipeCard from "@/components/RecipeCard";
+import Footer from "@/components/Footer";
+import { featuredRecipes, recentRecipes, categories } from "@/lib/data";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex min-h-screen flex-col bg-white">
+      {/* 1. Header */}
+      <Header />
+
+      <main className="flex-1">
+        {/* Hero Banner with H1 on Cream Background */}
+        <section className="bg-cream pt-6 pb-12 sm:pb-16 text-center">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted mb-2">
+              Authentic Island Flavors
+            </p>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink max-w-2xl mx-auto leading-tight">
+              Sri Lankan Recipes & Food Stories
+            </h1>
+            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto">
+              Time-honored family recipes, vibrant tropical spices, and comforting homestyle cooking from the pearl of the Indian Ocean.
+            </p>
+          </div>
+        </section>
+
+        {/* 2. Featured Row (Overlaps the cream backdrop into white) */}
+        <div className="-mt-8 sm:-mt-10 mb-16 md:mb-24">
+          <FeaturedRow recipes={featuredRecipes} />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* 3. Subscribe Banner */}
+        <div className="my-12 md:my-16">
+          <SubscribeBanner />
         </div>
+
+        {/* 4. Explore by Category */}
+        <CategoryCarousel categories={categories} />
+
+        {/* 5. Recent Recipes */}
+        <section
+          className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8 md:py-16"
+          aria-label="Recent Recipes"
+        >
+          <SectionHeading
+            title="Recent Recipes"
+            actionText="Browse all recipes"
+            actionHref="/recipes"
+          />
+
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {recentRecipes.map((recipe) => (
+              <RecipeCard
+                key={recipe.id}
+                title={recipe.title}
+                category={recipe.category}
+                image={recipe.image}
+                slug={recipe.slug}
+                rating={recipe.rating}
+                aspectRatio="4/3"
+                prepTime={recipe.prepTime}
+                cookTime={recipe.cookTime}
+              />
+            ))}
+          </div>
+        </section>
       </main>
+
+      {/* 6. Footer */}
+      <Footer />
     </div>
   );
 }
