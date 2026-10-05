@@ -65,9 +65,14 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - `RECIPES` dropdown: `ALL RECIPES` (`/recipes`), `BREAKFAST DISHES` (`/category/breakfast`), `CURRIES & DINNERS` (`/category/dinner`), `SWEETS & TREATS` (`/category/desserts`)
   - `CATEGORIES` dropdown: `ALL CATEGORIES` (`/category`) and all 8 categories
   - Global search bar routing to `/recipes?search=...`
+- [x] Error Handling & Recovery Pages:
+  - `app/not-found.tsx`: 404 Page Not Found with food-first narrative, category shortcut pills, and recovery actions
+  - `app/error.tsx`: 500 Server Error boundary with retry mechanism (`reset()`), error logging, and direct links
+  - `app/global-error.tsx`: Root-level error boundary with self-contained HTML/body shell for catastrophic errors
 
 ### Phase 5: Verification & Quality Assurance
 
 - [ ] Accessibility audit (WCAG AA contrast, touch targets >= 44px, keyboard navigation, focus rings)
 - [ ] End-to-end linting and build validation
+
 
