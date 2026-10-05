@@ -24,7 +24,8 @@ export default function Home() {
               Sri Lankan Recipes & Food Stories
             </h1>
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto">
-              Time-honored family recipes, vibrant tropical spices, and comforting homestyle cooking from the pearl of the Indian Ocean.
+              Time-honored family recipes, vibrant tropical spices, and
+              comforting homestyle cooking from the pearl of the Indian Ocean.
             </p>
           </div>
         </section>
