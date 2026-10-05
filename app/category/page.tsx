@@ -84,7 +84,7 @@ export default function CategoriesPage() {
 
                 <div className="mt-5 pt-3 border-t border-ink/10 flex items-center justify-between">
                   <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted">
-                    {category.count} Recipes
+                    {category.count} {category.count === 1 ? "Recipe" : "Recipes"}
                   </span>
                   <span className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-sage group-hover:translate-x-0.5 transition-transform">
                     <span>Explore</span>

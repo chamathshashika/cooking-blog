@@ -58,7 +58,13 @@ export default function IngredientsList({ ingredients }: Props) {
                     : "text-ink group-hover:text-ink/80"
                 }`}
               >
-                <strong className="font-semibold text-ink">{item.amount}</strong>{" "}
+                {(item.amount || item.quantity) && (
+                  <>
+                    <strong className="font-semibold text-ink">
+                      {item.amount || item.quantity}
+                    </strong>{" "}
+                  </>
+                )}
                 <span>{item.name}</span>
               </span>
             </li>

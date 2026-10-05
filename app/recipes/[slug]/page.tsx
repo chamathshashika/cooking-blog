@@ -85,7 +85,8 @@ export default async function RecipeDetailPage({ params }: Props) {
       ratingValue: recipe.rating,
       reviewCount: recipe.ratingCount || 25,
     },
-    recipeIngredient: recipe.ingredients?.map((i) => `${i.amount} ${i.name}`) || [],
+    recipeIngredient:
+      recipe.ingredients?.map((i) => `${i.amount || i.quantity || ""} ${i.name}`.trim()) || [],
     recipeInstructions: recipe.instructions?.map((inst) => ({
       "@type": "HowToStep",
       text: inst.text,
