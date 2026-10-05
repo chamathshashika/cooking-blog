@@ -12,6 +12,7 @@ type Props = {
   prepTime?: string;
   cookTime?: string;
   className?: string;
+  priority?: boolean;
 };
 
 export default function RecipeCard({
@@ -24,6 +25,7 @@ export default function RecipeCard({
   prepTime,
   cookTime,
   className = "",
+  priority = false,
 }: Props) {
   const aspectClass =
     aspectRatio === "4/3" ? "aspect-[4/3]" : "aspect-[3/4]";
@@ -36,6 +38,7 @@ export default function RecipeCard({
             src={image}
             alt={title}
             fill
+            priority={priority}
             sizes="(min-width: 1200px) 25vw, (min-width: 768px) 50vw, 100vw"
             className="object-cover transition-transform duration-200 ease-out group-hover:scale-[1.03]"
           />

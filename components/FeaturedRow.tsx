@@ -13,7 +13,7 @@ export default function FeaturedRow({ recipes }: Props) {
 
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {recipes.slice(0, 4).map((recipe) => (
+          {recipes.slice(0, 4).map((recipe, index) => (
             <RecipeCard
               key={recipe.id}
               title={recipe.title}
@@ -22,6 +22,7 @@ export default function FeaturedRow({ recipes }: Props) {
               slug={recipe.slug}
               rating={recipe.rating}
               aspectRatio="3/4"
+              priority={index < 2}
             />
           ))}
         </div>
