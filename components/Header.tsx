@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, ChevronDown, Menu, X } from "lucide-react";
@@ -10,8 +10,29 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
 
   const recipeSubLinks = [
     { label: "ALL RECIPES", href: "/recipes" },
@@ -34,8 +55,18 @@ export default function Header() {
 
   const navLinks = [
     { label: "Home", href: "/" },
-    { label: "Recipes", href: "/recipes", hasDropdown: true, subLinks: recipeSubLinks },
-    { label: "Categories", href: "/category", hasDropdown: true, subLinks: categorySubLinks },
+    {
+      label: "Recipes",
+      href: "/recipes",
+      hasDropdown: true,
+      subLinks: recipeSubLinks,
+    },
+    {
+      label: "Categories",
+      href: "/category",
+      hasDropdown: true,
+      subLinks: categorySubLinks,
+    },
     { label: "About", href: "/about" },
   ];
 
@@ -48,8 +79,16 @@ export default function Header() {
   };
 
   return (
-    <header className="relative w-full border-t-4 border-sunshine bg-cream">
-      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 sm:px-6 py-6 md:py-8">
+    <header
+      className={`sticky top-0 z-40 w-full border-t-4 border-sunshine bg-cream/95 backdrop-blur-md transition-all duration-200 ${
+        scrolled ? "border-b border-ink/10 shadow-xs" : ""
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-[1200px] items-center justify-between px-4 sm:px-6 transition-all duration-200 ${
+          scrolled ? "py-4 md:py-5" : "py-5 md:py-7"
+        }`}
+      >
         {/* Left: Wordmark Logo */}
         <Link
           href="/"
