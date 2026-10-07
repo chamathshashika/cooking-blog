@@ -33,12 +33,17 @@ export default function RecipesFilterView({
       if (selectedCategory !== "all") {
         const target = selectedCategory.toLowerCase();
         const rCat = recipe.category.toLowerCase();
-        if (target === "dinner") {
-          matchesCat = rCat === "dinner" || rCat === "entrees";
+        if (target === "dinner" || target === "curries" || target === "chicken-curries") {
+          matchesCat =
+            rCat === "dinner" ||
+            rCat === "entrees" ||
+            rCat.includes("curry") ||
+            rCat.includes("curries");
         } else if (target === "desserts") {
           matchesCat = rCat === "desserts" || rCat === "sweets";
         } else if (target === "entrees") {
-          matchesCat = rCat === "entrees" || rCat === "dinner";
+          matchesCat =
+            rCat === "entrees" || rCat === "dinner" || rCat.includes("curry");
         } else if (target === "lunch") {
           matchesCat = rCat === "lunch" || rCat === "entrees";
         } else {

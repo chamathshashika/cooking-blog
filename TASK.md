@@ -80,6 +80,14 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Minimal, lightweight form with only essential fields (name, email, message) and interactive confirmation state
   - Direct kitchen contact information, response time expectations, linked to site footer, and added to `app/sitemap.ts`
 
+- [x] Recipe & Post Data Management:
+  - Added authentic `chickenCurry` recipe (`Traditional Sri Lankan Chicken Curry`) in `lib/data.ts` with `isFeatured: true`
+  - Added high-resolution asset to `public/images/recipes/sri-lankan-chicken-curry.jpg`
+  - Populated `allRecipes: [chickenCurry]` and linked to Curries & Dinners category collection (`/category/dinner`) and search filter
+  - Supported flexible `amount` and `quantity` fields across `Ingredient` model, `IngredientsList`, and JSON-LD schema
+  - Ensured `featuredRecipes` and `recentRecipes` display seamlessly on the homepage with centered, proportional layouts when fewer recipes exist
+  - Maintained resilient empty state fallbacks for other zero-recipe sections
+
 ### Phase 5: Verification & Quality Assurance
 
 - [ ] Accessibility audit (WCAG AA contrast, touch targets >= 44px, keyboard navigation, focus rings)
