@@ -31,9 +31,11 @@ export default function Home() {
         </section>
 
         {/* 2. Featured Row (Overlaps the cream backdrop into white) */}
-        <div className="-mt-8 sm:-mt-10 mb-16 md:mb-24">
-          <FeaturedRow recipes={featuredRecipes} />
-        </div>
+        {featuredRecipes.length > 0 && (
+          <div className="-mt-8 sm:-mt-10 mb-16 md:mb-24">
+            <FeaturedRow recipes={featuredRecipes} />
+          </div>
+        )}
 
         {/* 3. Subscribe Banner */}
         <div className="my-12 md:my-16">
@@ -54,21 +56,38 @@ export default function Home() {
             actionHref="/recipes"
           />
 
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {recentRecipes.map((recipe) => (
-              <RecipeCard
-                key={recipe.id}
-                title={recipe.title}
-                category={recipe.category}
-                image={recipe.image}
-                slug={recipe.slug}
-                rating={recipe.rating}
-                aspectRatio="4/3"
-                prepTime={recipe.prepTime}
-                cookTime={recipe.cookTime}
-              />
-            ))}
-          </div>
+          {recentRecipes.length > 0 ? (
+            <div
+              className={`grid gap-8 ${
+                recentRecipes.length === 1
+                  ? "max-w-md mx-auto grid-cols-1"
+                  : recentRecipes.length === 2
+                  ? "max-w-2xl mx-auto grid-cols-1 sm:grid-cols-2"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              }`}
+            >
+              {recentRecipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  title={recipe.title}
+                  category={recipe.category}
+                  image={recipe.image}
+                  slug={recipe.slug}
+                  rating={recipe.rating}
+                  aspectRatio="4/3"
+                  prepTime={recipe.prepTime}
+                  cookTime={recipe.cookTime}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 px-4 bg-linen/20 border border-ink/10 max-w-lg mx-auto">
+              <p className="font-display text-xl text-ink mb-2">No recipes published yet</p>
+              <p className="font-display text-sm text-muted">
+                Our kitchen is busy simmering authentic dishes. Check back soon for new recipes!
+              </p>
+            </div>
+          )}
         </section>
       </main>
 

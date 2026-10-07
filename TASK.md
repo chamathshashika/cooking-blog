@@ -5,6 +5,7 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 ---
 
 ## Current Status
+
 - **Active Phase**: Phase 4 - Recipe & Category Pages
 - **Last Updated**: 2026-10-05
 
@@ -13,6 +14,7 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 ## Milestones & Tasks
 
 ### Phase 1: Foundation & Design System Setup
+
 - [x] Install missing dependencies (`lucide-react`) via `pnpm`
 - [x] Configure Tailwind CSS v4 design tokens in `app/globals.css` (Cream, Sunshine Yellow, Sage Green, Ink, typography variables)
 - [x] Set up Google fonts (`DM Serif Display` and `Montserrat`) in `app/layout.tsx`
@@ -30,7 +32,8 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Added `priority` preloading to above-the-fold featured cards in `components/FeaturedRow.tsx` for optimal LCP score
 
 ### Phase 2: Core Shared Components
-- [x] `Header`: Cream background, yellow top accent line, wordmark logo, uppercase navigation, search toggle, social icons, mobile navigation drawer
+
+- [x] `Header`: Sticky/fixed header with scroll detection, dynamic compacting animation (`py-4 md:py-5`), backdrop blur, cream background, yellow top accent line, wordmark logo, uppercase navigation with Recipes and Categories dropdowns, global search bar, social icons, and mobile navigation drawer with scroll lock
 - [x] `StarRating`: Gold star rating with accessible `aria-label`
 - [x] `RecipeCard`: 3:4 & 4:3 ratios, category pill tag, serif title, rating, subtle zoom hover
 - [x] `FeaturedRow`: 4-column desktop / 2-column tablet / 1-column mobile featured recipe layout with cream backdrop split
@@ -39,9 +42,11 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] `SectionHeading`: Serif H2 with optional "Browse all recipes →" link
 - [x] `SocialIcons`: Accessible branded SVG social links (Instagram, Facebook, Twitter) with sage green circles
 - [x] `IngredientsList`: Interactive checklist with checkboxes to mark prepared ingredients
+- [x] `ScrollToTop`: Floating right-bottom circular button with smooth scroll, scroll visibility threshold (>300px), sage green styling, and gentle pulsing/blinking ripple effect (pausing on hover)
 - [x] `Footer`: Cream/yellow color scheme matching the header with brand narrative and links
 
 ### Phase 3: Home Page Assembly
+
 - [x] Assemble `app/page.tsx` with all sections in order:
   1. `Header` with cream background & yellow top accent
   2. Hero with `h1` and `FeaturedRow` (overlapping cream backdrop into white)
@@ -53,10 +58,42 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Verified responsive structure (mobile, tablet, desktop)
 
 ### Phase 4: Recipe & Category Pages
-- [ ] Recipe listing page (`app/recipes/page.tsx`)
+
+- [x] Recipe listing page (`app/recipes/page.tsx`) with live search, real-time category filtering pills, and URL query support (`?category=...`, `?search=...`)
 - [x] Recipe detail page (`app/recipes/[slug]/page.tsx`) with ingredients checklist, numbered steps, tips, JSON-LD structured data
-- [ ] Category page (`app/category/[slug]/page.tsx`)
+- [x] Category overview page (`app/category/page.tsx`) and dynamic category detail page (`app/category/[slug]/page.tsx`) with category avatar, description, recipe grid, and carousel
+- [x] Header navigation routing:
+  - `RECIPES` dropdown: `ALL RECIPES` (`/recipes`), `BREAKFAST DISHES` (`/category/breakfast`), `CURRIES & DINNERS` (`/category/dinner`), `SWEETS & TREATS` (`/category/desserts`)
+  - `CATEGORIES` dropdown: `ALL CATEGORIES` (`/category`) and all 8 categories
+  - Global search bar routing to `/recipes?search=...`
+- [x] Error Handling & Recovery Pages:
+  - `app/not-found.tsx`: 404 Page Not Found with food-first narrative, category shortcut pills, and recovery actions
+  - `app/error.tsx`: 500 Server Error boundary with retry mechanism (`reset()`), error logging, and direct links
+  - `app/global-error.tsx`: Root-level error boundary with self-contained HTML/body shell for catastrophic errors
+- [x] Privacy Policy Page (`app/privacy/page.tsx`):
+  - Simple, transparent privacy declaration stating zero personal data collection, zero cross-site tracking, and optional newsletter unsubscribe rights
+  - Linked to site footer and added to `app/sitemap.ts`
+- [x] Terms of Service Page (`app/terms/page.tsx`):
+  - Clear guidelines for personal culinary use, recipe attribution, copyright, and dietary/allergen disclaimers
+  - Linked to site footer and added to `app/sitemap.ts`
+- [x] Contact Page (`app/contact/page.tsx`):
+  - Minimal, lightweight form with only essential fields (name, email, message) and interactive confirmation state
+  - Direct kitchen contact information, response time expectations, linked to site footer, and added to `app/sitemap.ts`
+
+- [x] Recipe & Post Data Management:
+  - Added authentic `chickenCurry` recipe (`Traditional Sri Lankan Chicken Curry`) in `lib/data.ts` with `isFeatured: true`
+  - Added high-resolution asset to `public/images/recipes/sri-lankan-chicken-curry.jpg`
+  - Populated `allRecipes: [chickenCurry]` and linked to Curries & Dinners category collection (`/category/dinner`) and search filter
+  - Supported flexible `amount` and `quantity` fields across `Ingredient` model, `IngredientsList`, and JSON-LD schema
+  - Ensured `featuredRecipes` and `recentRecipes` display seamlessly on the homepage with centered, proportional layouts when fewer recipes exist
+  - Maintained resilient empty state fallbacks for other zero-recipe sections
 
 ### Phase 5: Verification & Quality Assurance
+
 - [ ] Accessibility audit (WCAG AA contrast, touch targets >= 44px, keyboard navigation, focus rings)
 - [ ] End-to-end linting and build validation
+
+
+
+
+
