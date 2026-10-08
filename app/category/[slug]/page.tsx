@@ -30,13 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!category) {
     return {
-      title: "Category Not Found | Scrumptious",
+      title: "Category Not Found | CeylonSpicer",
       description: "The requested category could not be found.",
     };
   }
 
   return {
-    title: `${category.displayName} | Authentic Sri Lankan Recipes | Scrumptious`,
+    title: `${category.displayName} | Authentic Sri Lankan Recipes | CeylonSpicer`,
     description: category.description,
     openGraph: {
       title: `${category.displayName} - Sri Lankan Recipes`,
@@ -80,7 +80,9 @@ export default async function CategoryPage({ params }: Props) {
               Categories
             </Link>
             <span>/</span>
-            <span className="text-ink font-semibold">{category.displayName}</span>
+            <span className="text-ink font-semibold">
+              {category.displayName}
+            </span>
           </div>
         </div>
 
@@ -114,7 +116,8 @@ export default async function CategoryPage({ params }: Props) {
 
             <div className="mt-4 flex items-center justify-center gap-4 font-ui text-xs text-muted">
               <span className="font-semibold uppercase tracking-wider text-sage">
-                {recipes.length} {recipes.length === 1 ? "Recipe" : "Recipes"} Available
+                {recipes.length} {recipes.length === 1 ? "Recipe" : "Recipes"}{" "}
+                Available
               </span>
             </div>
           </div>

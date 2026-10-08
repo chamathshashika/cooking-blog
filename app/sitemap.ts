@@ -3,7 +3,7 @@ import { getAllRecipes, categories } from "@/lib/data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://scrumptious-recipes.com";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://CeylonSpicer-recipes.com";
   const currentDate = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -53,7 +53,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const recipeRoutes: MetadataRoute.Sitemap = getAllRecipes().map((recipe) => ({
     url: `${baseUrl}/recipes/${recipe.slug}`,
-    lastModified: recipe.publishedDate ? new Date(recipe.publishedDate) : currentDate,
+    lastModified: recipe.publishedDate
+      ? new Date(recipe.publishedDate)
+      : currentDate,
     changeFrequency: "monthly",
     priority: 0.8,
   }));

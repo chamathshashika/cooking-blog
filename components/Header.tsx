@@ -94,7 +94,7 @@ export default function Header() {
           href="/"
           className="font-display text-2xl md:text-3xl text-ink tracking-tight hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-sage"
         >
-          Scrumptious
+          CeylonSpicer
         </Link>
 
         {/* Desktop Navigation & Actions */}
@@ -221,7 +221,7 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-cream lg:hidden">
           <div className="flex items-center justify-between border-b border-ink/10 px-6 py-6">
-            <span className="font-display text-2xl text-ink">Scrumptious</span>
+            <span className="font-display text-2xl text-ink">CeylonSpicer</span>
             <button
               onClick={() => setMobileMenuOpen(false)}
               aria-label="Close navigation menu"

@@ -17,18 +17,18 @@ const montserrat = Montserrat({
 });
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://scrumptious-recipes.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://CeylonSpicer-recipes.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Scrumptious | Authentic Sri Lankan Cooking & Recipes",
-    template: "%s | Scrumptious",
+    default: "CeylonSpicer | Authentic Sri Lankan Cooking & Recipes",
+    template: "%s | CeylonSpicer",
   },
   description:
     "Explore traditional and modern Sri Lankan recipes, spice secrets, and heartfelt culinary stories.",
-  applicationName: "Scrumptious",
-  authors: [{ name: "Scrumptious Editorial Team" }],
+  applicationName: "CeylonSpicer",
+  authors: [{ name: "CeylonSpicer Editorial Team" }],
   generator: "Next.js",
   keywords: [
     "Sri Lankan recipes",
@@ -40,24 +40,24 @@ export const metadata: Metadata = {
     "South Asian cooking",
   ],
   referrer: "origin-when-cross-origin",
-  creator: "Scrumptious",
-  publisher: "Scrumptious",
+  creator: "CeylonSpicer",
+  publisher: "CeylonSpicer",
   manifest: "/manifest.webmanifest",
   openGraph: {
-    title: "Scrumptious | Authentic Sri Lankan Cooking & Recipes",
+    title: "CeylonSpicer | Authentic Sri Lankan Cooking & Recipes",
     description:
       "Explore traditional and modern Sri Lankan recipes, spice secrets, and heartfelt culinary stories.",
     url: siteUrl,
-    siteName: "Scrumptious",
+    siteName: "CeylonSpicer",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Scrumptious | Authentic Sri Lankan Cooking & Recipes",
+    title: "CeylonSpicer | Authentic Sri Lankan Cooking & Recipes",
     description:
       "Explore traditional and modern Sri Lankan recipes, spice secrets, and heartfelt culinary stories.",
-    creator: "@scrumptious",
+    creator: "@CeylonSpicer",
   },
   robots: {
     index: true,

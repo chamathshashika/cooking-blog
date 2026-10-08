@@ -50,11 +50,10 @@ export const categories: Category[] = [
     name: "breakfast",
     displayName: "Breakfast Dishes",
     slug: "breakfast",
-    image:
-      "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=400&q=80",
+    image: "/images/recipes/sri-lankan-string-hoppers.jpg",
     description:
       "Start your morning with fresh coconut milk rice, crispy lacy hoppers, flatbreads, and fiery lunu miris.",
-    count: 0,
+    count: 1,
   },
   {
     name: "curries & dinners",
@@ -312,7 +311,121 @@ export const chickenCurry: Recipe = {
   ],
 };
 
-export const allRecipes: Recipe[] = [chickenCurry];
+export const stringHoppers: Recipe = {
+  id: "sri-lankan-string-hoppers",
+  slug: "sri-lankan-string-hoppers",
+  title: "Sri Lankan String Hoppers",
+  category: "Breakfast",
+  image: "/images/recipes/sri-lankan-string-hoppers.jpg",
+  rating: 0,
+  ratingCount: 0,
+  prepTime: "25 minutes",
+  cookTime: "10 minutes per batch",
+  servings: 4,
+  isFeatured: true,
+
+  excerpt:
+    "Soft, steamed rice flour noodles made into small nests. Enjoy this Sri Lankan breakfast with coconut milk and your favourite curry.",
+
+  intro:
+    "String hoppers, also called idiyappam, are a popular Sri Lankan breakfast. They are made by pressing rice flour dough into thin strands and steaming them in small nests. Serve them warm with coconut milk, potato curry or a fried egg.",
+
+  ingredients: [
+    {
+      name: "Fine rice flour suitable for string hoppers",
+      quantity: "2 cups",
+    },
+    {
+      name: "Hot water",
+      quantity: "About 1 cup, plus more as needed",
+    },
+    {
+      name: "Salt",
+      quantity: "1 tsp, or to taste",
+    },
+    {
+      name: "Virgin coconut oil",
+      quantity: "2 tbsp",
+    },
+    {
+      name: "Full-fat coconut milk, for serving",
+      quantity: "1 cup",
+    },
+  ],
+
+  instructions: [
+    {
+      step: 1,
+      text:
+        "Mix the rice flour and salt in a large heatproof bowl. If you are using packaged string hopper flour, follow its instructions for the water temperature.",
+    },
+    {
+      step: 2,
+      text:
+        "Bring the water to a boil. Slowly add it to the flour while mixing with a wooden spoon. Start with a little water and add more until the mixture comes together into a soft dough.",
+    },
+    {
+      step: 3,
+      text:
+        "Add the coconut oil and mix well. Let the dough cool until you can handle it comfortably, then knead until smooth and soft. Add a little more hot water if it feels dry or cracks.",
+    },
+    {
+      step: 4,
+      text:
+        "Cover the dough with a damp kitchen towel while you prepare the steamer. Keep it covered between batches so it does not dry out.",
+    },
+    {
+      step: 5,
+      text:
+        "Add water to the steamer, keeping the water below the steaming trays. Bring it to a boil. Lightly grease the string hopper mats or plates.",
+    },
+    {
+      step: 6,
+      text:
+        "Put some dough into a string hopper press. Press it onto the mats in a circular motion to make small, loosely layered nests about 4 inches wide.",
+    },
+    {
+      step: 7,
+      text:
+        "Place the mats in the steamer and cover with the lid. Steam for about 8–10 minutes, until the strands are set and no longer taste raw. The time may vary depending on the thickness of the nests.",
+    },
+    {
+      step: 8,
+      text:
+        "Carefully remove the mats using oven mitts. Let the string hoppers cool slightly, then gently lift them onto a serving plate. Repeat with the remaining dough.",
+    },
+    {
+      step: 9,
+      text:
+        "Warm the coconut milk gently in a small saucepan, stirring occasionally.",
+    },
+    {
+      step: 10,
+      text:
+        "Serve the string hoppers warm, with the coconut milk on the side or lightly spooned over them. Add potato curry or a fried egg if you like.",
+    },
+  ],
+
+  notes: [
+    "Use a string hopper press with a fine-hole disc to make thin, even strands.",
+    "The amount of water depends on the rice flour. Add it gradually instead of pouring it all in at once.",
+    "Let the hot dough cool enough to handle before kneading.",
+    "Keep the nests loosely layered so the steam can pass through them.",
+    "Preparation time and servings are estimates. Total cooking time depends on how many batches you make.",
+    "For a gluten-free meal, check that the flour and side dishes are also gluten-free.",
+  ],
+
+  tags: [
+    "Sri Lankan string hoppers",
+    "idiyappam",
+    "Sri Lankan breakfast",
+    "rice flour",
+    "steamed noodles",
+    "Sri Lankan recipes",
+  ],
+};
+
+export const allRecipes: Recipe[] = [chickenCurry, stringHoppers];
 
 export const featuredRecipes =
   allRecipes.filter((r) => r.isFeatured).length > 0

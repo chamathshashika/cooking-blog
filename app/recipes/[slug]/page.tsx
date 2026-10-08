@@ -36,12 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!recipe) {
     return {
-      title: "Recipe Not Found | Scrumptious",
+      title: "Recipe Not Found | CeylonSpicer",
     };
   }
 
   return {
-    title: `${recipe.title} - Sri Lankan Recipe | Scrumptious`,
+    title: `${recipe.title} - Sri Lankan Recipe | CeylonSpicer`,
     description: recipe.excerpt,
     openGraph: {
       title: `${recipe.title} - Sri Lankan Recipe`,
@@ -72,7 +72,7 @@ export default async function RecipeDetailPage({ params }: Props) {
     description: recipe.excerpt,
     author: {
       "@type": "Person",
-      name: recipe.author?.name || "Scrumptious Kitchen",
+      name: recipe.author?.name || "CeylonSpicer Kitchen",
     },
     datePublished: recipe.publishedDate || "2026-01-01",
     prepTime: "PT" + recipe.prepTime.replace(/[^0-9]/g, "") + "M",
@@ -86,12 +86,15 @@ export default async function RecipeDetailPage({ params }: Props) {
       reviewCount: recipe.ratingCount || 25,
     },
     recipeIngredient:
-      recipe.ingredients?.map((i) => `${i.amount || i.quantity || ""} ${i.name}`.trim()) || [],
-    recipeInstructions: recipe.instructions?.map((inst) => ({
-      "@type": "HowToStep",
-      text: inst.text,
-      position: inst.step,
-    })) || [],
+      recipe.ingredients?.map((i) =>
+        `${i.amount || i.quantity || ""} ${i.name}`.trim(),
+      ) || [],
+    recipeInstructions:
+      recipe.instructions?.map((inst) => ({
+        "@type": "HowToStep",
+        text: inst.text,
+        position: inst.step,
+      })) || [],
   };
 
   return (
@@ -230,9 +233,7 @@ export default async function RecipeDetailPage({ params }: Props) {
                 <ChefHat className="h-3 w-3 text-sage" />
                 Cuisine
               </p>
-              <p className="mt-1 font-display text-lg text-ink">
-                Sri Lankan
-              </p>
+              <p className="mt-1 font-display text-lg text-ink">Sri Lankan</p>
             </div>
           </div>
 
@@ -280,7 +281,10 @@ export default async function RecipeDetailPage({ params }: Props) {
                   Instructions
                 </h3>
 
-                <ol className="space-y-6" aria-label="Step by step instructions">
+                <ol
+                  className="space-y-6"
+                  aria-label="Step by step instructions"
+                >
                   {recipe.instructions?.map((inst) => (
                     <li
                       key={inst.step}

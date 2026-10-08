@@ -1,6 +1,6 @@
-# Brand Guidelines: Scrumptious (Cooking Blog)
+# Brand Guidelines: CeylonSpicer (Cooking Blog)
 
-> Working name taken from the reference mockup. Replace "Scrumptious" with your own brand name; everything else applies as-is.
+> Working name taken from the reference mockup. Replace "CeylonSpicer" with your own brand name; everything else applies as-is.
 > Stack: Next.js 16 (App Router), React, Tailwind CSS v4, `next/font`, `next/image`.
 
 ---
