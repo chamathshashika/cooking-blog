@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Serif_Display, Montserrat } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const dmSerif = DM_Serif_Display({
   subsets: ["latin"],
@@ -83,6 +84,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${dmSerif.variable} ${montserrat.variable}`}
     >
+      <head>
+        <GoogleAnalytics gaId="G-K0QQFXPCCD" />
+      </head>
       <body
         suppressHydrationWarning
         className="bg-white font-display text-ink antialiased min-h-screen flex flex-col"
