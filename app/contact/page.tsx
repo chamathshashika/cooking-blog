@@ -7,13 +7,13 @@ import SocialIcons from "@/components/SocialIcons";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Scrumptious",
+  title: "Contact Us | CeylonSpicer",
   description:
-    "Get in touch with the Scrumptious kitchen. Share a family recipe, ask a spice question, or say hello.",
+    "Get in touch with the CeylonSpicer kitchen. Share a family recipe, ask a spice question, or say hello.",
   openGraph: {
-    title: "Contact Us | Scrumptious",
+    title: "Contact Us | CeylonSpicer",
     description:
-      "Get in touch with the Scrumptious kitchen. Share a family recipe, ask a spice question, or say hello.",
+      "Get in touch with the CeylonSpicer kitchen. Share a family recipe, ask a spice question, or say hello.",
   },
 };
 
@@ -47,8 +47,8 @@ export default function ContactPage() {
             </h1>
 
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
-              Have a question about balancing roasted curry powder, an heirloom family recipe to
-              share, or a friendly note? Drop us a line below.
+              Have a question about balancing roasted curry powder, an heirloom
+              family recipe to share, or a friendly note? Drop us a line below.
             </p>
           </div>
         </section>
@@ -58,7 +58,9 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             {/* Left: Minimal Contact Form (7 cols) */}
             <div className="lg:col-span-7">
-              <h2 className="font-display text-2xl text-ink mb-2">Send Us a Message</h2>
+              <h2 className="font-display text-2xl text-ink mb-2">
+                Send Us a Message
+              </h2>
               <p className="font-display text-sm text-muted mb-6 leading-relaxed">
                 Only the essentials needed—no account creation or clutter.
               </p>
@@ -68,7 +70,9 @@ export default function ContactPage() {
             {/* Right: Direct Information & Details (5 cols) */}
             <div className="lg:col-span-5 flex flex-col gap-6">
               <div className="border border-ink/10 bg-linen/20 p-6 sm:p-8">
-                <h3 className="font-display text-xl text-ink mb-6">Kitchen Details</h3>
+                <h3 className="font-display text-xl text-ink mb-6">
+                  Kitchen Details
+                </h3>
 
                 <div className="space-y-6">
                   {/* Email */}
@@ -81,10 +85,10 @@ export default function ContactPage() {
                         Direct Inquiries
                       </p>
                       <a
-                        href="mailto:hello@scrumptious-recipes.com"
+                        href="mailto:hello@CeylonSpicer-recipes.com"
                         className="font-display text-base text-ink hover:text-sage transition-colors"
                       >
-                        hello@scrumptious-recipes.com
+                        hello@CeylonSpicer-recipes.com
                       </a>
                     </div>
                   </div>
@@ -132,8 +136,12 @@ export default function ContactPage() {
               {/* Recipe shortcut card */}
               <div className="border border-ink/10 bg-cream/40 p-6 flex items-center justify-between">
                 <div>
-                  <p className="font-display text-base text-ink">Looking for dinner inspiration?</p>
-                  <p className="font-display text-xs text-muted">Explore our full recipe catalog.</p>
+                  <p className="font-display text-base text-ink">
+                    Looking for dinner inspiration?
+                  </p>
+                  <p className="font-display text-xs text-muted">
+                    Explore our full recipe catalog.
+                  </p>
                 </div>
                 <Link
                   href="/recipes"

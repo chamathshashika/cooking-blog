@@ -8,7 +8,7 @@ import SubscribeBanner from "@/components/SubscribeBanner";
 import { categories } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "404 - Recipe Not Found | Scrumptious",
+  title: "404 - Recipe Not Found | CeylonSpicer",
   description:
     "The page or recipe you are looking for doesn't exist or has moved. Explore our authentic Sri Lankan recipes.",
 };
@@ -54,8 +54,9 @@ export default function NotFound() {
             </h1>
 
             <p className="mt-4 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
-              We couldn&apos;t find the recipe, story, or category you were looking for. Perhaps it
-              was moved to another shelf in our pantry, or the link has changed.
+              We couldn&apos;t find the recipe, story, or category you were
+              looking for. Perhaps it was moved to another shelf in our pantry,
+              or the link has changed.
             </p>
 
             {/* Direct Action Buttons */}

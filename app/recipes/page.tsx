@@ -8,11 +8,11 @@ import RecipesFilterView from "@/components/RecipesFilterView";
 import { getAllRecipes, categories } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "All Recipes | Authentic Sri Lankan Cooking | Scrumptious",
+  title: "All Recipes | Authentic Sri Lankan Cooking | CeylonSpicer",
   description:
     "Explore our complete Sri Lankan recipe collection: breakfast hoppers, Jaffna crab curry, dark black pork curry, watalappam, and street food kottu.",
   openGraph: {
-    title: "All Sri Lankan Recipes | Scrumptious",
+    title: "All Sri Lankan Recipes | CeylonSpicer",
     description:
       "Explore our complete Sri Lankan recipe collection: breakfast hoppers, Jaffna crab curry, dark black pork curry, watalappam, and street food kottu.",
   },
@@ -54,8 +54,9 @@ export default async function RecipesPage({ searchParams }: Props) {
               All Sri Lankan Recipes
             </h1>
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
-              Explore our complete library of authentic island dishes, fragrant slow-simmered
-              curries, vibrant street foods, and festive holiday desserts.
+              Explore our complete library of authentic island dishes, fragrant
+              slow-simmered curries, vibrant street foods, and festive holiday
+              desserts.
             </p>
           </div>
         </section>

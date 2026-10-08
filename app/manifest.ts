@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Scrumptious | Authentic Sri Lankan Recipes",
-    short_name: "Scrumptious",
+    name: "CeylonSpicer | Authentic Sri Lankan Recipes",
+    short_name: "CeylonSpicer",
     description:
       "Explore traditional and modern Sri Lankan recipes, spice secrets, and heartfelt culinary stories.",
     start_url: "/",
