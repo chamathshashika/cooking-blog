@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FileText, BookOpen, Utensils, AlertTriangle, HeartHandshake, ArrowLeft } from "lucide-react";
+import {
+  FileText,
+  BookOpen,
+  Utensils,
+  AlertTriangle,
+  HeartHandshake,
+  ArrowLeft,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Scrumptious",
+  title: "Terms of Service | CeylonSpicer",
   description:
-    "Terms of service and fair usage guidelines for Scrumptious recipes, photography, and Sri Lankan culinary stories.",
+    "Terms of service and fair usage guidelines for CeylonSpicer recipes, photography, and Sri Lankan culinary stories.",
   openGraph: {
-    title: "Terms of Service | Scrumptious",
+    title: "Terms of Service | CeylonSpicer",
     description:
       "Simple, fair guidelines for enjoying our Sri Lankan recipes, photography, and cooking guides.",
   },
@@ -29,7 +36,7 @@ export default function TermsPage() {
       icon: BookOpen,
       title: "Content & Copyright",
       description:
-        "Our original recipe texts, culinary essays, and food photography are protected. Please credit Scrumptious with a direct link when referencing our work.",
+        "Our original recipe texts, culinary essays, and food photography are protected. Please credit CeylonSpicer with a direct link when referencing our work.",
     },
     {
       icon: AlertTriangle,
@@ -74,8 +81,8 @@ export default function TermsPage() {
             </h1>
 
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
-              Simple, fair guidelines for enjoying our authentic Sri Lankan recipes, photography,
-              and culinary stories.
+              Simple, fair guidelines for enjoying our authentic Sri Lankan
+              recipes, photography, and culinary stories.
             </p>
 
             <p className="mt-4 font-ui text-xs text-muted">
@@ -99,7 +106,9 @@ export default function TermsPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/10 text-sage">
                       <Icon className="h-4 w-4" />
                     </div>
-                    <h2 className="font-display text-lg text-ink">{item.title}</h2>
+                    <h2 className="font-display text-lg text-ink">
+                      {item.title}
+                    </h2>
                   </div>
                   <p className="font-display text-xs sm:text-sm text-ink/80 leading-relaxed">
                     {item.description}
@@ -116,10 +125,11 @@ export default function TermsPage() {
                 1. Acceptance of Terms
               </h2>
               <p>
-                By accessing and using <strong>Scrumptious</strong> (&ldquo;we&rdquo;, &ldquo;our&rdquo;,
-                or &ldquo;the blog&rdquo;), you agree to abide by these simple and fair Terms of
-                Service. If you do not agree with any part of these terms, please feel free to
-                discontinue using the website.
+                By accessing and using <strong>CeylonSpicer</strong>{" "}
+                (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;the
+                blog&rdquo;), you agree to abide by these simple and fair Terms
+                of Service. If you do not agree with any part of these terms,
+                please feel free to discontinue using the website.
               </p>
             </section>
 
@@ -128,11 +138,13 @@ export default function TermsPage() {
                 2. Personal & Non-Commercial Use
               </h2>
               <p>
-                All recipes, culinary guides, measurement tables, and instructions are published for
-                personal, educational, and domestic home cooking purposes. You are welcome to cook
-                these meals for family gatherings, potlucks, and dinner parties. You may not scrape,
-                bulk-reproduce, or republish entire recipe collections for commercial re-sale
-                without prior written consent.
+                All recipes, culinary guides, measurement tables, and
+                instructions are published for personal, educational, and
+                domestic home cooking purposes. You are welcome to cook these
+                meals for family gatherings, potlucks, and dinner parties. You
+                may not scrape, bulk-reproduce, or republish entire recipe
+                collections for commercial re-sale without prior written
+                consent.
               </p>
             </section>
 
@@ -141,14 +153,24 @@ export default function TermsPage() {
                 3. Intellectual Property & Attribution
               </h2>
               <p>
-                The written culinary stories, layout design, branding, and editorial photography on
-                Scrumptious are protected by copyright. If you are inspired by one of our recipes and
-                wish to feature it on your own blog or social media:
+                The written culinary stories, layout design, branding, and
+                editorial photography on CeylonSpicer are protected by
+                copyright. If you are inspired by one of our recipes and wish to
+                feature it on your own blog or social media:
               </p>
               <ul className="list-disc pl-5 space-y-2 mt-2">
-                <li>Re-write the instructions in your own words rather than copying verbatim.</li>
-                <li>Credit <strong>Scrumptious</strong> clearly with an active link back to the original recipe URL.</li>
-                <li>Do not scrape or re-host our original food images without explicit permission.</li>
+                <li>
+                  Re-write the instructions in your own words rather than
+                  copying verbatim.
+                </li>
+                <li>
+                  Credit <strong>CeylonSpicer</strong> clearly with an active
+                  link back to the original recipe URL.
+                </li>
+                <li>
+                  Do not scrape or re-host our original food images without
+                  explicit permission.
+                </li>
               </ul>
             </section>
 
@@ -157,15 +179,17 @@ export default function TermsPage() {
                 4. Cooking, Allergies & Health Disclaimer
               </h2>
               <p>
-                Sri Lankan cuisine makes rich and diverse use of ingredients including fresh coconut,
-                Maldive fish, seafood, crustaceans, tree nuts (such as cashews), and intense chili
-                varieties. Cooking times and temperatures are recommendations and can vary depending
-                on your stove, cookware, and climate.
+                Sri Lankan cuisine makes rich and diverse use of ingredients
+                including fresh coconut, Maldive fish, seafood, crustaceans,
+                tree nuts (such as cashews), and intense chili varieties.
+                Cooking times and temperatures are recommendations and can vary
+                depending on your stove, cookware, and climate.
               </p>
               <p className="mt-2 text-ink/75">
-                Cooks are responsible for confirming allergen safety for themselves and their guests,
-                practicing safe food handling (especially with seafood, meats, and raw marinades),
-                and adjusting spice levels to their personal tolerance.
+                Cooks are responsible for confirming allergen safety for
+                themselves and their guests, practicing safe food handling
+                (especially with seafood, meats, and raw marinades), and
+                adjusting spice levels to their personal tolerance.
               </p>
             </section>
 
@@ -174,9 +198,10 @@ export default function TermsPage() {
                 5. External Links & Third-Party Content
               </h2>
               <p>
-                Our articles may occasionally reference external sources, historical culinary
-                archives, or spice suppliers. We do not control and are not responsible for the
-                availability, accuracy, or privacy policies of third-party websites.
+                Our articles may occasionally reference external sources,
+                historical culinary archives, or spice suppliers. We do not
+                control and are not responsible for the availability, accuracy,
+                or privacy policies of third-party websites.
               </p>
             </section>
 
@@ -185,15 +210,17 @@ export default function TermsPage() {
                 6. Modifications & Contact
               </h2>
               <p>
-                We reserve the right to refine these terms as our platform evolves. Any updates will
-                be clearly posted on this page with an updated timestamp.
+                We reserve the right to refine these terms as our platform
+                evolves. Any updates will be clearly posted on this page with an
+                updated timestamp.
               </p>
               <p className="mt-2">
-                For questions regarding recipe licensing, content syndication, or friendly feedback,
-                please contact us at{" "}
+                For questions regarding recipe licensing, content syndication,
+                or friendly feedback, please contact us at{" "}
                 <span className="font-mono text-xs bg-cream px-2 py-0.5 border border-ink/10">
-                  hello@scrumptious-recipes.com
-                </span>.
+                  hello@CeylonSpicer-recipes.com
+                </span>
+                .
               </p>
             </section>
           </div>

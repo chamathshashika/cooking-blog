@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ShieldCheck, EyeOff, Lock, Mail, Cookie, ArrowLeft } from "lucide-react";
+import {
+  ShieldCheck,
+  EyeOff,
+  Lock,
+  Mail,
+  Cookie,
+  ArrowLeft,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Scrumptious",
+  title: "Privacy Policy | CeylonSpicer",
   description:
-    "Our simple and transparent privacy policy. Scrumptious does not collect, track, or sell your personal data.",
+    "Our simple and transparent privacy policy. CeylonSpicer does not collect, track, or sell your personal data.",
   openGraph: {
-    title: "Privacy Policy | Scrumptious",
+    title: "Privacy Policy | CeylonSpicer",
     description:
       "Simple, transparent privacy. We do not track, collect, or store your personal data.",
   },
@@ -74,8 +81,8 @@ export default function PrivacyPage() {
             </h1>
 
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
-              We believe in honest home cooking and straightforward privacy. We do not track,
-              collect, or sell your personal data.
+              We believe in honest home cooking and straightforward privacy. We
+              do not track, collect, or sell your personal data.
             </p>
 
             <p className="mt-4 font-ui text-xs text-muted">
@@ -99,7 +106,9 @@ export default function PrivacyPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/10 text-sage">
                       <Icon className="h-4 w-4" />
                     </div>
-                    <h2 className="font-display text-lg text-ink">{item.title}</h2>
+                    <h2 className="font-display text-lg text-ink">
+                      {item.title}
+                    </h2>
                   </div>
                   <p className="font-display text-xs sm:text-sm text-ink/80 leading-relaxed">
                     {item.description}
@@ -116,11 +125,12 @@ export default function PrivacyPage() {
                 1. Our Core Commitment
               </h2>
               <p>
-                At <strong>Scrumptious</strong>, our sole focus is celebrating authentic Sri
-                Lankan culinary heritage, traditional family recipes, and spice stories. We have
-                no desire to monitor your private browsing habits or build digital profiles. You
-                are free to read, bookmark, copy ingredient measurements, and cook every dish
-                without giving us your identity.
+                At <strong>CeylonSpicer</strong>, our sole focus is celebrating
+                authentic Sri Lankan culinary heritage, traditional family
+                recipes, and spice stories. We have no desire to monitor your
+                private browsing habits or build digital profiles. You are free
+                to read, bookmark, copy ingredient measurements, and cook every
+                dish without giving us your identity.
               </p>
             </section>
 
@@ -129,10 +139,21 @@ export default function PrivacyPage() {
                 2. Information We Do Not Collect
               </h2>
               <ul className="list-disc pl-5 space-y-2 mt-2">
-                <li>We do not collect names, phone numbers, or physical addresses.</li>
-                <li>We do not record your IP address or associate it with your personal identity.</li>
-                <li>We do not use fingerprinting techniques or third-party behavioral analytics.</li>
-                <li>We do not sell, rent, or trade any visitor data to marketing networks.</li>
+                <li>
+                  We do not collect names, phone numbers, or physical addresses.
+                </li>
+                <li>
+                  We do not record your IP address or associate it with your
+                  personal identity.
+                </li>
+                <li>
+                  We do not use fingerprinting techniques or third-party
+                  behavioral analytics.
+                </li>
+                <li>
+                  We do not sell, rent, or trade any visitor data to marketing
+                  networks.
+                </li>
               </ul>
             </section>
 
@@ -141,9 +162,10 @@ export default function PrivacyPage() {
                 3. Newsletter Subscriptions
               </h2>
               <p>
-                If you voluntarily submit your email in our &ldquo;Never miss a recipe&rdquo;
-                form, your email address is used strictly to deliver recipe notifications and food
-                essays. You can unsubscribe at any time with a single click, which permanently
+                If you voluntarily submit your email in our &ldquo;Never miss a
+                recipe&rdquo; form, your email address is used strictly to
+                deliver recipe notifications and food essays. You can
+                unsubscribe at any time with a single click, which permanently
                 removes your contact information.
               </p>
             </section>
@@ -153,10 +175,11 @@ export default function PrivacyPage() {
                 4. Cookies & Storage
               </h2>
               <p>
-                We do not deploy tracking cookies or cross-site advertising scripts. Any minimal
-                local storage utilized by your browser is strictly functional (such as remembering
-                checklist ticks on our interactive recipe ingredient lists so you don&apos;t lose
-                your place while cooking).
+                We do not deploy tracking cookies or cross-site advertising
+                scripts. Any minimal local storage utilized by your browser is
+                strictly functional (such as remembering checklist ticks on our
+                interactive recipe ingredient lists so you don&apos;t lose your
+                place while cooking).
               </p>
             </section>
 
@@ -165,10 +188,11 @@ export default function PrivacyPage() {
                 5. Third-Party Media
               </h2>
               <p>
-                Our recipe photography is served through trusted content delivery networks (such
-                as Unsplash for high-definition culinary imagery) to ensure fast page loading
-                speeds. These providers operate under standard web delivery protocols and do not
-                receive your personal information from us.
+                Our recipe photography is served through trusted content
+                delivery networks (such as Unsplash for high-definition culinary
+                imagery) to ensure fast page loading speeds. These providers
+                operate under standard web delivery protocols and do not receive
+                your personal information from us.
               </p>
             </section>
 
@@ -177,11 +201,13 @@ export default function PrivacyPage() {
                 6. Questions & Contact
               </h2>
               <p>
-                If you have any questions regarding our simple privacy philosophy or recipe
-                content, feel free to get in touch with us at{" "}
+                If you have any questions regarding our simple privacy
+                philosophy or recipe content, feel free to get in touch with us
+                at{" "}
                 <span className="font-mono text-xs bg-cream px-2 py-0.5 border border-ink/10">
-                  hello@scrumptious-recipes.com
-                </span>.
+                  hello@CeylonSpicer-recipes.com
+                </span>
+                .
               </p>
             </section>
           </div>

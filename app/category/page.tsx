@@ -6,14 +6,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import CategoryCarousel from "@/components/CategoryCarousel";
-import { categories } from "@/lib/data";
+import { categories, getCategoryCount } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Explore Recipe Categories | Scrumptious",
+  title: "Explore Recipe Categories | CeylonSpicer",
   description:
     "Explore our complete Sri Lankan recipe collection organized by category: Breakfast dishes, Curries & Dinners, Sweets & Treats, Short Eats, and more.",
   openGraph: {
-    title: "Explore Recipe Categories | Scrumptious",
+    title: "Explore Recipe Categories | CeylonSpicer",
     description:
       "Browse authentic Sri Lankan recipes by category: Breakfast, Curries, Desserts, Short Eats, and Island Drinks.",
   },
@@ -46,7 +46,8 @@ export default function CategoriesPage() {
               Browse by Category
             </h1>
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto">
-              From morning milk rice to midnight street-food kottu and festive jaggery watalappam—discover recipes categorized by your appetite.
+              From morning milk rice to midnight street-food kottu and festive
+              jaggery watalappam—discover recipes categorized by your appetite.
             </p>
           </div>
         </section>
@@ -84,7 +85,10 @@ export default function CategoriesPage() {
 
                 <div className="mt-5 pt-3 border-t border-ink/10 flex items-center justify-between">
                   <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted">
-                    {category.count} {category.count === 1 ? "Recipe" : "Recipes"}
+                    {getCategoryCount(category.slug)}{" "}
+                    {getCategoryCount(category.slug) === 1
+                      ? "Recipe"
+                      : "Recipes"}
                   </span>
                   <span className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-sage group-hover:translate-x-0.5 transition-transform">
                     <span>Explore</span>
