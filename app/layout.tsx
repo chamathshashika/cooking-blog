@@ -3,6 +3,7 @@ import { DM_Serif_Display, Montserrat } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
 
 const dmSerif = DM_Serif_Display({
   subsets: ["latin"],
@@ -93,6 +94,7 @@ export default function RootLayout({
       >
         {children}
         <ScrollToTop />
+        <Analytics />
       </body>
     </html>
   );
