@@ -18,8 +18,7 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://CeylonSpicer-recipes.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -86,6 +85,7 @@ export default function RootLayout({
       className={`${dmSerif.variable} ${montserrat.variable}`}
     >
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <GoogleAnalytics gaId="G-K0QQFXPCCD" />
       </head>
       <body

@@ -2,8 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllRecipes, categories } from "@/lib/data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://CeylonSpicer-recipes.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const currentDate = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
