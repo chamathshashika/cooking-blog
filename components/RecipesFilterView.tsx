@@ -37,13 +37,15 @@ export default function RecipesFilterView({
           matchesCat =
             rCat === "dinner" ||
             rCat === "entrees" ||
+            rCat === "seafood" ||
+            rCat === "meat" ||
             rCat.includes("curry") ||
             rCat.includes("curries");
         } else if (target === "desserts") {
           matchesCat = rCat === "desserts" || rCat === "sweets";
         } else if (target === "entrees") {
           matchesCat =
-            rCat === "entrees" || rCat === "dinner" || rCat.includes("curry");
+            rCat === "entrees" || rCat === "dinner" || rCat === "seafood" || rCat === "meat" || rCat.includes("curry");
         } else if (target === "lunch") {
           matchesCat = rCat === "lunch" || rCat === "entrees";
         } else {
@@ -81,15 +83,15 @@ export default function RecipesFilterView({
             placeholder="Search recipes, spices, ingredients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-none border border-ink/20 bg-linen/20 py-2.5 pl-10 pr-9 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage"
+            className="w-full min-h-[44px] rounded-none border border-ink/20 bg-linen/20 py-2.5 pl-10 pr-12 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink"
+              className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -118,7 +120,7 @@ export default function RecipesFilterView({
               role="tab"
               aria-selected={isSelected}
               onClick={() => setSelectedCategory(tab.slug)}
-              className={`shrink-0 px-4 py-2 font-ui text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-sage ${
+              className={`shrink-0 min-h-[44px] flex items-center px-4 py-2 font-ui text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage ${
                 isSelected
                   ? "bg-sage text-white shadow-xs"
                   : "bg-linen/40 text-ink/80 hover:bg-cream hover:text-ink border border-ink/10"
@@ -159,7 +161,7 @@ export default function RecipesFilterView({
               setSelectedCategory("all");
               setSearchQuery("");
             }}
-            className="inline-flex items-center gap-2 bg-sage px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage/90 transition-colors"
+            className="inline-flex min-h-[44px] items-center gap-2 bg-sage px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             Reset Filters
           </button>

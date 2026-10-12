@@ -41,7 +41,7 @@ export default function ContactForm() {
             setSubmitted(false);
             setFormData({ name: "", email: "", message: "" });
           }}
-          className="inline-flex items-center gap-2 border border-ink/20 bg-white px-5 py-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-cream transition-colors"
+          className="inline-flex min-h-[44px] items-center gap-2 border border-ink/20 bg-white px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-cream transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
         >
           Send Another Note
         </button>
@@ -67,7 +67,7 @@ export default function ContactForm() {
             placeholder="e.g. Anoma Perera"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full rounded-none border border-ink/20 bg-white py-2.5 px-3 font-ui text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage"
+            className="w-full min-h-[44px] rounded-none border border-ink/20 bg-white py-2.5 px-3.5 font-ui text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           />
         </div>
 
@@ -86,7 +86,7 @@ export default function ContactForm() {
             placeholder="e.g. anoma@example.com"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full rounded-none border border-ink/20 bg-white py-2.5 px-3 font-ui text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage"
+            className="w-full min-h-[44px] rounded-none border border-ink/20 bg-white py-2.5 px-3.5 font-ui text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           />
         </div>
 
@@ -105,7 +105,7 @@ export default function ContactForm() {
             placeholder="Share a recipe question, culinary tip, or say hello..."
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="w-full rounded-none border border-ink/20 bg-white py-2.5 px-3 font-ui text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage resize-y"
+            className="w-full rounded-none border border-ink/20 bg-white py-2.5 px-3.5 font-ui text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage resize-y"
           />
         </div>
 
@@ -114,7 +114,7 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-sage px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage/90 transition-colors shadow-xs disabled:opacity-50"
+            className="w-full sm:w-auto inline-flex min-h-[44px] items-center justify-center gap-2 bg-sage px-8 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark transition-colors shadow-xs disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <Send className="h-3.5 w-3.5" />
             <span>{loading ? "Sending..." : "Send Message"}</span>

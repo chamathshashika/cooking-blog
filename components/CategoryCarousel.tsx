@@ -38,23 +38,23 @@ export default function CategoryCarousel({ categories }: Props) {
             <button
               onClick={() => scroll("left")}
               aria-label="Previous categories"
-              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors hover:border-sage hover:text-sage focus:outline-none focus:ring-2 focus:ring-sage"
+              className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors hover:border-sage hover:text-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               onClick={() => scroll("right")}
               aria-label="Next categories"
-              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors hover:border-sage hover:text-sage focus:outline-none focus:ring-2 focus:ring-sage"
+              className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors hover:border-sage hover:text-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+              <ChevronRight className="h-5 w-5" />
             </button>
           </div>
         </div>
 
         <div
           ref={scrollRef}
-          className="flex items-center gap-7 sm:gap-8 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-2 focus:outline-none"
+          className="flex items-center gap-7 sm:gap-8 overflow-x-auto no-scrollbar scroll-smooth motion-reduce:scroll-auto pb-4 px-2 focus:outline-none"
           tabIndex={0}
           aria-label="Category scroll list"
         >

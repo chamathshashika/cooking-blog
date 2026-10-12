@@ -72,14 +72,20 @@ export default async function CategoryPage({ params }: Props) {
         {/* Breadcrumb Navigation */}
         <div className="border-b border-ink/10 bg-linen/30 py-3">
           <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+            <Link
+              href="/"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Home
             </Link>
-            <span>/</span>
-            <Link href="/category" className="hover:text-ink transition-colors">
+            <span aria-hidden="true">/</span>
+            <Link
+              href="/category"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Categories
             </Link>
-            <span>/</span>
+            <span aria-hidden="true">/</span>
             <span className="text-ink font-semibold">
               {category.displayName}
             </span>
@@ -154,7 +160,7 @@ export default async function CategoryPage({ params }: Props) {
               </p>
               <Link
                 href="/recipes"
-                className="inline-flex items-center gap-2 bg-sage px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage/90 transition-colors"
+                className="inline-flex min-h-[44px] items-center gap-2 bg-sage px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Browse All Recipes</span>

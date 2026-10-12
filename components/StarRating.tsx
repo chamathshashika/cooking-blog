@@ -9,6 +9,7 @@ type Props = {
 export default function StarRating({ value, max = 5, className = "" }: Props) {
   return (
     <div
+      role="img"
       className={`inline-flex items-center justify-center gap-1 ${className}`}
       aria-label={`Rated ${value} out of ${max} stars`}
     >

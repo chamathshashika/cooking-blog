@@ -11,11 +11,11 @@ export default function FeaturedRow({ recipes }: Props) {
   }
 
   return (
-    <section className="relative w-full" aria-label="Featured Recipes">
+    <section className="relative w-full isolate" aria-label="Featured Recipes">
       {/* Background split: Top cream, bottom white */}
-      <div className="absolute inset-0 bg-cream h-32 md:h-44 -z-10" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 bg-cream h-32 md:h-44 z-0" aria-hidden="true" />
 
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6">
         <div
           className={`grid gap-6 ${
             recipes.length === 1

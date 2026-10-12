@@ -46,7 +46,7 @@ export default function SubscribeBanner() {
               onChange={(e) => setName(e.target.value)}
               required
               aria-label="Your name"
-              className="h-10 w-full sm:w-48 bg-white px-3.5 font-ui text-xs text-ink placeholder:text-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider focus:outline-none focus:ring-2 focus:ring-sage"
+              className="min-h-[44px] h-11 w-full sm:w-48 bg-white px-3.5 font-ui text-xs text-ink placeholder:text-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             />
             <input
               type="email"
@@ -56,11 +56,11 @@ export default function SubscribeBanner() {
               onChange={(e) => setEmail(e.target.value)}
               required
               aria-label="Your email address"
-              className="h-10 w-full sm:w-64 bg-white px-3.5 font-ui text-xs text-ink placeholder:text-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider focus:outline-none focus:ring-2 focus:ring-sage"
+              className="min-h-[44px] h-11 w-full sm:w-64 bg-white px-3.5 font-ui text-xs text-ink placeholder:text-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             />
             <button
               type="submit"
-              className="h-10 w-full sm:w-auto bg-sage px-7 font-ui text-[11px] font-semibold uppercase tracking-[0.1em] text-white transition-colors duration-150 hover:bg-sage-dark focus:outline-none focus:ring-2 focus:ring-ink"
+              className="min-h-[44px] h-11 w-full sm:w-auto bg-sage px-7 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-150 hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
             >
               Sign Up
             </button>
