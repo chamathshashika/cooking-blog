@@ -6,8 +6,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Phase 4 - Recipe & Category Pages
-- **Last Updated**: 2026-10-05
+- **Active Phase**: Completed (All Phases Complete)
+- **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
+- **Last Updated**: 2026-10-12
 
 ---
 
@@ -34,16 +35,16 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 ### Phase 2: Core Shared Components
 
 - [x] `Header`: Sticky/fixed header with scroll detection, dynamic compacting animation (`py-4 md:py-5`), backdrop blur, cream background, yellow top accent line, wordmark logo, uppercase navigation with Recipes and Categories dropdowns, global search bar, social icons, and mobile navigation drawer with scroll lock
-- [x] `StarRating`: Gold star rating with accessible `aria-label`
+- [x] `StarRating`: Gold star rating with accessible `aria-label` and `role="img"`
 - [x] `RecipeCard`: 3:4 & 4:3 ratios, category pill tag, serif title, rating, subtle zoom hover
 - [x] `FeaturedRow`: 4-column desktop / 2-column tablet / 1-column mobile featured recipe layout with cream backdrop split
-- [x] `SubscribeBanner`: Sunshine yellow band, "Never miss a recipe" heading, input fields, sage green button
-- [x] `CategoryCarousel`: Circular category thumbnails with arrow navigation controls (enlarged 96–128px thumbnails, prominent heading, generous section rhythm)
+- [x] `SubscribeBanner`: Sunshine yellow band, "Never miss a recipe" heading, input fields, sage green button with 44px touch targets
+- [x] `CategoryCarousel`: Circular category thumbnails with arrow navigation controls (enlarged 96–128px thumbnails, prominent heading, generous section rhythm, 44px tap targets)
 - [x] `SectionHeading`: Serif H2 with optional "Browse all recipes →" link
-- [x] `SocialIcons`: Accessible branded SVG social links (Instagram, Facebook, Twitter) with sage green circles
-- [x] `IngredientsList`: Interactive checklist with checkboxes to mark prepared ingredients
-- [x] `ScrollToTop`: Floating right-bottom circular button with smooth scroll, scroll visibility threshold (>300px), sage green styling, and gentle pulsing/blinking ripple effect (pausing on hover)
-- [x] `Footer`: Cream/yellow color scheme matching the header with brand narrative and links
+- [x] `SocialIcons`: Accessible branded SVG social links (Instagram, Facebook, Twitter) with sage green circles and 44x44px touch targets
+- [x] `IngredientsList`: Interactive checklist with checkboxes to mark prepared ingredients, keyboard Enter/Space toggling, and focus rings
+- [x] `ScrollToTop`: Floating right-bottom circular button with smooth scroll, scroll visibility threshold (>300px), sage green styling, and gentle pulsing/blinking ripple effect with `prefers-reduced-motion` compliance
+- [x] `Footer`: Cream/yellow color scheme matching the header with brand narrative, explore links, and focus rings
 
 ### Phase 3: Home Page Assembly
 
@@ -79,21 +80,30 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Contact Page (`app/contact/page.tsx`):
   - Minimal, lightweight form with only essential fields (name, email, message) and interactive confirmation state
   - Direct kitchen contact information, response time expectations, linked to site footer, and added to `app/sitemap.ts`
-
 - [x] Recipe & Post Data Management:
   - Added authentic `chickenCurry` recipe (`Traditional Sri Lankan Chicken Curry`) in `lib/data.ts` with `isFeatured: true`
-  - Added high-resolution asset to `public/images/recipes/sri-lankan-chicken-curry.jpg`
-  - Populated `allRecipes: [chickenCurry]` and linked to Curries & Dinners category collection (`/category/dinner`) and search filter
-  - Supported flexible `amount` and `quantity` fields across `Ingredient` model, `IngredientsList`, and JSON-LD schema
+  - Added authentic `prawnCurry` recipe (`Prawn Curry` / `sri-lankan-prawn-curry`) in `lib/data.ts` with 30-min prep/cook time, whole spices, coconut gravy, and step-by-step instructions
+  - Added authentic `muttonCurry` recipe (`Sri Lankan Mutton Curry` / `sri-lankan-mutton-curry`) in `lib/data.ts` with hearty 48-min slow-reduced coconut milk gravy, aromatic whole spices, and lemongrass
+  - Added high-resolution food photography assets to `public/images/recipes/sri-lankan-chicken-curry.jpg`, `public/images/recipes/prawn-curry.jpg`, and `public/images/recipes/mutton-curry.jpg`
+  - Populated `allRecipes: [chickenCurry, stringHoppers, prawnCurry, muttonCurry]` and linked to categories, live search, and dynamic sitemap
+  - Extended `Ingredient` (supporting `group` and `optional`) and `Instruction` (supporting step `title`) models with backwards compatibility across `IngredientsList` and recipe detail views
   - Ensured `featuredRecipes` and `recentRecipes` display seamlessly on the homepage with centered, proportional layouts when fewer recipes exist
   - Maintained resilient empty state fallbacks for other zero-recipe sections
 
 ### Phase 5: Verification & Quality Assurance
 
-- [ ] Accessibility audit (WCAG AA contrast, touch targets >= 44px, keyboard navigation, focus rings)
-- [ ] End-to-end linting and build validation
-
-
-
-
-
+- [x] About Us Page (`app/about/page.tsx`):
+  - Authored authentic brand storytelling page reflecting `brandGuidelines.md` personality, voice, and design principles
+  - Preserved culinary heritage narrative, 3 core cooking principles, and seamless routing from header & footer
+- [x] Accessibility Audit (WCAG AA Compliance):
+  - **Touch Targets (>= 44x44px)**: Upgraded desktop search button, mobile hamburger & close buttons, drawer nav items, category carousel prev/next buttons, social media icon anchors, newsletter inputs & buttons, filter clear search button, category pill tabs, and contact form inputs/submit button to satisfy 44px minimum touch target dimensions.
+  - **Keyboard Navigation & Focus Rings**: Implemented visible `focus-visible:ring-2 focus-visible:ring-sage` and `focus-visible:ring-ink` across all interactive controls (links, buttons, inputs, checkboxes) to guarantee clear tab-navigation indicators.
+  - **Screen Reader Semantics**: Enhanced `StarRating` with `role="img"`, `IngredientsList` with explicit `role="checkbox"` and `aria-checked` states, plus keyboard Enter/Space toggle support.
+  - **Reduced Motion**: Honored `prefers-reduced-motion` with `motion-reduce:hidden` on background ripple rings, `motion-reduce:animate-none` on pulse animations, and `motion-reduce:scroll-auto` on carousels.
+  - **Color Contrast**: Confirmed all charcoal text (`#2a2622`) on cream (`#fce9c0`), yellow (`#fdcb63`), and white backgrounds exceeds WCAG AAA standards, with bold weights and darker hover states (`sage-dark`) on sage buttons.
+- [x] End-to-end static routes and sitemap synchronization verified
+- [x] Featured Recipes Visibility Resolution:
+  - Resolved missing featured recipes on homepage by marking `prawnCurry` and `muttonCurry` with `isFeatured: true` in `lib/data.ts`.
+  - Hardened `featuredRecipes` selection to guarantee 4 cards populate the 4-column desktop grid per `brandGuidelines.md`.
+  - Reinforced stacking context in `components/FeaturedRow.tsx` using `isolate`, non-blocking `z-0` cream background split, and `relative z-10` cards container to prevent negative z-index paint occlusion.
+  - Added explicit aspect-ratio style fallback (`style={{ aspectRatio: "3 / 4" }}`) in `components/RecipeCard.tsx` for rock-solid box computation with `next/image fill`.

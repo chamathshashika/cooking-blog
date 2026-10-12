@@ -111,21 +111,27 @@ export default async function RecipeDetailPage({ params }: Props) {
         {/* Breadcrumb Navigation */}
         <div className="border-b border-ink/10 bg-linen/30 py-3">
           <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+            <Link
+              href="/"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Home
             </Link>
-            <span>/</span>
-            <Link href="/recipes" className="hover:text-ink transition-colors">
+            <span aria-hidden="true">/</span>
+            <Link
+              href="/recipes"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Recipes
             </Link>
-            <span>/</span>
+            <span aria-hidden="true">/</span>
             <Link
               href={`/category/${recipe.category.toLowerCase()}`}
-              className="hover:text-ink transition-colors"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               {recipe.category}
             </Link>
-            <span>/</span>
+            <span aria-hidden="true">/</span>
             <span className="text-ink truncate max-w-xs">{recipe.title}</span>
           </div>
         </div>
@@ -135,7 +141,7 @@ export default async function RecipeDetailPage({ params }: Props) {
           {/* Back link */}
           <Link
             href="/recipes"
-            className="inline-flex items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-wider text-muted hover:text-ink transition-colors mb-6"
+            className="inline-flex min-h-[44px] items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-wider text-muted hover:text-ink transition-colors mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>All Recipes</span>
@@ -294,6 +300,11 @@ export default async function RecipeDetailPage({ params }: Props) {
                         {inst.step}
                       </span>
                       <div className="pt-0.5">
+                        {inst.title && (
+                          <h4 className="font-display font-semibold text-lg text-ink mb-1">
+                            {inst.title}
+                          </h4>
+                        )}
                         <p className="font-display text-base sm:text-[17px] text-ink leading-relaxed">
                           {inst.text}
                         </p>

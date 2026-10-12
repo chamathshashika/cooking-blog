@@ -27,7 +27,7 @@ export default function IngredientsList({ ingredients }: Props) {
         </span>
       </div>
 
-      <ul className="space-y-3.5" role="list" aria-label="Recipe ingredients">
+      <ul className="space-y-2" role="list" aria-label="Recipe ingredients">
         {ingredients.map((item, index) => {
           const isChecked = !!checkedItems[index];
 
@@ -35,14 +35,24 @@ export default function IngredientsList({ ingredients }: Props) {
             <li
               key={index}
               onClick={() => toggleItem(index)}
-              className="flex items-start gap-3.5 cursor-pointer group select-none transition-opacity"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleItem(index);
+                }
+              }}
+              className="flex min-h-[44px] items-center gap-3.5 py-1 px-2 -mx-2 cursor-pointer group select-none transition-colors hover:bg-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               <button
                 type="button"
                 role="checkbox"
                 aria-checked={isChecked}
                 aria-label={`Mark ${item.name} as prepared`}
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border transition-all ${
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleItem(index);
+                }}
+                className={`flex h-5 w-5 shrink-0 items-center justify-center border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-1 ${
                   isChecked
                     ? "bg-sage border-sage text-white"
                     : "border-ink/30 bg-white group-hover:border-sage"
@@ -66,6 +76,11 @@ export default function IngredientsList({ ingredients }: Props) {
                   </>
                 )}
                 <span>{item.name}</span>
+                {item.optional && (
+                  <span className="text-xs text-muted/80 italic ml-1.5 font-normal">
+                    (optional)
+                  </span>
+                )}
               </span>
             </li>
           );
