@@ -36,10 +36,13 @@ export default async function RecipesPage({ searchParams }: Props) {
         {/* Breadcrumb Navigation */}
         <div className="border-b border-ink/10 bg-linen/30 py-3">
           <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+            <Link
+              href="/"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Home
             </Link>
-            <span>/</span>
+            <span aria-hidden="true">/</span>
             <span className="text-ink font-semibold">Recipes</span>
           </div>
         </div>

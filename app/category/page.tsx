@@ -28,11 +28,14 @@ export default function CategoriesPage() {
         {/* Breadcrumb Navigation */}
         <div className="border-b border-ink/10 bg-linen/30 py-3">
           <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+            <Link
+              href="/"
+              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Home
             </Link>
-            <span>/</span>
-            <span className="text-ink">Categories</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-ink font-semibold">Categories</span>
           </div>
         </div>
 
@@ -62,7 +65,7 @@ export default function CategoriesPage() {
               <Link
                 key={category.slug}
                 href={`/category/${category.slug}`}
-                className="group flex flex-col bg-linen/30 border border-ink/10 p-6 text-center transition-all duration-200 hover:border-sage hover:bg-cream/30 hover:shadow-xs focus:outline-none focus:ring-2 focus:ring-sage"
+                className="group flex flex-col bg-linen/30 border border-ink/10 p-6 text-center transition-all duration-200 hover:border-sage hover:bg-cream/30 hover:shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
               >
                 {/* Circular Category Thumbnail */}
                 <div className="mx-auto relative h-28 w-28 overflow-hidden rounded-full border-2 border-transparent transition-transform duration-200 group-hover:scale-105 group-hover:border-sage mb-4">

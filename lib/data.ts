@@ -2,10 +2,13 @@ export type Ingredient = {
   name: string;
   amount?: string;
   quantity?: string;
+  group?: string;
+  optional?: boolean;
 };
 
 export type Instruction = {
   step: number;
+  title?: string;
   text: string;
 };
 
@@ -425,12 +428,177 @@ export const stringHoppers: Recipe = {
   ],
 };
 
-export const allRecipes: Recipe[] = [chickenCurry, stringHoppers];
+export const prawnCurry: Recipe = {
+  id: "prawn-curry",
+  slug: "sri-lankan-prawn-curry",
+  title: "Prawn Curry",
+  category: "Seafood",
+  image: "/images/recipes/prawn-curry.jpg", // TODO: replace with your real image path
+  rating: 0, // TODO: set real rating
+  ratingCount: 0, // TODO: set real count
+  prepTime: "12 min",
+  cookTime: "18 min",
+  totalTime: "30 min",
+  servings: 4,
+  excerpt:
+    "A rich, creamy Sri Lankan prawn curry with fragrant spices. Ready in 30 minutes and perfect with steamed rice or bread.",
+  intro:
+    "This prawn curry is a real treat. It has a bright colour, a wonderful smell and a deep, joyful taste. Sri Lankan spices bring it all together, and it goes beautifully with steamed rice or bread. It is easy to make and ready to eat in 30 minutes.",
+  isFeatured: true,
+  ingredients: [
+    // To season the prawns
+    { group: "To season the prawns", quantity: "500 g", name: "prawns, cleaned and washed" },
+    { group: "To season the prawns", quantity: "1 tsp", name: "salt" },
+    { group: "To season the prawns", quantity: "1/2 tsp", name: "turmeric powder" },
+    { group: "To season the prawns", quantity: "1 tsp", name: "black pepper powder" },
 
-export const featuredRecipes =
-  allRecipes.filter((r) => r.isFeatured).length > 0
-    ? allRecipes.filter((r) => r.isFeatured)
-    : allRecipes.slice(0, 4);
+    // For the curry
+    { group: "For the curry", quantity: "1 tbsp", name: "oil" },
+    { group: "For the curry", quantity: "8", name: "curry leaves" },
+    { group: "For the curry", quantity: "4", name: "pandan leaves" },
+    { group: "For the curry", quantity: "1/2", name: "cinnamon stick" },
+    { group: "For the curry", quantity: "1 tsp", name: "fenugreek seeds" },
+    { group: "For the curry", quantity: "4", name: "cardamom pods" },
+    { group: "For the curry", quantity: "3", name: "dried chillies" },
+    { group: "For the curry", quantity: "1", name: "onion, chopped" },
+    { group: "For the curry", quantity: "4 cloves", name: "garlic, chopped" },
+    { group: "For the curry", quantity: "1 tsp", name: "ginger" },
+    { group: "For the curry", quantity: "1 tsp", name: "curry powder" },
+    { group: "For the curry", quantity: "1 1/2 tsp", name: "chilli powder" },
+    { group: "For the curry", quantity: "1", name: "tomato, chopped" },
+    { group: "For the curry", quantity: "1", name: "green chilli" },
+    { group: "For the curry", quantity: "1", name: "red chilli", optional: true },
+    { group: "For the curry", quantity: "1 1/2 cups", name: "coconut milk" },
+    { group: "For the curry", quantity: "1 tsp", name: "salt, or to taste" },
+    { group: "To finish", quantity: "1 tsp", name: "lemon juice" },
+    { group: "To finish", quantity: "1 tbsp", name: "coriander leaves, chopped" },
+  ],
+  instructions: [
+    {
+      step: 1,
+      title: "Season the prawns",
+      text: "Clean the prawns well. Mix them with the turmeric, salt and black pepper. Set them aside while you make the curry.",
+    },
+    {
+      step: 2,
+      title: "Fry the whole spices",
+      text: "Heat the oil in a saucepan over medium heat. When the oil is hot, add the curry leaves, pandan leaves, cinnamon stick, cardamom pods, dried chillies and fenugreek seeds. Stir briefly. Add the garlic, onion and ginger, and saute for about 2 minutes.",
+    },
+    {
+      step: 3,
+      title: "Add the spice powders and tomato",
+      text: "Add the curry powder and chilli powder. Mix well and fry for about 2 minutes. Do not let the spices burn. Add the tomato and cook for about 2 minutes, stirring now and then.",
+    },
+    {
+      step: 4,
+      title: "Cook the prawns in coconut milk",
+      text: "Add the prawns and fry for about 3 minutes, turning them now and then. Stir in the green and red chillies. Pour in the coconut milk and cook for about 7 minutes, stirring all the time. Add salt to taste.",
+    },
+    {
+      step: 5,
+      title: "Finish and serve",
+      text: "Turn off the heat. Add the lemon juice and coriander leaves, and stir well. Serve hot with rice or bread.",
+    },
+  ],
+  notes: [
+    "Clean the prawns properly before you season them.",
+    "Stir the spice powders constantly so they do not burn.",
+    "The red chilli is optional. Leave it out for a milder curry.",
+  ],
+  tags: ["prawn", "seafood", "sri lankan", "curry", "coconut milk", "30 minutes"],
+  publishedDate: "2026-10-12",
+};
+
+export const muttonCurry: Recipe = {
+  id: "mutton-curry",
+  slug: "sri-lankan-mutton-curry",
+  title: "Sri Lankan Mutton Curry",
+  category: "Meat",
+  image: "/images/recipes/mutton-curry.jpg", // TODO: replace with your real image path
+  rating: 0, // TODO: set real rating
+  ratingCount: 0, // TODO: set real count
+  prepTime: "15 min",
+  cookTime: "33 min",
+  totalTime: "48 min",
+  servings: 6,
+  excerpt:
+    "A hearty, comforting Sri Lankan mutton curry, cooked down until thick and rich. Serve it with steamed rice or toasted garlic bread.",
+  intro:
+    "This is a proper hearty and comforting curry that suits any occasion. Sri Lankan mutton curry comes in a few different versions, and this reduced, thick version is my favourite. It goes nicely with steamed rice and is also brilliant with toasted garlic bread.",
+  isFeatured: true,
+  ingredients: [
+    // To marinate the mutton
+    { group: "To marinate the mutton", quantity: "900 g", name: "mutton, cut into cubes" },
+    { group: "To marinate the mutton", quantity: "3 tsp", name: "salt" },
+    { group: "To marinate the mutton", quantity: "2 tsp", name: "black pepper, crushed" },
+    { group: "To marinate the mutton", quantity: "1 tsp", name: "turmeric powder" },
+    { group: "To marinate the mutton", quantity: "2 tbsp", name: "chilli powder" },
+    { group: "To marinate the mutton", quantity: "2 tbsp", name: "curry powder" },
+    { group: "To marinate the mutton", quantity: "2 tbsp", name: "vinegar" },
+
+    // For the curry
+    { group: "For the curry", quantity: "3 tbsp", name: "oil" },
+    { group: "For the curry", quantity: "1 sprig", name: "curry leaves" },
+    { group: "For the curry", quantity: "1 tsp", name: "cumin seeds" },
+    { group: "For the curry", quantity: "1 tsp", name: "mustard seeds" },
+    { group: "For the curry", quantity: "1 tsp", name: "coriander seeds" },
+    { group: "For the curry", quantity: "1 small", name: "cinnamon stick" },
+    { group: "For the curry", quantity: "5", name: "small cloves" },
+    { group: "For the curry", quantity: "4", name: "small cardamom pods" },
+    { group: "For the curry", quantity: "2 tbsp", name: "garlic, chopped" },
+    { group: "For the curry", quantity: "1 tbsp", name: "ginger, chopped" },
+    { group: "For the curry", quantity: "2 small", name: "onions, chopped" },
+    { group: "For the curry", quantity: "2 medium", name: "green chillies, sliced" },
+    { group: "For the curry", quantity: "1 small stick", name: "lemongrass" },
+    { group: "For the curry", quantity: "1 1/2 cups", name: "coconut milk" },
+    { group: "To finish", quantity: "to taste", name: "extra salt", optional: true },
+  ],
+  instructions: [
+    {
+      step: 1,
+      title: "Marinate the mutton",
+      text: "Put the mutton in a large mixing bowl. Add the salt, black pepper, turmeric, chilli powder, curry powder and vinegar, and mix everything well. Let the mutton marinate for about 15 minutes.",
+    },
+    {
+      step: 2,
+      title: "Fry the spices and aromatics",
+      text: "Heat the oil in a saucepan over medium heat for about 2 minutes. When the oil is hot, add the curry leaves, cumin seeds, mustard seeds, coriander seeds, cinnamon stick, cloves, cardamom pods, garlic, ginger, onion and green chilli. Fry for about 3 minutes.",
+    },
+    {
+      step: 3,
+      title: "Brown the mutton",
+      text: "Add the marinated mutton to the pan and mix well. Fry for about 3 minutes, then add the lemongrass and stir gently. Fry for 10 more minutes, stirring regularly.",
+    },
+    {
+      step: 4,
+      title: "Simmer in coconut milk",
+      text: "Pour in the coconut milk and stir gently. Keep cooking for 15 more minutes, stirring regularly, until the curry thickens.",
+    },
+    {
+      step: 5,
+      title: "Season and serve",
+      text: "When the curry is thick enough, turn off the heat. Add more salt if you like. Serve hot with rice or bread.",
+    },
+  ],
+  notes: [
+    "Cut the mutton into even cubes so the pieces cook at the same speed.",
+    "Stir regularly while the curry thickens so it does not stick to the pan.",
+    "This is a reduced, thick curry. Add a splash of water if you prefer more gravy.",
+  ],
+  tags: ["mutton", "meat", "sri lankan", "curry", "coconut milk", "comfort food"],
+  publishedDate: "2026-10-12",
+};
+
+export const allRecipes: Recipe[] = [chickenCurry, stringHoppers, prawnCurry, muttonCurry];
+
+export const featuredRecipes: Recipe[] = (() => {
+  const explicitFeatured = allRecipes.filter((r) => r.isFeatured);
+  if (explicitFeatured.length >= 4) {
+    return explicitFeatured.slice(0, 4);
+  }
+  const remaining = allRecipes.filter((r) => !explicitFeatured.includes(r));
+  return [...explicitFeatured, ...remaining].slice(0, 4);
+})();
 
 export const recentRecipes = allRecipes.slice(0, 6);
 
@@ -481,9 +649,11 @@ export function getRecipesByCategory(categorySlug: string): Recipe[] {
     const rCat = recipe.category.toLowerCase();
     if (rCat === target) return true;
     if (
-      (target === "dinner" || target === "curries" || target === "chicken-curries") &&
+      (target === "dinner" || target === "curries" || target === "chicken-curries" || target === "seafood" || target === "meat") &&
       (rCat === "dinner" ||
         rCat === "entrees" ||
+        rCat === "seafood" ||
+        rCat === "meat" ||
         rCat.includes("curry") ||
         rCat.includes("curries"))
     ) {
@@ -495,7 +665,7 @@ export function getRecipesByCategory(categorySlug: string): Recipe[] {
     if (target === "sides" && rCat === "sides") return true;
     if (
       target === "entrees" &&
-      (rCat === "entrees" || rCat === "dinner" || rCat.includes("curry"))
+      (rCat === "entrees" || rCat === "dinner" || rCat === "seafood" || rCat === "meat" || rCat.includes("curry"))
     ) {
       return true;
     }

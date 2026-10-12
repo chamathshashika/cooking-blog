@@ -33,7 +33,10 @@ export default function RecipeCard({
   return (
     <article className={`group block text-center ${className}`}>
       <Link href={`/recipes/${slug}`} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-sage">
-        <div className={`relative ${aspectClass} w-full overflow-hidden bg-linen`}>
+        <div
+          className={`relative ${aspectClass} w-full overflow-hidden bg-linen`}
+          style={{ aspectRatio: aspectRatio === "4/3" ? "4 / 3" : "3 / 4" }}
+        >
           <Image
             src={image}
             alt={title}
@@ -60,7 +63,7 @@ export default function RecipeCard({
             </p>
           )}
 
-          {rating !== undefined && (
+          {rating !== undefined && rating > 0 && (
             <div className="mt-1.5 flex justify-center">
               <StarRating value={rating} />
             </div>

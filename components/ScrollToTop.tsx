@@ -38,7 +38,7 @@ export default function ScrollToTop() {
     >
       {/* Outer pulsing ripple ring */}
       <span
-        className="absolute inset-0 rounded-full bg-sage/60 animate-ping pointer-events-none"
+        className="absolute inset-0 rounded-full bg-sage/60 animate-ping motion-reduce:hidden pointer-events-none"
         style={{ animationDuration: "2.5s" }}
         aria-hidden="true"
       />
@@ -47,7 +47,7 @@ export default function ScrollToTop() {
         onClick={scrollToTop}
         aria-label="Scroll to top of page"
         title="Scroll to top"
-        className="relative flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-sage text-white shadow-lg border border-white/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sage focus:ring-offset-2 hover:bg-sage/90 hover:scale-110 active:scale-95 animate-pulse hover:animate-none"
+        className="relative flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-sage text-white shadow-lg border border-white/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 hover:bg-sage-dark hover:scale-105 active:scale-95 animate-pulse motion-reduce:animate-none hover:animate-none"
       >
         <ArrowUp className="h-5 w-5 stroke-[2.5]" />
       </button>

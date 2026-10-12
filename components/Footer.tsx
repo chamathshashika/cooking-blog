@@ -31,22 +31,33 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 font-ui text-xs uppercase tracking-wider text-muted">
               <li>
-                <Link href="/" className="hover:text-ink transition-colors">
+                <Link
+                  href="/"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                >
                   Home
                 </Link>
               </li>
               <li>
                 <Link
                   href="/recipes"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   All Recipes
                 </Link>
               </li>
               <li>
                 <Link
+                  href="/about"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/category/breakfast"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   Breakfast Favorites
                 </Link>
@@ -54,7 +65,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/category/dinner"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   Curry & Rice
                 </Link>
@@ -71,7 +82,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/category/appetizers"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   Appetizers & Short Eats
                 </Link>
@@ -79,7 +90,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/category/entrees"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   Main Entrees
                 </Link>
@@ -87,7 +98,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/category/sides"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   Sambols & Sides
                 </Link>
@@ -95,7 +106,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/category/desserts"
-                  className="hover:text-ink transition-colors"
+                  className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
                   Sweets & Desserts
                 </Link>
@@ -112,13 +123,22 @@ export default function Footer() {
             CeylonSpicer. Crafted with love for Sri Lankan cuisine.
           </p>
           <div className="flex items-center gap-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/privacy" className="hover:text-ink">
+            <Link
+              href="/privacy"
+              className="hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-ink">
+            <Link
+              href="/terms"
+              className="hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Terms
             </Link>
-            <Link href="/contact" className="hover:text-ink">
+            <Link
+              href="/contact"
+              className="hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
               Contact
             </Link>
           </div>
