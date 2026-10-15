@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getAllRecipes, categories } from "@/lib/data";
+import { env } from "@/lib/env";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
   const currentDate = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
