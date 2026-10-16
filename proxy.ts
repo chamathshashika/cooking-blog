@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decrypt } from "@/lib/session";
+import { hasAdminAccess } from "@/lib/definitions";
 
 // 1. Specify protected and public auth routes
 const protectedRoutes = ["/admin", "/dashboard"];
@@ -26,9 +27,15 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 4. Redirect to /admin if authenticated user visits login or signup
+  // 3b. Role-based access control: only admin and editor role have access to the admin panel
+  if (isProtectedRoute && !hasAdminAccess(session?.role)) {
+    return NextResponse.redirect(new URL("/", req.nextUrl));
+  }
+
+  // 4. Redirect authenticated user away from login or signup
   if (isPublicAuthRoute && session?.userId) {
-    return NextResponse.redirect(new URL("/admin", req.nextUrl));
+    const destination = hasAdminAccess(session?.role) ? "/admin" : "/";
+    return NextResponse.redirect(new URL(destination, req.nextUrl));
   }
 
   return NextResponse.next();

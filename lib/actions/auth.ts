@@ -6,7 +6,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { createSession, deleteSession } from "@/lib/session";
 import type { FormState } from "@/lib/definitions";
-import { DEFAULT_USER_ROLE } from "@/lib/definitions";
+import { DEFAULT_USER_ROLE, hasAdminAccess } from "@/lib/definitions";
 
 /**
  * Hash password with random salt using Node.js crypto scrypt.
@@ -113,8 +113,12 @@ export async function signup(
     };
   }
 
-  // Redirect after successful registration
-  redirect("/admin");
+  // Redirect after successful registration (admin & editor to /admin, reader to /)
+  const rawRedirectTo = (formData.get("redirectTo") as string) || "/admin";
+  const targetDestination = hasAdminAccess(newUser.role)
+    ? rawRedirectTo
+    : (rawRedirectTo.startsWith("/admin") ? "/" : rawRedirectTo);
+  redirect(targetDestination);
 }
 
 /**
@@ -163,6 +167,13 @@ export async function login(
       };
     }
 
+    // Readers are not allowed to log into the admin panel
+    if (!hasAdminAccess(user.role)) {
+      return {
+        message: "You don't have access to login.",
+      };
+    }
+
     // Create session cookie via Next.js session management
     await createSession(
       user._id.toString(),
@@ -177,8 +188,12 @@ export async function login(
     };
   }
 
-  // Redirect after successful login
-  redirect("/admin");
+  // Redirect after successful login (admin & editor to /admin, reader to /)
+  const rawRedirectTo = (formData.get("redirectTo") as string) || "/admin";
+  const targetDestination = hasAdminAccess(user.role)
+    ? rawRedirectTo
+    : (rawRedirectTo.startsWith("/admin") ? "/" : rawRedirectTo);
+  redirect(targetDestination);
 }
 
 /**

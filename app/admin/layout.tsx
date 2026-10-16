@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import AdminHeader from "@/components/admin/AdminHeader";
-import { verifySession } from "@/lib/dal";
+import { verifyAdminSession } from "@/lib/dal";
 
 export const metadata: Metadata = {
   title: "Admin Studio | CeylonSpicer",
@@ -19,7 +19,8 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   // Centralized authorization verification via Data Access Layer (DAL)
-  const session = await verifySession();
+  // Ensures only 'admin' and 'editor' roles have access to the admin panel
+  const session = await verifyAdminSession();
 
   return (
     <div className="flex min-h-screen flex-col bg-[#fcfaf6] text-ink antialiased">

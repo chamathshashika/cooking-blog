@@ -175,9 +175,11 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Strictly validated all environment variables (`MONGODB_URL`, `NEXT_PUBLIC_SITE_URL`, `SESSION_SECRET`, `NODE_ENV`) using Joi schema.
   - Eliminated all default/fallback values from the application codebase; all values are strictly sourced from `.env`.
   - Added build-time/startup assertion with clear error reporting.
-- [x] MongoDB & Mongoose Database Layer (`lib/mongodb.ts`, `lib/models/User.ts`):
+- [x] MongoDB & Mongoose Database Layer (`lib/mongodb.ts`, `lib/models/User.ts`, `lib/models/Category.ts`):
   - Configured resilient singleton connection caching in `lib/mongodb.ts` using validated `env.MONGODB_URL`.
-  - Built `User` Mongoose schema with email uniqueness, password hashing support, and role attributes (`admin` | `reader` | `editor`).
+  - Established strict schema standard: every collection's primary key is `_id: Types.ObjectId`, and any collection referencing another document uses foreign key `{ type: Schema.Types.ObjectId, ref: 'ModelName' }` referencing that document's `_id`.
+  - Built `User` Mongoose schema with email uniqueness, password hashing support, role attributes (`admin` | `reader` | `editor`), and `Types.ObjectId` `_id`.
+  - Built `Category` Mongoose schema with `Types.ObjectId` `_id`.
 - [x] Role-Based Configuration & Reader Default (`lib/definitions.ts`, `lib/models/User.ts`, `lib/session.ts`, `lib/dal.ts`):
   - Strictly limited user roles to `["admin", "reader", "editor"]` via TypeScript `UserRole` union and `USER_ROLES` constant array.
   - Set `reader` as the default role across the database schema (`UserSchema.role.default = "reader"`), session generator (`createSession(..., role = "reader")`), Data Access Layer fallback, and signup server action (`newUser.role = DEFAULT_USER_ROLE`).
@@ -200,9 +202,25 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Route Aliases & Search Bot Protection:
   - Created `/signin` redirect alias in `app/signin/page.tsx` pointing to `/login`.
   - Added `/login`, `/signup`, and `/signin` to crawler `disallow` rules in `app/robots.ts`.
-- [x] Admin Studio Guard & User Profile (`app/admin/layout.tsx`, `components/admin/AdminHeader.tsx`):
-  - Enforced `verifySession()` DAL check in `app/admin/layout.tsx`.
-  - Updated `AdminHeader.tsx` to display active chef user name, avatar, role, and a one-click Sign Out action.
+- [x] Admin Studio Guard & Role-Based Access Control (`app/admin/layout.tsx`, `proxy.ts`, `lib/dal.ts`):
+  - Enforced `verifyAdminSession()` DAL check in `app/admin/layout.tsx`, restricting access strictly to `"admin"` and `"editor"` roles; unauthorized roles (e.g. `"reader"`) are redirected to `/`.
+  - Added role check in `proxy.ts` to reject reader access to `/admin` and `/dashboard` at the routing boundary.
+  - Configured login, signup, and server actions (`lib/actions/auth.ts`) to route `"admin"` and `"editor"` to `/admin` while safely routing `"reader"` to `/`.
+  - Updated `AdminHeader.tsx` to display active chef user name, avatar, role badge, and a one-click Sign Out action.
+- [x] Reader Login Prevention & Role Guard (`lib/actions/auth.ts`, `components/auth/SignInForm.tsx`):
+  - Blocked readers from authenticating into the studio: if a reader attempts to log in via the login form, the server action stops and returns `"You don't have access to login."` without creating a session.
+  - Form action triggers a toast alert displaying the unauthorized message immediately.
+- [x] Common Toast Notification System (`components/ToastProvider.tsx`, `app/layout.tsx`):
+  - Created a global, unified `ToastProvider` and `useToast()` hook supporting `success`, `error`, `warning`, and `info` toast alerts with brand-consistent styling and accessible ARIA attributes (`role="alert"`, `aria-live="polite"`).
+  - Mounted `ToastProvider` at the root layout in `app/layout.tsx`, making toast notifications universally accessible to all components.
+  - Unified toast usage across `SignInForm.tsx`, `SignUpForm.tsx`, `AdminRecipeList.tsx`, and `AdminCategoryList.tsx`.
+- [x] Category CRUD Operations & Admin-Only Authorization (`lib/models/Category.ts`, `lib/actions/category.ts`, `app/admin/categories/page.tsx`, `components/admin/AdminCategoryList.tsx`):
+  - Built `CategoryModel` Mongoose schema with name, displayName, slug uniqueness, description, and image URL.
+  - Implemented secure server actions `createCategory`, `updateCategory`, and `deleteCategory` in `lib/actions/category.ts`, each verifying `session.role === "admin"` and rejecting non-admin requests with clear authorization errors.
+  - Integrated auto-seeding logic from default Sri Lankan categories on initial empty state.
+  - Updated `AdminCategoryList.tsx` with dynamic category creation, editing, and confirmation-protected deletion modals.
+  - Provided role-aware UI: administrators get full management actions (New, Edit, Delete), while editors are presented with a read-only taxonomy view with action buttons disabled and an informative status indicator.
+  - Revalidated path cache (`/admin/categories`, `/category`, `/`) upon mutations and displayed status feedback using the common toast notification system.
 - [x] Code Quality:
   - Removed deprecated `middleware.ts` and obsolete `lib/auth.ts`.
   - Verified clean ESLint check (`pnpm lint`) with 0 errors and 0 warnings.

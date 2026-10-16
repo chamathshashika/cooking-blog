@@ -1,16 +1,24 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Lock, Mail, Eye, EyeOff, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { login } from "@/lib/actions/auth";
+import { useToast } from "@/components/ToastProvider";
 
 export default function SignInForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") || "/admin";
   const [showPassword, setShowPassword] = useState(false);
   const [state, action, pending] = useActionState(login, undefined);
+  const { error: toastError } = useToast();
+
+  useEffect(() => {
+    if (state?.message) {
+      toastError(state.message);
+    }
+  }, [state?.message, toastError]);
 
   return (
     <form action={action} className="space-y-4">

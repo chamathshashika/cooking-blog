@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { ArrowLeft, UserPlus, ShieldCheck } from "lucide-react";
 import SignUpForm from "@/components/auth/SignUpForm";
 import { getSession } from "@/lib/session";
+import { hasAdminAccess } from "@/lib/definitions";
 
 export const metadata: Metadata = {
   title: "Admin Sign Up | CeylonSpicer",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 export default async function SignUpPage() {
   const session = await getSession();
   if (session) {
-    redirect("/admin");
+    redirect(hasAdminAccess(session.role) ? "/admin" : "/");
   }
 
   return (

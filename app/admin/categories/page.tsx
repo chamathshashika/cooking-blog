@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Layers } from "lucide-react";
+import { ArrowLeft, Layers, ShieldCheck } from "lucide-react";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
-import { categories, allRecipes } from "@/lib/data";
+import { allRecipes } from "@/lib/data";
+import { getCategories } from "@/lib/actions/category";
+import { verifyAdminSession } from "@/lib/dal";
 
 export const metadata: Metadata = {
   title: "Categories Studio | Admin Panel | CeylonSpicer",
   description: "Browse and manage culinary categories and recipe assignments.",
 };
 
-export default function AdminCategoriesPage() {
+export default async function AdminCategoriesPage() {
+  const session = await verifyAdminSession();
+  const categoriesList = await getCategories();
+  const isAdmin = session.role === "admin";
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -38,14 +44,29 @@ export default function AdminCategoriesPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {isAdmin ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage/10 px-3 py-1 font-ui text-xs font-bold uppercase tracking-wider text-sage border border-sage/20 shadow-2xs">
+              <ShieldCheck className="h-3.5 w-3.5 text-sage" />
+              <span>Admin Management</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-cream/80 px-3 py-1 font-ui text-xs font-bold uppercase tracking-wider text-muted border border-ink/10 shadow-2xs">
+              <span>Editor (Read Only)</span>
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5 rounded-full bg-cream/80 px-3 py-1 font-ui text-xs font-bold uppercase tracking-wider text-ink border border-ink/10 shadow-2xs">
             <Layers className="h-3.5 w-3.5 text-sage" />
-            <span>{categories.length} Categories</span>
+            <span>{categoriesList.length} Categories</span>
           </span>
         </div>
       </div>
 
-      <AdminCategoryList initialCategories={categories} recipes={allRecipes} />
+      <AdminCategoryList
+        initialCategories={categoriesList}
+        recipes={allRecipes}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }
+

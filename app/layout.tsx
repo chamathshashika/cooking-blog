@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Montserrat } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
+import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -93,7 +94,9 @@ export default function RootLayout({
         suppressHydrationWarning
         className="bg-white font-display text-ink antialiased min-h-screen flex flex-col"
       >
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
         <ScrollToTop />
         <Analytics />
       </body>

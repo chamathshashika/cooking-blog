@@ -1,14 +1,14 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Schema, Model, Types } from "mongoose";
 import { type UserRole, USER_ROLES, DEFAULT_USER_ROLE } from "@/lib/definitions";
 
 export interface IUser {
-  _id?: string;
+  _id?: Types.ObjectId;
   name: string;
   email: string;
   password: string;
   role: UserRole;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const UserSchema = new Schema<IUser>(

@@ -7,7 +7,7 @@ import { decrypt } from "@/lib/session";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 
-import { type UserRole, DEFAULT_USER_ROLE } from "@/lib/definitions";
+import { type UserRole, DEFAULT_USER_ROLE, hasAdminAccess } from "@/lib/definitions";
 
 /**
  * Data Access Layer (DAL) function that verifies the user session.
@@ -29,6 +29,21 @@ export const verifySession = cache(async () => {
     name: session.name || "Chef",
     email: session.email || "",
   };
+});
+
+/**
+ * Data Access Layer (DAL) function that verifies admin panel privileges.
+ * Strictly restricts access to users with "admin" or "editor" roles.
+ * Users with "reader" role or unauthorized roles are redirected to "/".
+ */
+export const verifyAdminSession = cache(async () => {
+  const session = await verifySession();
+
+  if (!hasAdminAccess(session.role)) {
+    redirect("/");
+  }
+
+  return session;
 });
 
 /**

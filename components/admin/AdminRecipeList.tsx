@@ -21,6 +21,7 @@ import {
   Check,
 } from "lucide-react";
 import type { Recipe, Category } from "@/lib/data";
+import { useToast } from "@/components/ToastProvider";
 
 type Props = {
   initialRecipes: Recipe[];
@@ -64,15 +65,8 @@ export default function AdminRecipeList({
     isFeatured: false,
   });
 
-  // Notification Toast
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-  };
+  // Common Notification Toast
+  const { showToast } = useToast();
 
   // Toggle Featured Status
   const handleToggleFeatured = (id: string) => {
@@ -197,23 +191,6 @@ export default function AdminRecipeList({
 
   return (
     <div className="space-y-5">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-lg border border-sage/40 bg-white px-4 py-3 shadow-lg animate-in slide-in-from-bottom-3">
-          <CheckCircle2 className="h-5 w-5 text-sage shrink-0" />
-          <span className="font-ui text-xs font-semibold text-ink">
-            {toastMessage}
-          </span>
-          <button
-            onClick={() => setToastMessage(null)}
-            className="text-muted hover:text-ink ml-2 focus:outline-none"
-            aria-label="Dismiss toast"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-
       {/* Main Filter & Action Toolbar */}
       <div className="rounded-xl border border-ink/10 bg-white p-4 sm:p-5 shadow-2xs space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
