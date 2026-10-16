@@ -2,15 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  Clock,
-  Users,
-  ChefHat,
-  Calendar,
-  ArrowLeft,
-  Bookmark,
-  Share2,
-} from "lucide-react";
+import { Clock, Users, ChefHat, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StarRating from "@/components/StarRating";

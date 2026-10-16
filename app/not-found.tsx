@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Compass, Search, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Compass, UtensilsCrossed } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CategoryCarousel from "@/components/CategoryCarousel";

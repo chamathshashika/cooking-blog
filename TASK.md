@@ -8,7 +8,7 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 - **Active Phase**: Completed (All Phases Complete)
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
-- **Last Updated**: 2026-10-12
+- **Last Updated**: 2026-10-15
 
 ---
 
@@ -107,3 +107,123 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Hardened `featuredRecipes` selection to guarantee 4 cards populate the 4-column desktop grid per `brandGuidelines.md`.
   - Reinforced stacking context in `components/FeaturedRow.tsx` using `isolate`, non-blocking `z-0` cream background split, and `relative z-10` cards container to prevent negative z-index paint occlusion.
   - Added explicit aspect-ratio style fallback (`style={{ aspectRatio: "3 / 4" }}`) in `components/RecipeCard.tsx` for rock-solid box computation with `next/image fill`.
+
+### Phase 6: Admin Panel & Content Studio
+
+- [x] Admin Layout & Navigation (`app/admin/layout.tsx`, `components/admin/AdminHeader.tsx`):
+  - Created dedicated layout with warm brand aesthetic, Montserrat uppercase tabs, CeylonSpicer Admin badge, and mobile drawer.
+  - Navigation routing across Overview (`/admin`), Recipes (`/admin/recipes`), Categories (`/admin/categories`), and external link to live site.
+- [x] Metric Statistics (`components/admin/AdminStats.tsx`):
+  - Summary cards for Total Recipes, Featured Recipes, Active Categories, and Average Prep/Cook Time.
+- [x] Interactive Recipe Management (`components/admin/AdminRecipeList.tsx`, `app/admin/recipes/page.tsx`):
+  - Real-time search across titles, categories, excerpts, and tags.
+  - Filter by category and featured status with sort controls.
+  - Responsive table and mobile card views with Next.js image thumbnails, metadata, and status badges.
+  - Interactive "Toggle Featured" button with live state feedback and toast notifications.
+  - "Quick Edit" modal with form fields for title, category, timings, servings, and excerpt.
+  - "New Recipe" creation modal with automatic slug generator and validation.
+  - Direct "View Live" action linking to `/recipes/[slug]`.
+- [x] Interactive Category Management (`components/admin/AdminCategoryList.tsx`, `app/admin/categories/page.tsx`):
+  - Grid of all 8 Sri Lankan cuisine categories with circular image thumbnails and descriptions.
+  - Dynamic recipe count badge per category with direct deep-link to filtered recipes (`/admin/recipes?category=[slug]`).
+  - Search filtering by name and description.
+  - "Edit Category" modal and "New Category" creation modal.
+  - Direct "View Public" action linking to `/category/[slug]`.
+- [x] Dashboard Alias & Security (`app/dashboard/page.tsx`, `app/robots.ts`, `components/Footer.tsx`):
+  - Created `/dashboard` route that automatically redirects to `/admin`.
+  - Protected admin routes from search crawlers via `disallow: ["/api/", "/dashboard/", "/admin/"]` in `app/robots.ts`.
+  - Added discreet, accessible "Admin" link to the site footer.
+  - Configured `favicon.ico` in `components/admin/AdminHeader.tsx` as the admin panel navbar logo.
+- [x] Code Quality & Lint Audit:
+  - Cleaned up unused imports across `app/admin/page.tsx`, `app/not-found.tsx`, and `app/recipes/[slug]/page.tsx`.
+  - Replaced `as any` type assertion in `components/admin/AdminRecipeList.tsx` with explicit `"title" | "prep" | "servings"` union type.
+  - Replaced anchor with `window.location.reload()` in `app/global-error.tsx`.
+  - Validated clean ESLint run with `pnpm lint` (0 errors, 0 warnings).
+
+### Phase 7: Admin Panel UI Modernization & Visual Polish
+
+- [x] Modernized Admin Header (`components/admin/AdminHeader.tsx`):
+  - Added top status micro-bar with active pulse indicator and "CeylonSpicer Studio" live status.
+  - Redesigned brand logo badge with `favicon.ico`, gold border accent, and subtle hover scale.
+  - Implemented segmented tab pill navigation with active state indicators and icons.
+  - Added "View Public Blog" quick-launch action button.
+- [x] Enhanced Analytical Stat Cards (`components/admin/AdminStats.tsx`):
+  - Implemented brand color top border indicators (`border-t-sage`, `border-t-sunshine`, gold, linen).
+  - Added pill badges for display mode status ("Published", "Hero Display", "Taxonomy", "Cooking Prep").
+  - Added micro-hover lift (`hover:-translate-y-0.5`), subtle shadow elevation, and interactive navigation links.
+- [x] Editorial Studio Hero Banner (`app/admin/page.tsx`):
+  - Designed an editorial welcome banner with warm cream/linen gradient, subtle blur accents, and headline.
+  - Added quick-action button group linking to Recipe Database and Categories.
+- [x] Dual View Modes & Enhanced Recipe List (`components/admin/AdminRecipeList.tsx`):
+  - Added view mode toggle between **Table View** and **Card Grid View**.
+  - Table view: high-res photo thumbnails with hover zoom, serif titles, prep/cook tags, and servings count.
+  - Grid view: visual cards with photography, ratings, category tag overlays, and embedded actions.
+  - Interactive "Featured Status" pill toggle (`★ Featured` glow vs `☆ Standard`).
+  - Unified filter toolbar with search, category selector, featured filter tabs, and sort selector.
+  - Two-column responsive Quick Edit and Create modals with live image preview box.
+- [x] Redesigned Category Cards & Taxonomy View (`components/admin/AdminCategoryList.tsx`):
+  - Circular photo thumbnails with sunshine yellow rings.
+  - Live recipe count badge with direct deep link to category recipes.
+  - Responsive Edit and Create Category modals with image preview.
+- [x] Verification:
+  - Validated clean ESLint execution (`pnpm lint`) with 0 errors and 0 warnings.
+  - Verified SSR / layout rendering at `/admin`.
+
+### Phase 8: Authentication & Access Control (Aligned with Next.js Documentation)
+
+- [x] Environment Variables Validation with Joi (`lib/env.ts`):
+  - Strictly validated all environment variables (`MONGODB_URL`, `NEXT_PUBLIC_SITE_URL`, `SESSION_SECRET`, `NODE_ENV`) using Joi schema.
+  - Eliminated all default/fallback values from the application codebase; all values are strictly sourced from `.env`.
+  - Added build-time/startup assertion with clear error reporting.
+- [x] MongoDB & Mongoose Database Layer (`lib/mongodb.ts`, `lib/models/User.ts`, `lib/models/Category.ts`):
+  - Configured resilient singleton connection caching in `lib/mongodb.ts` using validated `env.MONGODB_URL`.
+  - Established strict schema standard: every collection's primary key is `_id: Types.ObjectId`, and any collection referencing another document uses foreign key `{ type: Schema.Types.ObjectId, ref: 'ModelName' }` referencing that document's `_id`.
+  - Built `User` Mongoose schema with email uniqueness, password hashing support, role attributes (`admin` | `reader` | `editor`), and `Types.ObjectId` `_id`.
+  - Built `Category` Mongoose schema with `Types.ObjectId` `_id`.
+- [x] Role-Based Configuration & Reader Default (`lib/definitions.ts`, `lib/models/User.ts`, `lib/session.ts`, `lib/dal.ts`):
+  - Strictly limited user roles to `["admin", "reader", "editor"]` via TypeScript `UserRole` union and `USER_ROLES` constant array.
+  - Set `reader` as the default role across the database schema (`UserSchema.role.default = "reader"`), session generator (`createSession(..., role = "reader")`), Data Access Layer fallback, and signup server action (`newUser.role = DEFAULT_USER_ROLE`).
+  - Added role typing and badge display to `AdminHeader.tsx` (desktop profile pill and mobile navigation drawer).
+- [x] Stateless Session Management with Jose (`lib/session.ts`):
+  - Implemented `encrypt` and `decrypt` with `jose` (`SignJWT` & `jwtVerify`) using `env.SESSION_SECRET` per official Next.js documentation.
+  - Built `createSession`, `updateSession`, and `deleteSession` utilizing Next.js `cookies` API with `httpOnly`, `secure`, and `sameSite: "lax"`.
+- [x] Data Access Layer (DAL) (`lib/dal.ts`):
+  - Built centralized authorization logic with React `cache()` for memoization during render passes.
+  - Implemented `verifySession` and `getUser` to perform secure data and identity queries.
+- [x] Server-Side Authentication Actions with React `useActionState` (`lib/actions/auth.ts`, `components/auth/`):
+  - `login`: Validates inputs, checks database, verifies password, calls `createSession()`, and redirects to `/admin`.
+  - `signup`: Validates full name, email, password length, and password match, saves user in MongoDB, calls `createSession()`, and redirects.
+  - `logout`: Deletes session cookie via `deleteSession()` and redirects to `/login`.
+  - Both `SignInForm.tsx` and `SignUpForm.tsx` use React's `useActionState` for interactive field-level and general error display.
+- [x] Migration to Next.js 16 Proxy Convention (`proxy.ts`):
+  - Migrated from deprecated `middleware.ts` to `proxy.ts` exporting default function `proxy(req)`.
+  - Performs optimistic session checks on `/admin` and `/dashboard`, redirecting unauthenticated requests to `/login`.
+  - Automatically redirects authenticated users away from `/login` and `/signup` to `/admin`.
+- [x] Route Aliases & Search Bot Protection:
+  - Created `/signin` redirect alias in `app/signin/page.tsx` pointing to `/login`.
+  - Added `/login`, `/signup`, and `/signin` to crawler `disallow` rules in `app/robots.ts`.
+- [x] Admin Studio Guard & Role-Based Access Control (`app/admin/layout.tsx`, `proxy.ts`, `lib/dal.ts`):
+  - Enforced `verifyAdminSession()` DAL check in `app/admin/layout.tsx`, restricting access strictly to `"admin"` and `"editor"` roles; unauthorized roles (e.g. `"reader"`) are redirected to `/`.
+  - Added role check in `proxy.ts` to reject reader access to `/admin` and `/dashboard` at the routing boundary.
+  - Configured login, signup, and server actions (`lib/actions/auth.ts`) to route `"admin"` and `"editor"` to `/admin` while safely routing `"reader"` to `/`.
+  - Updated `AdminHeader.tsx` to display active chef user name, avatar, role badge, and a one-click Sign Out action.
+- [x] Reader Login Prevention & Role Guard (`lib/actions/auth.ts`, `components/auth/SignInForm.tsx`):
+  - Blocked readers from authenticating into the studio: if a reader attempts to log in via the login form, the server action stops and returns `"You don't have access to login."` without creating a session.
+  - Form action triggers a toast alert displaying the unauthorized message immediately.
+- [x] Common Toast Notification System (`components/ToastProvider.tsx`, `app/layout.tsx`):
+  - Created a global, unified `ToastProvider` and `useToast()` hook supporting `success`, `error`, `warning`, and `info` toast alerts with brand-consistent styling and accessible ARIA attributes (`role="alert"`, `aria-live="polite"`).
+  - Mounted `ToastProvider` at the root layout in `app/layout.tsx`, making toast notifications universally accessible to all components.
+  - Unified toast usage across `SignInForm.tsx`, `SignUpForm.tsx`, `AdminRecipeList.tsx`, and `AdminCategoryList.tsx`.
+- [x] Category CRUD Operations & Admin-Only Authorization (`lib/models/Category.ts`, `lib/actions/category.ts`, `app/admin/categories/page.tsx`, `components/admin/AdminCategoryList.tsx`):
+  - Built `CategoryModel` Mongoose schema with name, displayName, slug uniqueness, description, and image URL.
+  - Implemented secure server actions `createCategory`, `updateCategory`, and `deleteCategory` in `lib/actions/category.ts`, each verifying `session.role === "admin"` and rejecting non-admin requests with clear authorization errors.
+  - Integrated auto-seeding logic from default Sri Lankan categories on initial empty state.
+  - Updated `AdminCategoryList.tsx` with dynamic category creation, editing, and confirmation-protected deletion modals.
+  - Provided role-aware UI: administrators get full management actions (New, Edit, Delete), while editors are presented with a read-only taxonomy view with action buttons disabled and an informative status indicator.
+  - Revalidated path cache (`/admin/categories`, `/category`, `/`) upon mutations and displayed status feedback using the common toast notification system.
+- [x] Global Typography Configuration with Google Sans, JetBrains Mono & Roboto (`app/globals.css`, `app/layout.tsx`):
+  - Configured `@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap')` in `globals.css` and injected `<style>` tag into `app/layout.tsx`.
+  - Mapped Tailwind tokens `--font-display` to `"Google Sans", sans-serif`, `--font-ui` and `--font-sans` to `"Roboto", sans-serif`, and `--font-mono` to `"JetBrains Mono", monospace`.
+- [x] Code Quality:
+  - Removed deprecated `middleware.ts` and obsolete `lib/auth.ts`.
+  - Verified clean ESLint check (`pnpm lint`) with 0 errors and 0 warnings.

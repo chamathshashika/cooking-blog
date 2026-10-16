@@ -141,6 +141,12 @@ export default function Footer() {
             >
               Contact
             </Link>
+            <Link
+              href="/admin"
+              className="hover:text-ink font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
+              Admin
+            </Link>
           </div>
         </div>
       </div>
