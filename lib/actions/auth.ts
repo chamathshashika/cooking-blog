@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { createSession, deleteSession } from "@/lib/session";
-import type { FormState } from "@/lib/definitions";
+import type { FormState, UserRole } from "@/lib/definitions";
 import { DEFAULT_USER_ROLE, hasAdminAccess } from "@/lib/definitions";
 
 /**
@@ -77,6 +77,8 @@ export async function signup(
     };
   }
 
+  let userRole: UserRole = DEFAULT_USER_ROLE;
+
   try {
     await connectToDatabase();
 
@@ -98,6 +100,7 @@ export async function signup(
       password: hashedPassword,
       role: DEFAULT_USER_ROLE,
     });
+    userRole = newUser.role;
 
     // Create session cookie via Next.js session management
     await createSession(
@@ -115,7 +118,7 @@ export async function signup(
 
   // Redirect after successful registration (admin & editor to /admin, reader to /)
   const rawRedirectTo = (formData.get("redirectTo") as string) || "/admin";
-  const targetDestination = hasAdminAccess(newUser.role)
+  const targetDestination = hasAdminAccess(userRole)
     ? rawRedirectTo
     : (rawRedirectTo.startsWith("/admin") ? "/" : rawRedirectTo);
   redirect(targetDestination);
@@ -150,6 +153,8 @@ export async function login(
     };
   }
 
+  let userRole: UserRole | undefined;
+
   try {
     await connectToDatabase();
 
@@ -174,6 +179,8 @@ export async function login(
       };
     }
 
+    userRole = user.role;
+
     // Create session cookie via Next.js session management
     await createSession(
       user._id.toString(),
@@ -190,7 +197,7 @@ export async function login(
 
   // Redirect after successful login (admin & editor to /admin, reader to /)
   const rawRedirectTo = (formData.get("redirectTo") as string) || "/admin";
-  const targetDestination = hasAdminAccess(user.role)
+  const targetDestination = hasAdminAccess(userRole)
     ? rawRedirectTo
     : (rawRedirectTo.startsWith("/admin") ? "/" : rawRedirectTo);
   redirect(targetDestination);
