@@ -43,7 +43,7 @@ const { error, value: envVars } = envSchema.validate(process.env, {
 if (error) {
   const errorMessages = error.details.map((detail) => ` • ${detail.message}`).join("\n");
   throw new Error(
-    `[Config Error] Environment variable validation failed via Joi:\n${errorMessages}\nPlease check your .env file.`
+    `[Config Error] Environment variable validation failed via Joi:\n${errorMessages}\nPlease ensure these variables are defined in your .env file (locally) or in your deployment platform's Environment Variables settings (in production).`
   );
 }
 
