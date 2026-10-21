@@ -321,3 +321,233 @@ export async function findRecipeBySlug(
 
   return defaultRecipes.find((r) => r.slug === slug);
 }
+
+export type UpdateRecipeInput = CreateRecipeInput;
+
+/**
+ * Server action to update an existing Recipe.
+ * Requires authenticated session with admin or editor privileges.
+ */
+export async function updateRecipe(
+  originalSlug: string,
+  data: UpdateRecipeInput
+): Promise<RecipeActionResult> {
+  try {
+    // 1. Authorization check
+    const session = await verifySession();
+    if (!session.isAuth || !hasAdminAccess(session.role)) {
+      return {
+        success: false,
+        error: "Unauthorized: You do not have permission to update recipes.",
+      };
+    }
+
+    // 2. Validate basic input fields
+    const title = data.title?.trim();
+    if (!title || title.length < 3) {
+      return {
+        success: false,
+        error: "Recipe title must be at least 3 characters long.",
+      };
+    }
+
+    const category = data.category?.trim();
+    if (!category) {
+      return {
+        success: false,
+        error: "Please select a category for this recipe.",
+      };
+    }
+
+    const image = data.image?.trim();
+    if (!image) {
+      return {
+        success: false,
+        error: "Please provide a featured recipe image.",
+      };
+    }
+
+    const prepTime = data.prepTime?.trim() || "20 min";
+    const cookTime = data.cookTime?.trim() || "25 min";
+    const servings = Number(data.servings) || 4;
+    const excerpt =
+      data.excerpt?.trim() ||
+      `${title} — an authentic, comforting Sri Lankan recipe made with aromatic spices and traditional ingredients.`;
+
+    // 3. Format or validate slug
+    let newSlug = data.slug?.trim().toLowerCase();
+    if (!newSlug) {
+      newSlug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+    } else {
+      newSlug = newSlug
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+    }
+
+    await connectToDatabase();
+
+    // 4. If slug changed, ensure new slug is not taken by another recipe
+    if (newSlug !== originalSlug) {
+      const existingNew = await RecipeModel.findOne({ slug: newSlug }).lean();
+      if (existingNew) {
+        return {
+          success: false,
+          error: `The URL slug "${newSlug}" is already in use by another recipe. Please pick a unique slug.`,
+        };
+      }
+    }
+
+    // 5. Sanitize Ingredients (with affiliate links)
+    const sanitizedIngredients: IIngredient[] = (data.ingredients || [])
+      .filter((ing) => ing.name && ing.name.trim().length > 0)
+      .map((ing) => {
+        let affiliateUrl = ing.affiliateUrl?.trim() || ing.affiliateLink?.trim();
+        if (
+          affiliateUrl &&
+          !affiliateUrl.startsWith("http://") &&
+          !affiliateUrl.startsWith("https://")
+        ) {
+          affiliateUrl = `https://${affiliateUrl}`;
+        }
+
+        return {
+          name: ing.name.trim(),
+          amount: ing.amount?.trim() || ing.quantity?.trim(),
+          quantity: ing.quantity?.trim() || ing.amount?.trim(),
+          group: ing.group?.trim(),
+          optional: Boolean(ing.optional),
+          affiliateUrl: affiliateUrl || undefined,
+          affiliateLink: affiliateUrl || undefined,
+        };
+      });
+
+    // 6. Sanitize Instructions
+    const sanitizedInstructions: IInstruction[] = (data.instructions || [])
+      .filter((step) => step.text && step.text.trim().length > 0)
+      .map((step, idx) => ({
+        step: idx + 1,
+        title: step.title?.trim() || undefined,
+        text: step.text.trim(),
+      }));
+
+    // 7. Find existing or upsert (for static recipes being customized for the first time)
+    const existingDoc = await RecipeModel.findOne({ slug: originalSlug });
+
+    if (existingDoc) {
+      existingDoc.slug = newSlug;
+      existingDoc.title = title;
+      existingDoc.category = category;
+      existingDoc.image = image;
+      existingDoc.prepTime = prepTime;
+      existingDoc.cookTime = cookTime;
+      existingDoc.totalTime = data.totalTime?.trim() || undefined;
+      existingDoc.servings = servings;
+      existingDoc.excerpt = excerpt;
+      existingDoc.intro = data.intro?.trim() || undefined;
+      existingDoc.isFeatured = Boolean(data.isFeatured);
+      existingDoc.ingredients = sanitizedIngredients;
+      existingDoc.instructions = sanitizedInstructions;
+      existingDoc.notes = (data.notes || []).map((n) => n.trim()).filter(Boolean);
+      existingDoc.tags = (data.tags || []).map((t) => t.trim().toLowerCase()).filter(Boolean);
+      if (data.status) {
+        existingDoc.status = data.status;
+      }
+      await existingDoc.save();
+    } else {
+      // Upsert: Create a new document in MongoDB from the static recipe
+      await RecipeModel.create({
+        slug: newSlug,
+        title,
+        category,
+        image,
+        rating: 5,
+        ratingCount: 1,
+        prepTime,
+        cookTime,
+        totalTime: data.totalTime?.trim() || undefined,
+        servings,
+        excerpt,
+        intro: data.intro?.trim() || undefined,
+        isFeatured: Boolean(data.isFeatured),
+        ingredients: sanitizedIngredients,
+        instructions: sanitizedInstructions,
+        notes: (data.notes || []).map((n) => n.trim()).filter(Boolean),
+        tags: (data.tags || []).map((t) => t.trim().toLowerCase()).filter(Boolean),
+        author: {
+          name: session.name || "Chef Amara Perera",
+          role: session.role === "admin" ? "Master Chef & Founder" : "Culinary Contributor",
+          avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
+        },
+        status: data.status || "published",
+        publishedDate: new Date().toISOString().split("T")[0],
+      });
+    }
+
+    // 8. Revalidate all dependent routes
+    revalidatePath("/admin/recipes");
+    revalidatePath(`/admin/recipes/${newSlug}/edit`);
+    revalidatePath(`/admin/recipes/${originalSlug}/edit`);
+    revalidatePath("/admin");
+    revalidatePath("/recipes");
+    revalidatePath(`/recipes/${newSlug}`);
+    revalidatePath(`/recipes/${originalSlug}`);
+    revalidatePath("/");
+
+    return {
+      success: true,
+      slug: newSlug,
+    };
+  } catch (error: unknown) {
+    console.error("Failed to update recipe in database:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "An unexpected error occurred while updating the recipe.";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Server action to delete a recipe.
+ * Requires admin or editor role.
+ */
+export async function deleteRecipe(
+  slug: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await verifySession();
+    if (!session.isAuth || !hasAdminAccess(session.role)) {
+      return {
+        success: false,
+        error: "Unauthorized: You do not have permission to delete recipes.",
+      };
+    }
+
+    await connectToDatabase();
+    await RecipeModel.findOneAndDelete({ slug });
+
+    revalidatePath("/admin/recipes");
+    revalidatePath("/admin");
+    revalidatePath("/recipes");
+    revalidatePath(`/recipes/${slug}`);
+    revalidatePath("/");
+
+    return { success: true };
+  } catch (error: unknown) {
+    console.error("Failed to delete recipe:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while deleting the recipe.",
+    };
+  }
+}

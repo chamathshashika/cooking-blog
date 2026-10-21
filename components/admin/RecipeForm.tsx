@@ -22,14 +22,20 @@ import {
   Sparkles,
   DollarSign,
 } from "lucide-react";
-import { createRecipe, type CreateRecipeInput } from "@/lib/actions/recipe";
+import {
+  createRecipe,
+  updateRecipe,
+  type CreateRecipeInput,
+} from "@/lib/actions/recipe";
 import { useToast } from "@/components/ToastProvider";
 import RecipeImageUploader from "@/components/admin/RecipeImageUploader";
-import type { Category } from "@/lib/data";
+import type { Category, Recipe } from "@/lib/data";
 
 type Props = {
   categories: Category[];
   authorName?: string;
+  initialRecipe?: Recipe;
+  isEditing?: boolean;
 };
 
 type IngredientRow = {
@@ -47,81 +53,115 @@ type InstructionStep = {
   text: string;
 };
 
-export default function RecipeForm({ categories, authorName = "Chef Amara Perera" }: Props) {
+export default function RecipeForm({
+  categories,
+  authorName = "Chef Amara Perera",
+  initialRecipe,
+  isEditing = false,
+}: Props) {
   const router = useRouter();
   const { showToast } = useToast();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEditing);
 
   // Form State
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState(categories[0]?.name || "Curries & Dinners");
-  const [image, setImage] = useState("/images/recipes/sri-lankan-chicken-curry.jpg");
-  const [prepTime, setPrepTime] = useState("20 min");
-  const [cookTime, setCookTime] = useState("30 min");
-  const [totalTime, setTotalTime] = useState("50 min");
-  const [servings, setServings] = useState(4);
-  const [excerpt, setExcerpt] = useState("");
-  const [intro, setIntro] = useState("");
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [status, setStatus] = useState<"draft" | "published">("published");
+  const [title, setTitle] = useState(initialRecipe?.title || "");
+  const [slug, setSlug] = useState(initialRecipe?.slug || "");
+  const [category, setCategory] = useState(
+    initialRecipe?.category || categories[0]?.name || "Curries & Dinners"
+  );
+  const [image, setImage] = useState(
+    initialRecipe?.image || "/images/recipes/sri-lankan-chicken-curry.jpg"
+  );
+  const [prepTime, setPrepTime] = useState(initialRecipe?.prepTime || "20 min");
+  const [cookTime, setCookTime] = useState(initialRecipe?.cookTime || "30 min");
+  const [totalTime, setTotalTime] = useState(initialRecipe?.totalTime || "");
+  const [servings, setServings] = useState(initialRecipe?.servings || 4);
+  const [excerpt, setExcerpt] = useState(initialRecipe?.excerpt || "");
+  const [intro, setIntro] = useState(initialRecipe?.intro || "");
+  const [isFeatured, setIsFeatured] = useState(Boolean(initialRecipe?.isFeatured));
+  const [status, setStatus] = useState<"draft" | "published">(
+    ((initialRecipe as unknown as { status?: "draft" | "published" })?.status) || "published"
+  );
 
   // Dynamic Ingredients with Affiliate Links
-  const [ingredients, setIngredients] = useState<IngredientRow[]>([
-    {
-      id: "ing-1",
-      name: "Ceylon Cinnamon Stick (Alba Grade)",
-      amount: "1 stick",
-      group: "Spices",
-      optional: false,
-      affiliateUrl: "https://amazon.com/dp/example-ceylon-cinnamon",
-    },
-    {
-      id: "ing-2",
-      name: "Roasted Sri Lankan Curry Powder",
-      amount: "2 tbsp",
-      group: "Curry Base",
-      optional: false,
-      affiliateUrl: "",
-    },
-    {
-      id: "ing-3",
-      name: "Fresh Coconut Milk (First Extract)",
-      amount: "1 cup",
-      group: "Curry Base",
-      optional: false,
-      affiliateUrl: "",
-    },
-  ]);
+  const [ingredients, setIngredients] = useState<IngredientRow[]>(() => {
+    if (initialRecipe?.ingredients && initialRecipe.ingredients.length > 0) {
+      return initialRecipe.ingredients.map((ing, idx) => ({
+        id: `ing-${idx}-${Date.now()}`,
+        name: ing.name || "",
+        amount: ing.amount || ing.quantity || "",
+        group: ing.group || "",
+        optional: Boolean(ing.optional),
+        affiliateUrl: ing.affiliateUrl || ing.affiliateLink || "",
+      }));
+    }
+    return [
+      {
+        id: "ing-1",
+        name: "Ceylon Cinnamon Stick (Alba Grade)",
+        amount: "1 stick",
+        group: "Spices",
+        optional: false,
+        affiliateUrl: "https://amazon.com/dp/example-ceylon-cinnamon",
+      },
+      {
+        id: "ing-2",
+        name: "Roasted Sri Lankan Curry Powder",
+        amount: "2 tbsp",
+        group: "Curry Base",
+        optional: false,
+        affiliateUrl: "",
+      },
+      {
+        id: "ing-3",
+        name: "Fresh Coconut Milk (First Extract)",
+        amount: "1 cup",
+        group: "Curry Base",
+        optional: false,
+        affiliateUrl: "",
+      },
+    ];
+  });
 
   // Dynamic Instructions
-  const [instructions, setInstructions] = useState<InstructionStep[]>([
-    {
-      id: "step-1",
-      title: "Temper the Whole Aromatics",
-      text: "Heat coconut oil in a clay pot over medium flame. Add curry leaves, bruised lemongrass, cardamom pods, and the cinnamon stick until sizzling and deeply fragrant.",
-    },
-    {
-      id: "step-2",
-      title: "Simmer and Reduce",
-      text: "Stir in the roasted spices, add the main ingredients with thin coconut milk, and simmer gently until tender and infused with flavor.",
-    },
-  ]);
+  const [instructions, setInstructions] = useState<InstructionStep[]>(() => {
+    if (initialRecipe?.instructions && initialRecipe.instructions.length > 0) {
+      return initialRecipe.instructions.map((st, idx) => ({
+        id: `step-${idx}-${Date.now()}`,
+        title: st.title || "",
+        text: st.text || "",
+      }));
+    }
+    return [
+      {
+        id: "step-1",
+        title: "Temper the Whole Aromatics",
+        text: "Heat coconut oil in a clay pot over medium flame. Add curry leaves, bruised lemongrass, cardamom pods, and the cinnamon stick until sizzling and deeply fragrant.",
+      },
+      {
+        id: "step-2",
+        title: "Simmer and Reduce",
+        text: "Stir in the roasted spices, add the main ingredients with thin coconut milk, and simmer gently until tender and infused with flavor.",
+      },
+    ];
+  });
 
   // Notes
-  const [notes, setNotes] = useState<string[]>([
-    "For the most authentic taste, use genuine Ceylon cinnamon rather than Cassia bark.",
-  ]);
+  const [notes, setNotes] = useState<string[]>(
+    initialRecipe?.notes && initialRecipe.notes.length > 0
+      ? initialRecipe.notes
+      : ["For the most authentic taste, use genuine Ceylon cinnamon rather than Cassia bark."]
+  );
   const [newNote, setNewNote] = useState("");
 
   // Tags
-  const [tags, setTags] = useState<string[]>([
-    "curry",
-    "authentic",
-    "coconut milk",
-  ]);
+  const [tags, setTags] = useState<string[]>(
+    initialRecipe?.tags && initialRecipe.tags.length > 0
+      ? initialRecipe.tags
+      : ["curry", "authentic", "coconut milk"]
+  );
   const [newTag, setNewTag] = useState("");
 
   // Auto-generate slug from title
@@ -296,16 +336,31 @@ export default function RecipeForm({ categories, authorName = "Chef Amara Perera
         status,
       };
 
-      const result = await createRecipe(payload);
+      let result;
+      if (isEditing && initialRecipe) {
+        result = await updateRecipe(initialRecipe.slug, payload);
+      } else {
+        result = await createRecipe(payload);
+      }
 
       if (result.success && result.slug) {
-        showToast(`Recipe "${title}" published successfully!`, "success");
+        showToast(
+          isEditing
+            ? `Recipe "${title}" updated successfully!`
+            : `Recipe "${title}" published successfully!`,
+          "success"
+        );
         router.push("/admin/recipes");
+        router.refresh();
       } else {
-        showToast(result.error || "Failed to publish recipe.", "error");
+        showToast(
+          result.error ||
+            (isEditing ? "Failed to update recipe." : "Failed to publish recipe."),
+          "error"
+        );
       }
     } catch (err: unknown) {
-      console.error("Create recipe submission error:", err);
+      console.error("Recipe submission error:", err);
       const errorMessage =
         err instanceof Error
           ? err.message
@@ -331,19 +386,33 @@ export default function RecipeForm({ categories, authorName = "Chef Amara Perera
             </Link>
           </div>
           <h1 className="font-display text-2xl sm:text-3xl text-ink">
-            Create Sri Lankan Recipe
+            {isEditing ? `Edit: ${initialRecipe?.title || title}` : "Create Sri Lankan Recipe"}
           </h1>
           <p className="mt-1 font-display text-xs sm:text-sm text-ink/80">
-            Publish authentic family culinary stories, ingredient checklists with affiliate partnerships, and step-by-step guidance.
+            {isEditing
+              ? "Modify family culinary storytelling, ingredients checklist with affiliate partnerships, instructions, and hero photography."
+              : "Publish authentic family culinary stories, ingredient checklists with affiliate partnerships, and step-by-step guidance."}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+          {isEditing && initialRecipe && (
+            <Link
+              href={`/recipes/${initialRecipe.slug}`}
+              target="_blank"
+              className="min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/20 bg-white px-3.5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted hover:text-ink hover:bg-linen/50 transition-colors"
+              title="Open public recipe in new tab"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">View Live</span>
+            </Link>
+          )}
+
           <Link
             href="/admin/recipes"
             className="min-h-[44px] inline-flex items-center justify-center rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors"
           >
-            Discard
+            Cancel
           </Link>
 
           <button
@@ -354,12 +423,12 @@ export default function RecipeForm({ categories, authorName = "Chef Amara Perera
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Publishing...</span>
+                <span>{isEditing ? "Saving Changes..." : "Publishing..."}</span>
               </>
             ) : (
               <>
                 <Check className="h-4 w-4" />
-                <span>Publish Recipe</span>
+                <span>{isEditing ? "Save Changes" : "Publish Recipe"}</span>
               </>
             )}
           </button>
@@ -1026,12 +1095,12 @@ export default function RecipeForm({ categories, authorName = "Chef Amara Perera
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Publishing Recipe...</span>
+                  <span>{isEditing ? "Saving Changes..." : "Publishing Recipe..."}</span>
                 </>
               ) : (
                 <>
                   <Check className="h-4 w-4" />
-                  <span>Publish Recipe</span>
+                  <span>{isEditing ? "Save Changes" : "Publish Recipe"}</span>
                 </>
               )}
             </button>

@@ -17,10 +17,10 @@ import {
   LayoutGrid,
   List,
   ChevronDown,
-  Check,
 } from "lucide-react";
 import type { Recipe, Category } from "@/lib/data";
 import { useToast } from "@/components/ToastProvider";
+import { deleteRecipe } from "@/lib/actions/recipe";
 
 type Props = {
   initialRecipes: Recipe[];
@@ -46,24 +46,6 @@ export default function AdminRecipeList({
   const [sortBy, setSortBy] = useState<"title" | "prep" | "servings">("title");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
-  // Edit Modal State
-  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
-
-  // Create Modal State
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [newRecipeData, setNewRecipeData] = useState({
-    title: "",
-    slug: "",
-    category: categories[0]?.name || "Dinner",
-    prepTime: "20 min",
-    cookTime: "25 min",
-    servings: 4,
-    excerpt: "",
-    intro: "",
-    image: "/images/recipes/sri-lankan-chicken-curry.jpg",
-    isFeatured: false,
-  });
-
   // Common Notification Toast
   const { showToast } = useToast();
 
@@ -84,69 +66,18 @@ export default function AdminRecipeList({
   };
 
   // Delete Recipe
-  const handleDeleteRecipe = (id: string, title: string) => {
+  const handleDeleteRecipe = async (id: string, title: string, slug?: string) => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       setRecipes((prev) => prev.filter((r) => r.id !== id));
       showToast(`Recipe "${title}" removed from listing.`);
+      if (slug) {
+        try {
+          await deleteRecipe(slug);
+        } catch (err) {
+          console.error("Failed to delete recipe on server:", err);
+        }
+      }
     }
-  };
-
-  // Save Edited Recipe
-  const handleSaveEdit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingRecipe) return;
-
-    setRecipes((prev) =>
-      prev.map((r) => (r.id === editingRecipe.id ? editingRecipe : r))
-    );
-    showToast(`Updated "${editingRecipe.title}" successfully.`);
-    setEditingRecipe(null);
-  };
-
-  // Create New Recipe
-  const handleCreateRecipe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newRecipeData.title.trim()) return;
-
-    const generatedSlug =
-      newRecipeData.slug.trim() ||
-      newRecipeData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-
-    const newRecipe: Recipe = {
-      id: `custom-${Date.now()}`,
-      slug: generatedSlug,
-      title: newRecipeData.title.trim(),
-      category: newRecipeData.category,
-      image: newRecipeData.image,
-      rating: 0,
-      ratingCount: 0,
-      prepTime: newRecipeData.prepTime,
-      cookTime: newRecipeData.cookTime,
-      servings: Number(newRecipeData.servings) || 4,
-      excerpt: newRecipeData.excerpt.trim() || "A flavorful authentic Sri Lankan family recipe.",
-      intro: newRecipeData.intro.trim(),
-      isFeatured: newRecipeData.isFeatured,
-      publishedDate: new Date().toISOString().split("T")[0],
-    };
-
-    setRecipes((prev) => [newRecipe, ...prev]);
-    showToast(`Created new recipe "${newRecipe.title}".`);
-    setCreateModalOpen(false);
-    setNewRecipeData({
-      title: "",
-      slug: "",
-      category: categories[0]?.name || "Dinner",
-      prepTime: "20 min",
-      cookTime: "25 min",
-      servings: 4,
-      excerpt: "",
-      intro: "",
-      image: "/images/recipes/sri-lankan-chicken-curry.jpg",
-      isFeatured: false,
-    });
   };
 
   // Filtered & Sorted Recipes
@@ -461,16 +392,15 @@ export default function AdminRecipeList({
                       {/* Actions */}
                       <td className="py-3.5 px-5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          {/* Quick Edit */}
-                          <button
-                            type="button"
-                            onClick={() => setEditingRecipe(recipe)}
+                          {/* Edit Recipe */}
+                          <Link
+                            href={`/admin/recipes/${recipe.slug}/edit`}
                             className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-sage hover:text-sage hover:bg-cream/20 transition-all"
                             title="Edit Recipe"
                             aria-label={`Edit ${recipe.title}`}
                           >
                             <Edit3 className="h-3.5 w-3.5" />
-                          </button>
+                          </Link>
 
                           {/* View Live */}
                           <Link
@@ -486,7 +416,9 @@ export default function AdminRecipeList({
                           {/* Delete */}
                           <button
                             type="button"
-                            onClick={() => handleDeleteRecipe(recipe.id, recipe.title)}
+                            onClick={() =>
+                              handleDeleteRecipe(recipe.id, recipe.title, recipe.slug)
+                            }
                             className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-red-400 hover:text-red-600 hover:bg-red-50 transition-all"
                             title="Delete Recipe"
                             aria-label={`Delete ${recipe.title}`}
@@ -587,14 +519,13 @@ export default function AdminRecipeList({
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setEditingRecipe(recipe)}
+                      <Link
+                        href={`/admin/recipes/${recipe.slug}/edit`}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-sage hover:text-sage"
                         title="Edit Recipe"
                       >
                         <Edit3 className="h-3.5 w-3.5" />
-                      </button>
+                      </Link>
                       <Link
                         href={`/recipes/${recipe.slug}`}
                         target="_blank"
@@ -605,7 +536,9 @@ export default function AdminRecipeList({
                       </Link>
                       <button
                         type="button"
-                        onClick={() => handleDeleteRecipe(recipe.id, recipe.title)}
+                        onClick={() =>
+                          handleDeleteRecipe(recipe.id, recipe.title, recipe.slug)
+                        }
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-red-400 hover:text-red-600"
                         title="Delete Recipe"
                       >
@@ -626,398 +559,6 @@ export default function AdminRecipeList({
             </p>
           </div>
         )
-      )}
-
-      {/* Quick Edit Recipe Modal */}
-      {editingRecipe && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="edit-modal-title"
-        >
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-ink/15 bg-white p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-ink/10 pb-4">
-              <div>
-                <span className="font-ui text-[10px] font-bold uppercase tracking-widest text-sage">
-                  Content Editor
-                </span>
-                <h3 id="edit-modal-title" className="font-display text-2xl text-ink mt-0.5">
-                  Edit &quot;{editingRecipe.title}&quot;
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditingRecipe(null)}
-                className="rounded-md p-1.5 text-muted hover:text-ink hover:bg-linen/50 transition-colors"
-                aria-label="Close edit modal"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEdit} className="mt-6 space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Title */}
-                <div className="sm:col-span-2">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Recipe Title
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={editingRecipe.title}
-                    onChange={(e) =>
-                      setEditingRecipe({ ...editingRecipe, title: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-display text-sm text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Category
-                  </label>
-                  <select
-                    value={editingRecipe.category}
-                    onChange={(e) =>
-                      setEditingRecipe({ ...editingRecipe, category: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs uppercase tracking-wider text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.slug} value={cat.name}>
-                        {cat.displayName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Servings */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Servings
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={editingRecipe.servings}
-                    onChange={(e) =>
-                      setEditingRecipe({
-                        ...editingRecipe,
-                        servings: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Prep Time */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Prep Time
-                  </label>
-                  <input
-                    type="text"
-                    value={editingRecipe.prepTime}
-                    onChange={(e) =>
-                      setEditingRecipe({ ...editingRecipe, prepTime: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Cook Time */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Cook Time
-                  </label>
-                  <input
-                    type="text"
-                    value={editingRecipe.cookTime}
-                    onChange={(e) =>
-                      setEditingRecipe({ ...editingRecipe, cookTime: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Image Path / URL with Live Preview */}
-                <div className="sm:col-span-2">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Image Path or URL
-                  </label>
-                  <div className="flex gap-3 items-center">
-                    <input
-                      type="text"
-                      value={editingRecipe.image}
-                      onChange={(e) =>
-                        setEditingRecipe({ ...editingRecipe, image: e.target.value })
-                      }
-                      className="flex-1 rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                    />
-                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border border-ink/15 bg-linen">
-                      <Image
-                        src={editingRecipe.image}
-                        alt="Preview"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Excerpt */}
-                <div className="sm:col-span-2">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Short Excerpt
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={editingRecipe.excerpt}
-                    onChange={(e) =>
-                      setEditingRecipe({ ...editingRecipe, excerpt: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-display text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Featured Checkbox */}
-                <div className="sm:col-span-2 flex items-center gap-2 pt-2">
-                  <input
-                    type="checkbox"
-                    id="edit-featured"
-                    checked={editingRecipe.isFeatured}
-                    onChange={(e) =>
-                      setEditingRecipe({
-                        ...editingRecipe,
-                        isFeatured: e.target.checked,
-                      })
-                    }
-                    className="h-4 w-4 rounded accent-sage focus:ring-sage"
-                  />
-                  <label
-                    htmlFor="edit-featured"
-                    className="font-ui text-xs font-bold uppercase tracking-wider text-ink cursor-pointer"
-                  >
-                    Feature this recipe on the homepage hero banner
-                  </label>
-                </div>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-3 border-t border-ink/10 pt-5">
-                <button
-                  type="button"
-                  onClick={() => setEditingRecipe(null)}
-                  className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-sage px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors"
-                >
-                  <Check className="h-4 w-4" />
-                  <span>Save Changes</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Create New Recipe Modal */}
-      {createModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="create-modal-title"
-        >
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-ink/15 bg-white p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-ink/10 pb-4">
-              <div>
-                <span className="font-ui text-[10px] font-bold uppercase tracking-widest text-sage">
-                  Recipe Creator
-                </span>
-                <h3 id="create-modal-title" className="font-display text-2xl text-ink mt-0.5">
-                  Publish New Recipe
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCreateModalOpen(false)}
-                className="rounded-md p-1.5 text-muted hover:text-ink hover:bg-linen/50 transition-colors"
-                aria-label="Close create modal"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateRecipe} className="mt-6 space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Title */}
-                <div className="sm:col-span-2">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Recipe Title *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Jaffna Crab Curry"
-                    value={newRecipeData.title}
-                    onChange={(e) =>
-                      setNewRecipeData({ ...newRecipeData, title: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Category
-                  </label>
-                  <select
-                    value={newRecipeData.category}
-                    onChange={(e) =>
-                      setNewRecipeData({ ...newRecipeData, category: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs uppercase tracking-wider text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.slug} value={cat.name}>
-                        {cat.displayName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Servings */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Servings
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={newRecipeData.servings}
-                    onChange={(e) =>
-                      setNewRecipeData({
-                        ...newRecipeData,
-                        servings: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Prep Time */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Prep Time
-                  </label>
-                  <input
-                    type="text"
-                    value={newRecipeData.prepTime}
-                    onChange={(e) =>
-                      setNewRecipeData({ ...newRecipeData, prepTime: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Cook Time */}
-                <div>
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Cook Time
-                  </label>
-                  <input
-                    type="text"
-                    value={newRecipeData.cookTime}
-                    onChange={(e) =>
-                      setNewRecipeData({ ...newRecipeData, cookTime: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Image Path */}
-                <div className="sm:col-span-2">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Image Path or URL
-                  </label>
-                  <input
-                    type="text"
-                    value={newRecipeData.image}
-                    onChange={(e) =>
-                      setNewRecipeData({ ...newRecipeData, image: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Excerpt */}
-                <div className="sm:col-span-2">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Short Excerpt
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder="A rich, fragrant Sri Lankan curry infused with roasted spices..."
-                    value={newRecipeData.excerpt}
-                    onChange={(e) =>
-                      setNewRecipeData({ ...newRecipeData, excerpt: e.target.value })
-                    }
-                    className="w-full rounded-md border border-ink/20 px-3 py-2 font-display text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-                  />
-                </div>
-
-                {/* Featured Checkbox */}
-                <div className="sm:col-span-2 flex items-center gap-2 pt-2">
-                  <input
-                    type="checkbox"
-                    id="new-featured"
-                    checked={newRecipeData.isFeatured}
-                    onChange={(e) =>
-                      setNewRecipeData({
-                        ...newRecipeData,
-                        isFeatured: e.target.checked,
-                      })
-                    }
-                    className="h-4 w-4 rounded accent-sage focus:ring-sage"
-                  />
-                  <label
-                    htmlFor="new-featured"
-                    className="font-ui text-xs font-bold uppercase tracking-wider text-ink cursor-pointer"
-                  >
-                    Feature this recipe on the homepage hero banner
-                  </label>
-                </div>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-3 border-t border-ink/10 pt-5">
-                <button
-                  type="button"
-                  onClick={() => setCreateModalOpen(false)}
-                  className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-sage px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Create Recipe</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
       )}
     </div>
   );
