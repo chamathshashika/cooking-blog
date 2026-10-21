@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { CategoryModel } from "@/lib/models/Category";
 import { verifySession } from "@/lib/dal";
 import { categories as defaultCategories, type Category } from "@/lib/data";
+import { deleteBlobByUrl } from "@/lib/actions/upload";
 
 /**
  * Fetch all categories from MongoDB.
@@ -195,16 +196,26 @@ export async function updateCategory(
 
     await connectToDatabase();
 
+    const existing = await CategoryModel.findOne({ slug: originalSlug });
+    if (!existing) {
+      return {
+        success: false,
+        error: `Category "${originalSlug}" not found.`,
+      };
+    }
+
     // If slug is changing, verify the new slug is not already used
     if (newSlug !== originalSlug) {
-      const existing = await CategoryModel.findOne({ slug: newSlug });
-      if (existing) {
+      const duplicate = await CategoryModel.findOne({ slug: newSlug });
+      if (duplicate) {
         return {
           success: false,
           error: `A category with slug "${newSlug}" already exists.`,
         };
       }
     }
+
+    const previousImage = existing.image;
 
     const name = (data.name?.trim() || newSlug).toLowerCase();
 
@@ -225,6 +236,11 @@ export async function updateCategory(
         success: false,
         error: `Category "${originalSlug}" not found.`,
       };
+    }
+
+    // If image has changed, remove previous image from Vercel Blob
+    if (previousImage && previousImage !== image) {
+      await deleteBlobByUrl(previousImage);
     }
 
     revalidatePath("/admin/categories");
@@ -276,6 +292,11 @@ export async function deleteCategory(slug: string) {
         success: false,
         error: `Category "${slug}" not found.`,
       };
+    }
+
+    // Delete image from Vercel Blob if stored there
+    if (deleted.image) {
+      await deleteBlobByUrl(deleted.image);
     }
 
     revalidatePath("/admin/categories");

@@ -224,6 +224,11 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Global Typography Configuration with Google Sans, JetBrains Mono & Roboto (`app/globals.css`, `app/layout.tsx`):
   - Configured `@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap')` in `globals.css` and injected `<style>` tag into `app/layout.tsx`.
   - Mapped Tailwind tokens `--font-display` to `"Google Sans", sans-serif`, `--font-ui` and `--font-sans` to `"Roboto", sans-serif`, and `--font-mono` to `"JetBrains Mono", monospace`.
+- [x] Category Image Upload with `@vercel/blob` (`lib/actions/upload.ts`, `components/admin/CategoryImageUploader.tsx`, `components/admin/AdminCategoryList.tsx`, `next.config.ts`):
+  - Installed `@vercel/blob` and created secure server action `uploadCategoryImage` in `lib/actions/upload.ts` enforcing admin-only access (`verifySession` & `hasAdminAccess`), file type validation (JPG, PNG, WebP, AVIF, GIF), and 5MB size limit.
+  - Configured `*.public.blob.vercel-storage.com` in `next.config.ts` `images.remotePatterns` for optimized Next.js image rendering.
+  - Built interactive `CategoryImageUploader` component with drag-and-drop file upload, upload progress indicator, live circular category preview, Vercel Blob badge, and manual URL fallback.
+  - Integrated `CategoryImageUploader` seamlessly into both "New Category" and "Edit Category" modals in `AdminCategoryList.tsx`.
 - [x] Code Quality:
   - Removed deprecated `middleware.ts` and obsolete `lib/auth.ts`.
   - Verified clean ESLint check (`pnpm lint`) with 0 errors and 0 warnings.
