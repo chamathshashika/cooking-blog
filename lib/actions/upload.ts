@@ -198,3 +198,111 @@ export async function deleteBlobImage(
   }
 }
 
+/**
+ * Server action to securely upload a recipe hero/step image to Vercel Blob.
+ * Validates session, user authorization (admin or editor role required),
+ * file type (images only), and max file size (up to 5MB).
+ */
+export async function uploadRecipeImage(
+  formData: FormData
+): Promise<UploadResult> {
+  try {
+    // 1. Authorization check
+    const session = await verifySession();
+    if (!session.isAuth || !hasAdminAccess(session.role)) {
+      return {
+        success: false,
+        error:
+          "Unauthorized: Only administrators and editors are permitted to upload recipe images.",
+      };
+    }
+
+    // 2. Extract file from FormData
+    const file = formData.get("file");
+    if (!file || !(file instanceof File) || file.size === 0) {
+      return {
+        success: false,
+        error: "No image file provided.",
+      };
+    }
+
+    // 3. Validate image MIME type
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/avif",
+      "image/gif",
+    ];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      return {
+        success: false,
+        error: "Invalid file type. Allowed formats: JPEG, PNG, WebP, AVIF, GIF.",
+      };
+    }
+
+    // 4. Validate file size (max 5MB)
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      return {
+        success: false,
+        error: "Image exceeds maximum allowed size of 5MB.",
+      };
+    }
+
+    // 5. Generate clean filename
+    const originalName = file.name || "recipe-image";
+    const extension = originalName.split(".").pop()?.toLowerCase() || "jpg";
+    const baseName = originalName
+      .substring(0, originalName.lastIndexOf(".") || originalName.length)
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, "-")
+      .replace(/-+/g, "-")
+      .slice(0, 50);
+
+    const blobPath = `recipes/${baseName}-${Date.now()}.${extension}`;
+
+    // 6. Upload to Vercel Blob
+    const blob = await put(blobPath, file, {
+      access: "public",
+      addRandomSuffix: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+
+    // 7. Route through proxy if local blob server or configured
+    let finalUrl = blob.url;
+    if (
+      blob.url.includes("localhost") ||
+      blob.url.includes("127.0.0.1") ||
+      !blob.url.startsWith("http")
+    ) {
+      finalUrl = `/api/blob?url=${encodeURIComponent(blob.url)}`;
+    } else if (process.env.BLOB_STORE_URL) {
+      try {
+        const base = process.env.BLOB_STORE_URL.replace(/\/+$/, "");
+        const path = blob.pathname.startsWith("/")
+          ? blob.pathname
+          : `/${blob.pathname}`;
+        finalUrl = `${base}${path}`;
+      } catch {
+        finalUrl = blob.url;
+      }
+    }
+
+    return {
+      success: true,
+      url: finalUrl,
+    };
+  } catch (error: unknown) {
+    console.error("Vercel Blob recipe image upload failed:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "An unexpected error occurred while uploading the recipe image to Vercel Blob.";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+

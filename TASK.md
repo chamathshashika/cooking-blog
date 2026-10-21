@@ -6,9 +6,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Completed (All Phases Complete)
+- **Active Phase**: Phase 9 (Recipe Studio: Creation, Editing & Affiliate Monetization) Complete
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
-- **Last Updated**: 2026-10-15
+- **Last Updated**: 2026-10-22
 
 ---
 
@@ -232,3 +232,41 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Code Quality:
   - Removed deprecated `middleware.ts` and obsolete `lib/auth.ts`.
   - Verified clean ESLint check (`pnpm lint`) with 0 errors and 0 warnings.
+
+### Phase 9: Recipe Creation Studio & Ingredient Affiliate Monetization
+
+- [x] Extended Recipe & Ingredient Data Models (`lib/data.ts`, `lib/models/Recipe.ts`):
+  - Added `affiliateUrl?: string` and `affiliateLink?: string` to `Ingredient` type in `lib/data.ts`.
+  - Created full Mongoose `RecipeModel` in `lib/models/Recipe.ts` with strict validation, indexes, timestamps, and embedded `IngredientSchema` supporting affiliate monetization links.
+- [x] Recipe Server Actions & Database Persistence (`lib/actions/recipe.ts`):
+  - Built `createRecipe` server action with authentication check (`verifySession`), role authorization (`hasAdminAccess`), slug uniqueness check, and input sanitization (ensuring affiliate links have valid protocols `https://`).
+  - Added automated Next.js cache revalidation (`/admin/recipes`, `/recipes`, `/`, `/recipes/[slug]`).
+  - Built `getRecipes()` with automated MongoDB fallback and initial seeding from `defaultRecipes`.
+  - Built `findRecipeBySlug(slug)` for seamless lookup across MongoDB and static data.
+- [x] Secure Recipe Image Upload (`lib/actions/upload.ts`, `components/admin/RecipeImageUploader.tsx`):
+  - Added `uploadRecipeImage` server action enforcing admin/editor authorization, MIME type checks, and 5MB size limit using `@vercel/blob`.
+  - Built `RecipeImageUploader` component with live 4:3 recipe card preview, drag-and-drop zone, Vercel Blob badge, and manual URL fallback.
+- [x] Full-Featured Recipe Creation Form (`components/admin/RecipeForm.tsx`, `app/admin/recipes/new/page.tsx`):
+  - Created dedicated editorial page at `/admin/recipes/new` with breadcrumb navigation.
+  - Implemented multi-section form following `brandGuidelines.md` (warm cream/linen tones, DM Serif headings, Montserrat uppercase labels, 44px minimum touch targets).
+  - Built interactive Ingredients Builder with dynamic row addition/deletion, quantity, group, optional toggle, and **Affiliate Link** input with test destination link and helpful monetization tip.
+  - Built re-orderable Step-by-Step Instructions with move up/down controls.
+  - Added Chef Notes & Culinary Tips manager, recipe tags chips, and hero banner feature toggle.
+- [x] Public Recipe Page Affiliate Integration (`components/IngredientsList.tsx`):
+  - Updated `IngredientsList` to render a styled, accessible "Shop" button with `ShoppingCart` and `ExternalLink` icons when an ingredient has an affiliate link.
+  - Enforced FTC/SEO compliance with `rel="noopener noreferrer sponsored"` and isolated click handlers to prevent checklist toggle interference.
+- [x] Studio Navigation & Dynamic Synchronization (`app/admin/recipes/page.tsx`, `components/admin/AdminRecipeList.tsx`, `app/recipes/page.tsx`, `app/recipes/[slug]/page.tsx`, `app/page.tsx`):
+  - Linked "New Recipe" action in admin header and recipe toolbar directly to `/admin/recipes/new`.
+  - Updated admin list, recipes catalog, recipe detail, and homepage to dynamically render newly published recipes from MongoDB.
+- [x] Unified Recipe Edit & Update UI (`components/admin/RecipeForm.tsx`, `app/admin/recipes/[slug]/edit/page.tsx`):
+  - Enhanced `RecipeForm.tsx` to operate in dual-mode (creation and updating) with full field pre-population (`initialRecipe`, `isEditing={true}`).
+  - Pre-loads and enables editing of all recipe data: title, custom URL slug, category, hero photo, prep/cook/total times, servings count, excerpt, background story / intro, ingredients checklist with affiliate links, ordered instruction steps, chef notes, tags, and draft/published status.
+  - Dynamically adapts UI: "Edit: [Recipe Title]" heading, "Save Changes" submit button, "View Live" shortcut link, and contextual success notifications.
+  - Created dedicated admin editorial route at `app/admin/recipes/[slug]/edit/page.tsx` with dynamic page metadata and secure session verification.
+- [x] Recipe Update & Deletion Server Actions (`lib/actions/recipe.ts`, `components/admin/AdminRecipeList.tsx`):
+  - Implemented `updateRecipe(originalSlug, data)` with authorization guard (`verifySession` & `hasAdminAccess`), slug uniqueness check, and ingredient affiliate URL protocol normalization (`https://`).
+  - Implemented seamless persistence: updates existing MongoDB documents or automatically upserts static recipes into MongoDB when modified.
+  - Integrated automated Next.js path cache revalidation (`/admin/recipes`, `/admin/recipes/[slug]/edit`, `/recipes`, `/recipes/[slug]`, `/`).
+  - Implemented `deleteRecipe(slug)` for MongoDB document cleanup and wired directly to admin list deletion handler.
+  - Updated both table view and card grid view in `AdminRecipeList.tsx` to link edit buttons directly to `/admin/recipes/${recipe.slug}/edit`.
+

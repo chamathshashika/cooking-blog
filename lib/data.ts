@@ -4,6 +4,8 @@ export type Ingredient = {
   quantity?: string;
   group?: string;
   optional?: boolean;
+  affiliateUrl?: string;
+  affiliateLink?: string;
 };
 
 export type Instruction = {

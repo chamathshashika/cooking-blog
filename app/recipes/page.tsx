@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import RecipesFilterView from "@/components/RecipesFilterView";
-import { getAllRecipes, categories } from "@/lib/data";
+import { categories } from "@/lib/data";
+import { getRecipes } from "@/lib/actions/recipe";
 
 export const metadata: Metadata = {
   title: "All Recipes | Authentic Sri Lankan Cooking | CeylonSpicer",
@@ -26,7 +27,7 @@ export default async function RecipesPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
   const initialCategory = resolvedSearchParams?.category || "all";
   const initialSearch = resolvedSearchParams?.search || "";
-  const allRecipes = getAllRecipes();
+  const allRecipes = await getRecipes();
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
