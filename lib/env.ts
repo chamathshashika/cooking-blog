@@ -34,6 +34,9 @@ const envSchema = Joi.object({
   NODE_ENV: Joi.string()
     .valid("development", "production", "test")
     .optional(),
+  BLOB_READ_WRITE_TOKEN: Joi.string().optional(),
+  BLOB_STORE_ID: Joi.string().optional(),
+  BLOB_STORE_URL: Joi.string().uri({ scheme: ["http", "https"] }).optional(),
 }).unknown(true);
 
 const { error, value: envVars } = envSchema.validate(process.env, {
@@ -52,4 +55,7 @@ export const env = {
   NEXT_PUBLIC_SITE_URL: envVars.NEXT_PUBLIC_SITE_URL as string,
   SESSION_SECRET: envVars.SESSION_SECRET as string,
   NODE_ENV: (envVars.NODE_ENV as string) || "development",
+  BLOB_READ_WRITE_TOKEN: envVars.BLOB_READ_WRITE_TOKEN as string | undefined,
+  BLOB_STORE_ID: envVars.BLOB_STORE_ID as string | undefined,
+  BLOB_STORE_URL: envVars.BLOB_STORE_URL as string | undefined,
 };

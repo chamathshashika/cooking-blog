@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import { categories, getCategoryCount } from "@/lib/data";
+import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
 
 export const metadata: Metadata = {
   title: "Explore Recipe Categories | CeylonSpicer",
@@ -70,10 +71,11 @@ export default function CategoriesPage() {
                 {/* Circular Category Thumbnail */}
                 <div className="mx-auto relative h-28 w-28 overflow-hidden rounded-full border-2 border-transparent transition-transform duration-200 group-hover:scale-105 group-hover:border-sage mb-4">
                   <Image
-                    src={category.image}
+                    src={getBlobDisplayUrl(category.image)}
                     alt={`${category.displayName} category`}
                     fill
                     sizes="112px"
+                    unoptimized={isBlobProxyUrl(category.image)}
                     className="object-cover"
                   />
                 </div>

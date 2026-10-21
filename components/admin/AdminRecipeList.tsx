@@ -12,7 +12,6 @@ import {
   Plus,
   Clock,
   Users,
-  CheckCircle2,
   X,
   AlertCircle,
   LayoutGrid,

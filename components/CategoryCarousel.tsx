@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Category } from "@/lib/data";
+import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
 
 type Props = {
   categories: Category[];
@@ -66,10 +67,11 @@ export default function CategoryCarousel({ categories }: Props) {
             >
               <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 overflow-hidden rounded-full bg-cream border-2 border-transparent transition-all duration-200 group-hover:scale-105 group-hover:border-sage">
                 <Image
-                  src={cat.image}
+                  src={getBlobDisplayUrl(cat.image)}
                   alt={`${cat.name} category`}
                   fill
                   sizes="(min-width: 768px) 128px, (min-width: 640px) 112px, 96px"
+                  unoptimized={isBlobProxyUrl(cat.image)}
                   className="object-cover"
                 />
               </div>

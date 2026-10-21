@@ -23,6 +23,8 @@ import {
   updateCategory,
   deleteCategory,
 } from "@/lib/actions/category";
+import CategoryImageUploader from "@/components/admin/CategoryImageUploader";
+import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
 
 type Props = {
   initialCategories: Category[];
@@ -41,14 +43,14 @@ export default function AdminCategoryList({
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   const [newCategoryData, setNewCategoryData] = useState({
     name: "",
     displayName: "",
     slug: "",
     description: "",
-    image:
-      "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80",
+    image: "",
   });
 
   const { showToast } = useToast();
@@ -104,11 +106,21 @@ export default function AdminCategoryList({
       return;
     }
 
+    if (isImageUploading) {
+      showToast("Please wait for the image upload to complete.", "error");
+      return;
+    }
+
+    if (!editingCategory.image.trim()) {
+      showToast("Please upload or provide an image for the category.", "error");
+      return;
+    }
+
     startTransition(async () => {
       const res = await updateCategory(editingCategory.slug, {
         displayName: editingCategory.displayName,
         description: editingCategory.description,
-        image: editingCategory.image,
+        image: editingCategory.image.trim(),
         name: editingCategory.name,
       });
 
@@ -127,15 +139,31 @@ export default function AdminCategoryList({
   // Create Category
   const handleCreateCategory = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCategoryData.displayName.trim()) return;
+    if (!newCategoryData.displayName.trim()) {
+      showToast("Please enter a category display name.", "error");
+      return;
+    }
 
     if (!isAdmin) {
       showToast("Unauthorized: Only administrators can create categories.", "error");
       return;
     }
 
+    if (isImageUploading) {
+      showToast("Please wait for the image upload to complete.", "error");
+      return;
+    }
+
+    if (!newCategoryData.image.trim()) {
+      showToast("Please upload a category image before creating.", "error");
+      return;
+    }
+
     startTransition(async () => {
-      const res = await createCategory(newCategoryData);
+      const res = await createCategory({
+        ...newCategoryData,
+        image: newCategoryData.image.trim(),
+      });
 
       if (res.success && res.category) {
         setCategories((prev) => [...prev, res.category!]);
@@ -146,8 +174,7 @@ export default function AdminCategoryList({
           displayName: "",
           slug: "",
           description: "",
-          image:
-            "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80",
+          image: "",
         });
       } else {
         showToast(res.error || "Failed to create category.", "error");
@@ -271,10 +298,11 @@ export default function AdminCategoryList({
                     {/* Circular Photo with warm border */}
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-sunshine/40 bg-linen shadow-2xs">
                       <Image
-                        src={category.image}
+                        src={getBlobDisplayUrl(category.image)}
                         alt={category.displayName}
                         fill
                         sizes="64px"
+                        unoptimized={isBlobProxyUrl(category.image)}
                         className="object-cover transition-transform duration-300 group-hover:scale-110"
                       />
                     </div>
@@ -436,24 +464,17 @@ export default function AdminCategoryList({
                 </p>
               </div>
 
-              <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                  Image URL *
-                </label>
-                <input
-                  type="text"
-                  required
-                  disabled={isPending}
-                  value={editingCategory.image}
-                  onChange={(e) =>
-                    setEditingCategory({
-                      ...editingCategory,
-                      image: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
-                />
-              </div>
+              <CategoryImageUploader
+                key={editingCategory.slug}
+                imageUrl={editingCategory.image}
+                onImageChange={(url) =>
+                  setEditingCategory((prev) =>
+                    prev ? { ...prev, image: url } : null
+                  )
+                }
+                onUploadStatusChange={setIsImageUploading}
+                disabled={isPending}
+              />
 
               <div>
                 <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
@@ -465,10 +486,14 @@ export default function AdminCategoryList({
                   disabled={isPending}
                   value={editingCategory.description}
                   onChange={(e) =>
-                    setEditingCategory({
-                      ...editingCategory,
-                      description: e.target.value,
-                    })
+                    setEditingCategory((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            description: e.target.value,
+                          }
+                        : null
+                    )
                   }
                   className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-display text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
@@ -477,7 +502,7 @@ export default function AdminCategoryList({
               <div className="flex items-center justify-end gap-3 border-t border-ink/10 pt-4">
                 <button
                   type="button"
-                  disabled={isPending}
+                  disabled={isPending || isImageUploading}
                   onClick={() => setEditingCategory(null)}
                   className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors cursor-pointer disabled:opacity-60"
                 >
@@ -485,13 +510,18 @@ export default function AdminCategoryList({
                 </button>
                 <button
                   type="submit"
-                  disabled={isPending}
+                  disabled={isPending || isImageUploading || !editingCategory.image.trim()}
                   className="inline-flex items-center gap-1.5 rounded-md bg-sage px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors cursor-pointer disabled:opacity-60"
                 >
                   {isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Saving...</span>
+                    </>
+                  ) : isImageUploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Uploading Image...</span>
                     </>
                   ) : (
                     <span>Save Changes</span>
@@ -572,24 +602,18 @@ export default function AdminCategoryList({
                 />
               </div>
 
-              <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                  Image URL *
-                </label>
-                <input
-                  type="text"
-                  required
-                  disabled={isPending}
-                  value={newCategoryData.image}
-                  onChange={(e) =>
-                    setNewCategoryData({
-                      ...newCategoryData,
-                      image: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
-                />
-              </div>
+              <CategoryImageUploader
+                key="new-category-uploader"
+                imageUrl={newCategoryData.image}
+                onImageChange={(url) =>
+                  setNewCategoryData((prev) => ({
+                    ...prev,
+                    image: url,
+                  }))
+                }
+                onUploadStatusChange={setIsImageUploading}
+                disabled={isPending}
+              />
 
               <div>
                 <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
@@ -602,10 +626,10 @@ export default function AdminCategoryList({
                   placeholder="Warm narrative describing this culinary category..."
                   value={newCategoryData.description}
                   onChange={(e) =>
-                    setNewCategoryData({
-                      ...newCategoryData,
+                    setNewCategoryData((prev) => ({
+                      ...prev,
                       description: e.target.value,
-                    })
+                    }))
                   }
                   className="w-full rounded-md border border-ink/20 px-3 py-2 font-display text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
@@ -614,7 +638,7 @@ export default function AdminCategoryList({
               <div className="flex items-center justify-end gap-3 border-t border-ink/10 pt-4">
                 <button
                   type="button"
-                  disabled={isPending}
+                  disabled={isPending || isImageUploading}
                   onClick={() => setCreateModalOpen(false)}
                   className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors cursor-pointer disabled:opacity-60"
                 >
@@ -622,13 +646,18 @@ export default function AdminCategoryList({
                 </button>
                 <button
                   type="submit"
-                  disabled={isPending}
+                  disabled={isPending || isImageUploading || !newCategoryData.image.trim()}
                   className="inline-flex items-center gap-1.5 rounded-md bg-sage px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors cursor-pointer disabled:opacity-60"
                 >
                   {isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Creating...</span>
+                    </>
+                  ) : isImageUploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Uploading Image...</span>
                     </>
                   ) : (
                     <>
