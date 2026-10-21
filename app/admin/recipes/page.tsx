@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Plus } from "lucide-react";
 import AdminRecipeList from "@/components/admin/AdminRecipeList";
-import { allRecipes, categories } from "@/lib/data";
+import { getRecipes } from "@/lib/actions/recipe";
+import { getCategories } from "@/lib/actions/category";
 
 export const metadata: Metadata = {
   title: "Recipe Studio | Admin Panel | CeylonSpicer",
@@ -20,6 +21,9 @@ export default async function AdminRecipesPage({ searchParams }: Props) {
       ? resolvedParams.category
       : undefined;
   const initialFeatured = resolvedParams.featured === "true";
+
+  const recipes = await getRecipes();
+  const categories = await getCategories();
 
   return (
     <div className="space-y-6">
@@ -48,16 +52,24 @@ export default async function AdminRecipesPage({ searchParams }: Props) {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-cream/80 px-3 py-1 font-ui text-xs font-bold uppercase tracking-wider text-ink border border-ink/10 shadow-2xs">
             <BookOpen className="h-3.5 w-3.5 text-sage" />
-            <span>{allRecipes.length} Total Recipes</span>
+            <span>{recipes.length} Total Recipes</span>
           </span>
+
+          <Link
+            href="/admin/recipes/new"
+            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-md bg-sage px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Recipe</span>
+          </Link>
         </div>
       </div>
 
       <AdminRecipeList
-        initialRecipes={allRecipes}
+        initialRecipes={recipes}
         categories={categories}
         initialCategoryFilter={initialCategory}
         initialFeaturedFilter={initialFeatured}

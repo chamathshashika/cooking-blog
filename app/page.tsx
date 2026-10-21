@@ -5,9 +5,18 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import SectionHeading from "@/components/SectionHeading";
 import RecipeCard from "@/components/RecipeCard";
 import Footer from "@/components/Footer";
-import { featuredRecipes, recentRecipes, categories } from "@/lib/data";
+import { categories } from "@/lib/data";
+import { getRecipes } from "@/lib/actions/recipe";
 
-export default function Home() {
+export default async function Home() {
+  const recipes = await getRecipes();
+  const explicitFeatured = recipes.filter((r) => r.isFeatured);
+  const featuredRecipes =
+    explicitFeatured.length >= 4
+      ? explicitFeatured.slice(0, 4)
+      : [...explicitFeatured, ...recipes.filter((r) => !r.isFeatured)].slice(0, 4);
+  const recentRecipes = recipes.slice(0, 6);
+
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* 1. Header */}

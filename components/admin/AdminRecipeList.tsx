@@ -247,13 +247,13 @@ export default function AdminRecipeList({
             </div>
 
             {/* Add New Recipe Button */}
-            <button
-              onClick={() => setCreateModalOpen(true)}
+            <Link
+              href="/admin/recipes/new"
               className="inline-flex min-h-[42px] items-center gap-2 rounded-md bg-sage px-4 py-2 font-ui text-xs font-bold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage shrink-0"
             >
               <Plus className="h-4 w-4" />
               <span>New Recipe</span>
-            </button>
+            </Link>
           </div>
         </div>
 
