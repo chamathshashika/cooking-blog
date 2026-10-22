@@ -112,20 +112,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               role="alert"
               className={`pointer-events-auto flex items-start gap-3 rounded-xl p-4 shadow-lg border transition-all animate-in fade-in slide-in-from-top-3 duration-200 ${
                 isError
-                  ? "bg-white border-red-300 text-red-950 shadow-red-500/10"
+                  ? "bg-white dark:bg-surface border-red-300 dark:border-red-900/60 text-red-950 dark:text-red-200 shadow-red-500/10"
                   : isSuccess
-                  ? "bg-white border-sage/40 text-ink shadow-sage/10"
+                  ? "bg-white dark:bg-surface border-sage/40 dark:border-success/40 text-ink dark:text-ice shadow-sage/10"
                   : isWarning
-                  ? "bg-white border-sunshine/80 text-ink shadow-sunshine/20"
-                  : "bg-white border-ink/15 text-ink shadow-ink/5"
+                  ? "bg-white dark:bg-surface border-sunshine/80 dark:border-gold/40 text-ink dark:text-ice shadow-sunshine/20"
+                  : "bg-white dark:bg-surface border-ink/15 dark:border-hairline text-ink dark:text-ice shadow-ink/5"
               }`}
             >
               {/* Type Icon */}
               <div className="shrink-0 mt-0.5">
-                {isError && <AlertCircle className="h-5 w-5 text-red-600" />}
-                {isSuccess && <CheckCircle2 className="h-5 w-5 text-sage" />}
-                {isWarning && <AlertTriangle className="h-5 w-5 text-[#d98b06]" />}
-                {toast.type === "info" && <Info className="h-5 w-5 text-muted" />}
+                {isError && <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />}
+                {isSuccess && <CheckCircle2 className="h-5 w-5 text-sage dark:text-success" />}
+                {isWarning && <AlertTriangle className="h-5 w-5 text-star dark:text-gold" />}
+                {toast.type === "info" && <Info className="h-5 w-5 text-muted dark:text-slate-muted" />}
               </div>
 
               {/* Message Content */}
@@ -137,7 +137,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 onClick={() => removeToast(toast.id)}
-                className="shrink-0 text-muted hover:text-ink transition-colors p-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
+                className="shrink-0 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice transition-colors p-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
                 aria-label="Dismiss toast notification"
               >
                 <X className="h-4 w-4" />

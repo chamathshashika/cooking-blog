@@ -122,23 +122,23 @@ export default function AdminRecipeList({
   return (
     <div className="space-y-5">
       {/* Main Filter & Action Toolbar */}
-      <div className="rounded-xl border border-ink/10 bg-white p-4 sm:p-5 shadow-2xs space-y-4">
+      <div className="rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-4 sm:p-5 shadow-2xs space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* Search Box */}
           <div className="relative flex-1 max-w-lg">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted dark:text-slate-muted pointer-events-none" />
             <input
               type="text"
               placeholder="Search recipes, ingredients, excerpt..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full min-h-[42px] rounded-md border border-ink/15 bg-[#faf8f5]/60 pl-10 pr-10 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="w-full min-h-[42px] rounded-md border border-ink/15 dark:border-hairline bg-linen/30 dark:bg-panel pl-10 pr-10 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:bg-white dark:focus:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
                 aria-label="Clear search"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice focus:outline-none"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -148,14 +148,14 @@ export default function AdminRecipeList({
           {/* Quick Actions (View Mode Switcher + Add Recipe) */}
           <div className="flex items-center gap-2.5">
             {/* View Mode Toggle */}
-            <div className="flex items-center rounded-md border border-ink/15 bg-linen/30 p-1">
+            <div className="flex items-center rounded-md border border-ink/15 dark:border-hairline bg-linen/30 dark:bg-panel p-1">
               <button
                 type="button"
                 onClick={() => setViewMode("table")}
                 className={`flex h-8 w-8 items-center justify-center rounded transition-all ${
                   viewMode === "table"
-                    ? "bg-white text-ink shadow-2xs"
-                    : "text-muted hover:text-ink"
+                    ? "bg-white dark:bg-surface text-ink dark:text-ice shadow-2xs"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                 }`}
                 title="Table View"
                 aria-label="Switch to Table View"
@@ -167,8 +167,8 @@ export default function AdminRecipeList({
                 onClick={() => setViewMode("grid")}
                 className={`flex h-8 w-8 items-center justify-center rounded transition-all ${
                   viewMode === "grid"
-                    ? "bg-white text-ink shadow-2xs"
-                    : "text-muted hover:text-ink"
+                    ? "bg-white dark:bg-surface text-ink dark:text-ice shadow-2xs"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                 }`}
                 title="Grid Cards View"
                 aria-label="Switch to Grid View"
@@ -180,7 +180,7 @@ export default function AdminRecipeList({
             {/* Add New Recipe Button */}
             <Link
               href="/admin/recipes/new"
-              className="inline-flex min-h-[42px] items-center gap-2 rounded-md bg-sage px-4 py-2 font-ui text-xs font-bold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage shrink-0"
+              className="inline-flex min-h-[42px] items-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage shrink-0"
             >
               <Plus className="h-4 w-4" />
               <span>New Recipe</span>
@@ -189,14 +189,14 @@ export default function AdminRecipeList({
         </div>
 
         {/* Filters and Controls Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-ink/5">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-ink/5 dark:border-hairline">
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Category Dropdown */}
             <div className="relative">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="appearance-none rounded-md border border-ink/15 bg-white pl-3 pr-8 py-2 font-ui text-xs uppercase tracking-wider text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
+                className="appearance-none rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel pl-3 pr-8 py-2 font-ui text-xs uppercase tracking-wider text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
                 aria-label="Filter by category"
               >
                 <option value="all">All Categories ({recipes.length})</option>
@@ -206,17 +206,17 @@ export default function AdminRecipeList({
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
+              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted dark:text-slate-muted" />
             </div>
 
             {/* Featured Filter Segmented Tabs */}
-            <div className="flex items-center rounded-md border border-ink/15 bg-linen/30 p-0.5">
+            <div className="flex items-center rounded-md border border-ink/15 dark:border-hairline bg-linen/30 dark:bg-panel p-0.5">
               <button
                 onClick={() => setFeaturedFilter("all")}
                 className={`px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider rounded transition-colors ${
                   featuredFilter === "all"
-                    ? "bg-white text-ink shadow-2xs"
-                    : "text-muted hover:text-ink"
+                    ? "bg-white dark:bg-surface text-ink dark:text-ice shadow-2xs"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                 }`}
               >
                 All
@@ -225,19 +225,19 @@ export default function AdminRecipeList({
                 onClick={() => setFeaturedFilter("featured")}
                 className={`flex items-center gap-1 px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider rounded transition-colors ${
                   featuredFilter === "featured"
-                    ? "bg-sunshine/40 text-ink shadow-2xs font-extrabold"
-                    : "text-muted hover:text-ink"
+                    ? "bg-sunshine/40 dark:bg-amber-primary/20 text-ink dark:text-amber-text shadow-2xs font-extrabold"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                 }`}
               >
-                <Star className="h-3 w-3 fill-sunshine text-ink" />
+                <Star className="h-3 w-3 fill-sunshine dark:fill-gold text-ink dark:text-amber-text" />
                 <span>Featured</span>
               </button>
               <button
                 onClick={() => setFeaturedFilter("standard")}
                 className={`px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider rounded transition-colors ${
                   featuredFilter === "standard"
-                    ? "bg-white text-ink shadow-2xs"
-                    : "text-muted hover:text-ink"
+                    ? "bg-white dark:bg-surface text-ink dark:text-ice shadow-2xs"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                 }`}
               >
                 Standard
@@ -249,22 +249,22 @@ export default function AdminRecipeList({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as "title" | "prep" | "servings")}
-                className="appearance-none rounded-md border border-ink/15 bg-white pl-3 pr-8 py-2 font-ui text-xs uppercase tracking-wider text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
+                className="appearance-none rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel pl-3 pr-8 py-2 font-ui text-xs uppercase tracking-wider text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
                 aria-label="Sort recipes"
               >
                 <option value="title">Sort: Title (A-Z)</option>
                 <option value="servings">Sort: Servings</option>
                 <option value="prep">Sort: Prep Time</option>
               </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
+              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted dark:text-slate-muted" />
             </div>
           </div>
 
           {/* Result Counter & Reset Button */}
-          <div className="flex items-center gap-3 font-ui text-xs text-muted">
+          <div className="flex items-center gap-3 font-ui text-xs text-muted dark:text-slate-muted">
             <span>
-              Showing <strong className="text-ink">{filteredRecipes.length}</strong> of{" "}
-              <strong className="text-ink">{recipes.length}</strong> recipes
+              Showing <strong className="text-ink dark:text-ice">{filteredRecipes.length}</strong> of{" "}
+              <strong className="text-ink dark:text-ice">{recipes.length}</strong> recipes
             </span>
 
             {(searchQuery || selectedCategory !== "all" || featuredFilter !== "all") && (
@@ -274,7 +274,7 @@ export default function AdminRecipeList({
                   setSelectedCategory("all");
                   setFeaturedFilter("all");
                 }}
-                className="font-bold text-sage hover:text-sage-dark underline"
+                className="font-bold text-sage hover:text-sage-dark dark:text-amber-text dark:hover:text-amber-secondary underline"
               >
                 Reset
               </button>
@@ -286,11 +286,11 @@ export default function AdminRecipeList({
       {/* Recipe List: Table View */}
       {viewMode === "table" ? (
         filteredRecipes.length > 0 ? (
-          <div className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-2xs">
+          <div className="overflow-hidden rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface shadow-2xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-ink/10 bg-cream/30 font-ui text-[11px] font-bold uppercase tracking-wider text-muted">
+                  <tr className="border-b border-ink/10 dark:border-hairline bg-cream/30 dark:bg-panel font-ui text-[11px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
                     <th className="py-3.5 px-5">Recipe</th>
                     <th className="py-3.5 px-4 hidden md:table-cell">Category</th>
                     <th className="py-3.5 px-4 hidden lg:table-cell">Prep / Cook</th>
@@ -299,16 +299,16 @@ export default function AdminRecipeList({
                     <th className="py-3.5 px-5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-ink/5">
+                <tbody className="divide-y divide-ink/5 dark:divide-hairline">
                   {filteredRecipes.map((recipe) => (
                     <tr
                       key={recipe.id}
-                      className="group hover:bg-cream/15 transition-colors"
+                      className="group hover:bg-cream/15 dark:hover:bg-panel/40 transition-colors"
                     >
                       {/* Recipe Image & Title */}
                       <td className="py-3.5 px-5">
                         <div className="flex items-center gap-3.5">
-                          <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-md bg-linen border border-ink/10 shadow-2xs">
+                          <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-md bg-linen dark:bg-panel border border-ink/10 dark:border-hairline shadow-2xs">
                             <Image
                               src={recipe.image}
                               alt={recipe.title}
@@ -321,15 +321,15 @@ export default function AdminRecipeList({
                             <Link
                               href={`/recipes/${recipe.slug}`}
                               target="_blank"
-                              className="font-display text-base font-semibold text-ink hover:text-sage transition-colors line-clamp-1"
+                              className="font-display text-base font-semibold text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text transition-colors line-clamp-1"
                             >
                               {recipe.title}
                             </Link>
-                            <p className="font-ui text-[11px] text-muted line-clamp-1 mt-0.5 max-w-md">
+                            <p className="font-ui text-[11px] text-muted dark:text-slate-muted line-clamp-1 mt-0.5 max-w-md">
                               {recipe.excerpt}
                             </p>
-                            <div className="flex items-center gap-2 mt-1 sm:hidden font-ui text-[10px] uppercase text-muted">
-                              <span className="font-semibold text-sage">{recipe.category}</span>
+                            <div className="flex items-center gap-2 mt-1 sm:hidden font-ui text-[10px] uppercase text-muted dark:text-slate-muted">
+                              <span className="font-semibold text-sage dark:text-amber-text">{recipe.category}</span>
                               <span>•</span>
                               <span>{recipe.servings} Servings</span>
                             </div>
@@ -339,25 +339,25 @@ export default function AdminRecipeList({
 
                       {/* Category */}
                       <td className="py-3.5 px-4 hidden md:table-cell">
-                        <span className="inline-block rounded-md bg-linen/80 px-2.5 py-1 font-ui text-[10px] font-bold uppercase tracking-wider text-ink border border-ink/5">
+                        <span className="inline-block rounded-md bg-linen/80 dark:bg-panel px-2.5 py-1 font-ui text-[10px] font-bold uppercase tracking-wider text-ink dark:text-ice border border-ink/5 dark:border-hairline">
                           {recipe.category}
                         </span>
                       </td>
 
                       {/* Times */}
                       <td className="py-3.5 px-4 hidden lg:table-cell">
-                        <div className="flex items-center gap-1.5 font-ui text-xs text-muted">
-                          <Clock className="h-3.5 w-3.5 text-sage" />
+                        <div className="flex items-center gap-1.5 font-ui text-xs text-muted dark:text-slate-muted">
+                          <Clock className="h-3.5 w-3.5 text-sage dark:text-amber-primary" />
                           <span>{recipe.prepTime}</span>
-                          <span className="text-ink/30">•</span>
+                          <span className="text-ink/30 dark:text-hairline">•</span>
                           <span>{recipe.cookTime}</span>
                         </div>
                       </td>
 
                       {/* Servings */}
                       <td className="py-3.5 px-4 hidden sm:table-cell">
-                        <div className="flex items-center gap-1.5 font-ui text-xs text-muted">
-                          <Users className="h-3.5 w-3.5 text-muted" />
+                        <div className="flex items-center gap-1.5 font-ui text-xs text-muted dark:text-slate-muted">
+                          <Users className="h-3.5 w-3.5 text-muted dark:text-slate-muted" />
                           <span>{recipe.servings} people</span>
                         </div>
                       </td>
@@ -369,8 +369,8 @@ export default function AdminRecipeList({
                           onClick={() => handleToggleFeatured(recipe.id)}
                           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-ui text-[10px] font-bold uppercase tracking-wider transition-all ${
                             recipe.isFeatured
-                              ? "bg-sunshine/30 text-ink border border-sunshine/60 hover:bg-sunshine/50 shadow-2xs"
-                              : "bg-linen text-muted/80 border border-ink/10 hover:border-ink/20 hover:text-ink"
+                              ? "bg-sunshine/30 dark:bg-amber-primary/20 text-ink dark:text-amber-text border border-sunshine/60 dark:border-amber-primary/40 hover:bg-sunshine/50 shadow-2xs"
+                              : "bg-linen dark:bg-panel text-muted/80 dark:text-slate-muted border border-ink/10 dark:border-hairline hover:border-ink/20 hover:text-ink dark:hover:text-ice"
                           }`}
                           title={
                             recipe.isFeatured
@@ -381,8 +381,8 @@ export default function AdminRecipeList({
                           <Star
                             className={`h-3 w-3 ${
                               recipe.isFeatured
-                                ? "fill-sunshine text-ink"
-                                : "text-muted"
+                                ? "fill-sunshine dark:fill-gold text-ink dark:text-amber-text"
+                                : "text-muted dark:text-slate-muted"
                             }`}
                           />
                           <span>{recipe.isFeatured ? "Featured" : "Standard"}</span>
@@ -395,7 +395,7 @@ export default function AdminRecipeList({
                           {/* Edit Recipe */}
                           <Link
                             href={`/admin/recipes/${recipe.slug}/edit`}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-sage hover:text-sage hover:bg-cream/20 transition-all"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel text-ink/70 dark:text-ice/70 hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text hover:bg-cream/20 dark:hover:bg-surface transition-all"
                             title="Edit Recipe"
                             aria-label={`Edit ${recipe.title}`}
                           >
@@ -406,7 +406,7 @@ export default function AdminRecipeList({
                           <Link
                             href={`/recipes/${recipe.slug}`}
                             target="_blank"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-sage hover:text-sage hover:bg-cream/20 transition-all"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel text-ink/70 dark:text-ice/70 hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text hover:bg-cream/20 dark:hover:bg-surface transition-all"
                             title="View Public Recipe"
                             aria-label={`View live ${recipe.title}`}
                           >
@@ -419,7 +419,7 @@ export default function AdminRecipeList({
                             onClick={() =>
                               handleDeleteRecipe(recipe.id, recipe.title, recipe.slug)
                             }
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-red-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel text-ink/70 dark:text-ice/70 hover:border-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all"
                             title="Delete Recipe"
                             aria-label={`Delete ${recipe.title}`}
                           >
@@ -434,10 +434,10 @@ export default function AdminRecipeList({
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-ink/10 bg-white p-12 text-center shadow-2xs">
-            <AlertCircle className="mx-auto h-8 w-8 text-muted mb-2" />
-            <h3 className="font-display text-xl text-ink">No recipes match your filter</h3>
-            <p className="mt-1 font-display text-sm text-muted">
+          <div className="rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-12 text-center shadow-2xs">
+            <AlertCircle className="mx-auto h-8 w-8 text-muted dark:text-slate-muted mb-2" />
+            <h3 className="font-display text-xl text-ink dark:text-ice">No recipes match your filter</h3>
+            <p className="mt-1 font-display text-sm text-muted dark:text-slate-muted">
               Try adjusting your search query, choosing a different category, or resetting filters.
             </p>
             <button
@@ -446,7 +446,7 @@ export default function AdminRecipeList({
                 setSelectedCategory("all");
                 setFeaturedFilter("all");
               }}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-sage px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage-dark dark:hover:bg-amber-primary/90"
             >
               Reset All Filters
             </button>
@@ -459,10 +459,10 @@ export default function AdminRecipeList({
             {filteredRecipes.map((recipe) => (
               <div
                 key={recipe.id}
-                className="group flex flex-col justify-between overflow-hidden rounded-xl border border-ink/10 bg-white shadow-2xs hover:shadow-md hover:border-ink/20 transition-all"
+                className="group flex flex-col justify-between overflow-hidden rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface shadow-2xs hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 transition-all"
               >
                 {/* Photo & Overlay */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-linen">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-linen dark:bg-panel">
                   <Image
                     src={recipe.image}
                     alt={recipe.title}
@@ -471,7 +471,7 @@ export default function AdminRecipeList({
                     className="object-cover transition-transform duration-300 group-hover:scale-103"
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="rounded bg-white/95 px-2.5 py-1 font-ui text-[10px] font-bold uppercase tracking-widest text-ink shadow-xs">
+                    <span className="rounded bg-white/95 dark:bg-panel px-2.5 py-1 font-ui text-[10px] font-bold uppercase tracking-widest text-ink dark:text-ice shadow-xs">
                       {recipe.category}
                     </span>
                   </div>
@@ -481,13 +481,13 @@ export default function AdminRecipeList({
                       onClick={() => handleToggleFeatured(recipe.id)}
                       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-ui text-[9px] font-bold uppercase tracking-wider shadow-xs backdrop-blur-sm transition-all ${
                         recipe.isFeatured
-                          ? "bg-sunshine text-ink"
+                          ? "bg-sunshine dark:bg-amber-primary text-ink dark:text-obsidian"
                           : "bg-black/40 text-white hover:bg-black/60"
                       }`}
                     >
                       <Star
                         className={`h-2.5 w-2.5 ${
-                          recipe.isFeatured ? "fill-ink text-ink" : "text-white"
+                          recipe.isFeatured ? "fill-ink text-ink dark:fill-obsidian dark:text-obsidian" : "text-white"
                         }`}
                       />
                       <span>{recipe.isFeatured ? "Featured" : "Standard"}</span>
@@ -501,27 +501,27 @@ export default function AdminRecipeList({
                     <Link
                       href={`/recipes/${recipe.slug}`}
                       target="_blank"
-                      className="font-display text-lg font-semibold text-ink group-hover:text-sage transition-colors line-clamp-1"
+                      className="font-display text-lg font-semibold text-ink dark:text-ice group-hover:text-sage dark:group-hover:text-amber-text transition-colors line-clamp-1"
                     >
                       {recipe.title}
                     </Link>
-                    <p className="mt-1 font-display text-xs text-muted line-clamp-2 leading-relaxed">
+                    <p className="mt-1 font-display text-xs text-muted dark:text-slate-muted line-clamp-2 leading-relaxed">
                       {recipe.excerpt}
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-ink/5 flex items-center justify-between text-muted font-ui text-xs">
+                  <div className="mt-4 pt-3 border-t border-ink/5 dark:border-hairline flex items-center justify-between text-muted dark:text-slate-muted font-ui text-xs">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="h-3 w-3 text-sage" />
+                      <Clock className="h-3 w-3 text-sage dark:text-amber-primary" />
                       <span>{recipe.prepTime}</span>
-                      <span className="text-ink/20">•</span>
+                      <span className="text-ink/20 dark:text-hairline">•</span>
                       <span>{recipe.cookTime}</span>
                     </div>
 
                     <div className="flex items-center gap-1">
                       <Link
                         href={`/admin/recipes/${recipe.slug}/edit`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-sage hover:text-sage"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel text-ink/70 dark:text-ice/70 hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text"
                         title="Edit Recipe"
                       >
                         <Edit3 className="h-3.5 w-3.5" />
@@ -529,7 +529,7 @@ export default function AdminRecipeList({
                       <Link
                         href={`/recipes/${recipe.slug}`}
                         target="_blank"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-sage hover:text-sage"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel text-ink/70 dark:text-ice/70 hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text"
                         title="View Live"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -539,7 +539,7 @@ export default function AdminRecipeList({
                         onClick={() =>
                           handleDeleteRecipe(recipe.id, recipe.title, recipe.slug)
                         }
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 bg-white text-ink/70 hover:border-red-400 hover:text-red-600"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel text-ink/70 dark:text-ice/70 hover:border-red-400 hover:text-red-600"
                         title="Delete Recipe"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -551,10 +551,10 @@ export default function AdminRecipeList({
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-ink/10 bg-white p-12 text-center shadow-2xs">
-            <AlertCircle className="mx-auto h-8 w-8 text-muted mb-2" />
-            <h3 className="font-display text-xl text-ink">No recipes match your filter</h3>
-            <p className="mt-1 font-display text-sm text-muted">
+          <div className="rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-12 text-center shadow-2xs">
+            <AlertCircle className="mx-auto h-8 w-8 text-muted dark:text-slate-muted mb-2" />
+            <h3 className="font-display text-xl text-ink dark:text-ice">No recipes match your filter</h3>
+            <p className="mt-1 font-display text-sm text-muted dark:text-slate-muted">
               Try adjusting your search query, choosing a different category, or resetting filters.
             </p>
           </div>

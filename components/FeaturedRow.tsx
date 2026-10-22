@@ -12,8 +12,8 @@ export default function FeaturedRow({ recipes }: Props) {
 
   return (
     <section className="relative w-full isolate" aria-label="Featured Recipes">
-      {/* Background split: Top cream, bottom white */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 bg-cream h-32 md:h-44 z-0" aria-hidden="true" />
+      {/* Background split: Top cream/surface, bottom white/obsidian */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 bg-cream dark:bg-surface h-32 md:h-44 z-0 transition-colors duration-200" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6">
         <div

@@ -221,23 +221,23 @@ export default function AdminCategoryList({
   return (
     <div className="space-y-6">
       {/* Main Filter & Action Toolbar */}
-      <div className="rounded-xl border border-ink/10 bg-white p-4 sm:p-5 shadow-2xs space-y-4">
+      <div className="rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-4 sm:p-5 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Search Input */}
           <div className="relative flex-1 max-w-md">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted dark:text-slate-muted" />
             <input
               type="text"
               placeholder="Search categories by name or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full min-h-[44px] rounded-md border border-ink/20 bg-white pl-10 pr-4 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="w-full min-h-[44px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel pl-10 pr-4 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice focus:outline-none"
                 aria-label="Clear category search"
               >
                 <X className="h-4 w-4" />
@@ -251,7 +251,7 @@ export default function AdminCategoryList({
               <button
                 type="button"
                 onClick={() => setCreateModalOpen(true)}
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md bg-sage px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white shadow-xs transition-all hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-ink cursor-pointer"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink cursor-pointer"
               >
                 <Plus className="h-4 w-4" />
                 <span>New Category</span>
@@ -259,9 +259,9 @@ export default function AdminCategoryList({
             ) : (
               <div
                 title="Only users with Admin role can create new categories"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-ink/10 bg-cream/30 px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted cursor-not-allowed"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-ink/10 dark:border-hairline bg-cream/30 dark:bg-panel px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted dark:text-slate-muted cursor-not-allowed"
               >
-                <ShieldAlert className="h-4 w-4 text-sage" />
+                <ShieldAlert className="h-4 w-4 text-sage dark:text-amber-primary" />
                 <span>Admin Required to Add</span>
               </div>
             )}
@@ -269,13 +269,13 @@ export default function AdminCategoryList({
         </div>
 
         {/* Counter & helper indicator */}
-        <div className="flex items-center justify-between border-t border-ink/5 pt-3 text-[11px] font-ui text-muted">
+        <div className="flex items-center justify-between border-t border-ink/5 dark:border-hairline pt-3 text-[11px] font-ui text-muted dark:text-slate-muted">
           <span>
-            Showing <strong className="text-ink">{filteredCategories.length}</strong> of{" "}
-            <strong className="text-ink">{categories.length}</strong> categories
+            Showing <strong className="text-ink dark:text-ice">{filteredCategories.length}</strong> of{" "}
+            <strong className="text-ink dark:text-ice">{categories.length}</strong> categories
           </span>
           {!isAdmin && (
-            <span className="text-[10px] uppercase tracking-wider text-muted font-medium">
+            <span className="text-[10px] uppercase tracking-wider text-muted dark:text-slate-muted font-medium">
               Category mutations restricted to Admin role
             </span>
           )}
@@ -291,12 +291,12 @@ export default function AdminCategoryList({
             return (
               <div
                 key={category.slug}
-                className="group flex flex-col justify-between rounded-xl border border-ink/10 bg-white p-5 shadow-2xs hover:shadow-md hover:border-ink/20 transition-all"
+                className="group flex flex-col justify-between rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-5 shadow-2xs hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 transition-all"
               >
                 <div>
                   <div className="flex items-start gap-4">
                     {/* Circular Photo with warm border */}
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-sunshine/40 bg-linen shadow-2xs">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-sunshine/40 dark:border-amber-primary/40 bg-linen dark:bg-panel shadow-2xs">
                       <Image
                         src={getBlobDisplayUrl(category.image)}
                         alt={category.displayName}
@@ -312,11 +312,11 @@ export default function AdminCategoryList({
                       <Link
                         href={`/category/${category.slug}`}
                         target="_blank"
-                        className="font-display text-lg font-semibold text-ink group-hover:text-sage transition-colors line-clamp-1"
+                        className="font-display text-lg font-semibold text-ink dark:text-ice group-hover:text-sage dark:group-hover:text-amber-text transition-colors line-clamp-1"
                       >
                         {category.displayName}
                       </Link>
-                      <p className="font-ui text-[10px] text-muted tracking-wider uppercase mt-0.5">
+                      <p className="font-ui text-[10px] text-muted dark:text-slate-muted tracking-wider uppercase mt-0.5">
                         /category/{category.slug}
                       </p>
 
@@ -326,8 +326,8 @@ export default function AdminCategoryList({
                           href={`/admin/recipes?category=${category.slug}`}
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-ui text-[10px] font-bold uppercase tracking-wider border transition-all ${
                             count > 0
-                              ? "bg-sage/10 text-sage border-sage/20 hover:bg-sage hover:text-white"
-                              : "bg-linen text-muted border-ink/10"
+                              ? "bg-sage/10 text-sage border-sage/20 dark:bg-sage/20 dark:text-sage-light dark:border-sage/40 hover:bg-sage hover:text-white dark:hover:bg-amber-primary dark:hover:text-obsidian"
+                              : "bg-linen text-muted border-ink/10 dark:bg-panel dark:text-slate-muted dark:border-hairline"
                           }`}
                         >
                           <BookOpen className="h-3 w-3" />
@@ -341,18 +341,18 @@ export default function AdminCategoryList({
                   </div>
 
                   {/* Description */}
-                  <p className="mt-4 font-display text-xs text-ink/80 leading-relaxed line-clamp-3">
+                  <p className="mt-4 font-display text-xs text-ink/80 dark:text-slate-muted leading-relaxed line-clamp-3">
                     {category.description}
                   </p>
                 </div>
 
                 {/* Footer Actions */}
-                <div className="mt-5 flex items-center justify-between border-t border-ink/5 pt-3">
+                <div className="mt-5 flex items-center justify-between border-t border-ink/5 dark:border-hairline pt-3">
                   <Link
                     href={`/category/${category.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                    className="inline-flex items-center gap-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                   >
                     <span>Public View</span>
                     <ExternalLink className="h-3 w-3" />
@@ -363,7 +363,7 @@ export default function AdminCategoryList({
                       <button
                         type="button"
                         onClick={() => setEditingCategory({ ...category })}
-                        className="inline-flex items-center gap-1.5 rounded-md border border-ink/10 bg-white px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-sage hover:bg-cream/30 hover:border-sage transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-panel px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-sage dark:text-amber-text hover:bg-cream/30 dark:hover:bg-surface hover:border-sage dark:hover:border-amber-primary transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
                       >
                         <Edit3 className="h-3 w-3" />
                         <span>Edit</span>
@@ -372,7 +372,7 @@ export default function AdminCategoryList({
                       <button
                         type="button"
                         onClick={() => setDeletingCategory(category)}
-                        className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-white px-2.5 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-red-600 hover:bg-red-50 hover:border-red-300 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-md border border-red-200 dark:border-red-900/60 bg-white dark:bg-panel px-2.5 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-300 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 cursor-pointer"
                         title="Delete category"
                         aria-label={`Delete category ${category.displayName}`}
                       >
@@ -381,7 +381,7 @@ export default function AdminCategoryList({
                       </button>
                     </div>
                   ) : (
-                    <span className="font-ui text-[10px] uppercase tracking-wider text-muted/80 font-medium">
+                    <span className="font-ui text-[10px] uppercase tracking-wider text-muted/80 dark:text-slate-muted font-medium">
                       Read Only
                     </span>
                   )}
@@ -391,10 +391,10 @@ export default function AdminCategoryList({
           })}
         </div>
       ) : (
-        <div className="rounded-xl border border-ink/10 bg-white p-12 text-center shadow-2xs">
-          <AlertCircle className="mx-auto h-8 w-8 text-muted mb-2" />
-          <h3 className="font-display text-xl text-ink">No categories found</h3>
-          <p className="mt-1 font-display text-sm text-muted">
+        <div className="rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-12 text-center shadow-2xs">
+          <AlertCircle className="mx-auto h-8 w-8 text-muted dark:text-slate-muted mb-2" />
+          <h3 className="font-display text-xl text-ink dark:text-ice">No categories found</h3>
+          <p className="mt-1 font-display text-sm text-muted dark:text-slate-muted">
             Try adjusting your search query or reset the search filter.
           </p>
         </div>
@@ -403,18 +403,18 @@ export default function AdminCategoryList({
       {/* Edit Category Modal (Admin Only) */}
       {isAdmin && editingCategory && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs animate-in fade-in"
           role="dialog"
           aria-modal="true"
           aria-labelledby="edit-category-title"
         >
-          <div className="relative w-full max-w-lg rounded-xl border border-ink/15 bg-white p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-ink/10 pb-4">
+          <div className="relative w-full max-w-lg rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-ink/10 dark:border-hairline pb-4">
               <div>
-                <span className="font-ui text-[10px] font-bold uppercase tracking-widest text-sage">
+                <span className="font-ui text-[10px] font-bold uppercase tracking-widest text-sage dark:text-amber-primary">
                   Taxonomy Editor • Admin
                 </span>
-                <h3 id="edit-category-title" className="font-display text-2xl text-ink mt-0.5">
+                <h3 id="edit-category-title" className="font-display text-2xl text-ink dark:text-ice mt-0.5">
                   Edit Category
                 </h3>
               </div>
@@ -422,7 +422,7 @@ export default function AdminCategoryList({
                 type="button"
                 disabled={isPending}
                 onClick={() => setEditingCategory(null)}
-                className="rounded-md p-1.5 text-muted hover:text-ink hover:bg-linen/50 transition-colors cursor-pointer"
+                className="rounded-md p-1.5 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-linen/50 dark:hover:bg-panel transition-colors cursor-pointer"
                 aria-label="Close edit modal"
               >
                 <X className="h-5 w-5" />
@@ -431,7 +431,7 @@ export default function AdminCategoryList({
 
             <form onSubmit={handleSaveEdit} className="mt-5 space-y-4">
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Display Name *
                 </label>
                 <input
@@ -445,21 +445,21 @@ export default function AdminCategoryList({
                       displayName: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-display text-sm text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2 font-display text-sm text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
               </div>
 
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Slug (URL path)
                 </label>
                 <input
                   type="text"
                   disabled
                   value={editingCategory.slug}
-                  className="w-full rounded-md border border-ink/10 bg-linen/40 px-3.5 py-2 font-ui text-xs text-muted cursor-not-allowed"
+                  className="w-full rounded-md border border-ink/10 dark:border-hairline bg-linen/40 dark:bg-panel/60 px-3.5 py-2 font-ui text-xs text-muted dark:text-slate-muted cursor-not-allowed"
                 />
-                <p className="mt-1 text-[10px] font-ui text-muted">
+                <p className="mt-1 text-[10px] font-ui text-muted dark:text-slate-muted">
                   URL slug is fixed to preserve existing external recipe and SEO links.
                 </p>
               </div>
@@ -477,7 +477,7 @@ export default function AdminCategoryList({
               />
 
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Description *
                 </label>
                 <textarea
@@ -495,23 +495,23 @@ export default function AdminCategoryList({
                         : null
                     )
                   }
-                  className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-display text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2 font-display text-xs text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 border-t border-ink/10 pt-4">
+              <div className="flex items-center justify-end gap-3 border-t border-ink/10 dark:border-hairline pt-4">
                 <button
                   type="button"
                   disabled={isPending || isImageUploading}
                   onClick={() => setEditingCategory(null)}
-                  className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors cursor-pointer disabled:opacity-60"
+                  className="rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-linen/50 dark:hover:bg-surface transition-colors cursor-pointer disabled:opacity-60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isPending || isImageUploading || !editingCategory.image.trim()}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-sage px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors cursor-pointer disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-sage dark:bg-amber-primary px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage-dark dark:hover:bg-amber-primary/90 shadow-xs transition-colors cursor-pointer disabled:opacity-60"
                 >
                   {isPending ? (
                     <>
@@ -536,18 +536,18 @@ export default function AdminCategoryList({
       {/* Create Category Modal (Admin Only) */}
       {isAdmin && createModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs animate-in fade-in"
           role="dialog"
           aria-modal="true"
           aria-labelledby="create-category-title"
         >
-          <div className="relative w-full max-w-lg rounded-xl border border-ink/15 bg-white p-6 sm:p-8 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-ink/10 pb-4">
+          <div className="relative w-full max-w-lg rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-ink/10 dark:border-hairline pb-4">
               <div>
-                <span className="font-ui text-[10px] font-bold uppercase tracking-widest text-sage">
+                <span className="font-ui text-[10px] font-bold uppercase tracking-widest text-sage dark:text-amber-primary">
                   Taxonomy Creator • Admin
                 </span>
-                <h3 id="create-category-title" className="font-display text-2xl text-ink mt-0.5">
+                <h3 id="create-category-title" className="font-display text-2xl text-ink dark:text-ice mt-0.5">
                   New Category
                 </h3>
               </div>
@@ -555,7 +555,7 @@ export default function AdminCategoryList({
                 type="button"
                 disabled={isPending}
                 onClick={() => setCreateModalOpen(false)}
-                className="rounded-md p-1.5 text-muted hover:text-ink hover:bg-linen/50 transition-colors cursor-pointer"
+                className="rounded-md p-1.5 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-linen/50 dark:hover:bg-panel transition-colors cursor-pointer"
                 aria-label="Close create modal"
               >
                 <X className="h-5 w-5" />
@@ -564,7 +564,7 @@ export default function AdminCategoryList({
 
             <form onSubmit={handleCreateCategory} className="mt-5 space-y-4">
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Display Name *
                 </label>
                 <input
@@ -579,12 +579,12 @@ export default function AdminCategoryList({
                       displayName: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-ink/20 px-3.5 py-2 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
               </div>
 
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Slug (Optional - auto-generated)
                 </label>
                 <input
@@ -598,7 +598,7 @@ export default function AdminCategoryList({
                       slug: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-ink/20 px-3 py-2 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-2 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
               </div>
 
@@ -616,7 +616,7 @@ export default function AdminCategoryList({
               />
 
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Description *
                 </label>
                 <textarea
@@ -631,23 +631,23 @@ export default function AdminCategoryList({
                       description: e.target.value,
                     }))
                   }
-                  className="w-full rounded-md border border-ink/20 px-3 py-2 font-display text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-2 font-display text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 border-t border-ink/10 pt-4">
+              <div className="flex items-center justify-end gap-3 border-t border-ink/10 dark:border-hairline pt-4">
                 <button
                   type="button"
                   disabled={isPending || isImageUploading}
                   onClick={() => setCreateModalOpen(false)}
-                  className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors cursor-pointer disabled:opacity-60"
+                  className="rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-linen/50 dark:hover:bg-surface transition-colors cursor-pointer disabled:opacity-60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isPending || isImageUploading || !newCategoryData.image.trim()}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-sage px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors cursor-pointer disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-sage dark:bg-amber-primary px-5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage-dark dark:hover:bg-amber-primary/90 shadow-xs transition-colors cursor-pointer disabled:opacity-60"
                 >
                   {isPending ? (
                     <>
@@ -675,32 +675,32 @@ export default function AdminCategoryList({
       {/* Delete Confirmation Modal (Admin Only) */}
       {isAdmin && deletingCategory && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs animate-in fade-in"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-category-title"
         >
-          <div className="relative w-full max-w-md rounded-xl border border-red-200 bg-white p-6 shadow-2xl">
+          <div className="relative w-full max-w-md rounded-xl border border-red-200 dark:border-red-900/60 bg-white dark:bg-surface p-6 shadow-2xl">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400">
                 <Trash2 className="h-5 w-5" />
               </div>
               <div className="flex-1">
                 <h3
                   id="delete-category-title"
-                  className="font-display text-xl font-bold text-ink"
+                  className="font-display text-xl font-bold text-ink dark:text-ice"
                 >
                   Delete Category?
                 </h3>
-                <p className="mt-2 text-xs font-ui text-muted leading-relaxed">
+                <p className="mt-2 text-xs font-ui text-muted dark:text-slate-muted leading-relaxed">
                   Are you sure you want to delete{" "}
-                  <strong className="text-ink">
+                  <strong className="text-ink dark:text-ice">
                     &quot;{deletingCategory.displayName}&quot;
                   </strong>
                   ? This will permanently remove it from the taxonomy database.
                 </p>
                 {getRecipeCount(deletingCategory.slug) > 0 && (
-                  <div className="mt-3 rounded-md border border-sunshine/60 bg-cream/40 p-2.5 text-xs font-ui text-ink">
+                  <div className="mt-3 rounded-md border border-sunshine/60 dark:border-amber-primary/40 bg-cream/40 dark:bg-panel p-2.5 text-xs font-ui text-ink dark:text-ice">
                     <span className="font-bold">Notice:</span> There are{" "}
                     <strong>{getRecipeCount(deletingCategory.slug)} recipes</strong> assigned
                     to this category. Recipes will remain published, but their taxonomy tag will be removed.
@@ -709,12 +709,12 @@ export default function AdminCategoryList({
               </div>
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-3 border-t border-ink/10 pt-4">
+            <div className="mt-6 flex items-center justify-end gap-3 border-t border-ink/10 dark:border-hairline pt-4">
               <button
                 type="button"
                 disabled={isPending}
                 onClick={() => setDeletingCategory(null)}
-                className="rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors cursor-pointer disabled:opacity-60"
+                className="rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-linen/50 dark:hover:bg-surface transition-colors cursor-pointer disabled:opacity-60"
               >
                 Cancel
               </button>

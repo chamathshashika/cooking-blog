@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { logout } from "@/lib/actions/auth";
 import type { UserRole } from "@/lib/definitions";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type Props = {
   session?: {
@@ -67,27 +68,27 @@ export default function AdminHeader({ session }: Props) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-ink/10 bg-[#fdfbf7]/95 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-40 w-full border-b border-ink/10 dark:border-hairline bg-white/95 dark:bg-surface/95 backdrop-blur-md transition-all">
       {/* Top micro-bar */}
-      <div className="border-b border-ink/5 bg-cream/30 px-4 sm:px-6 py-1">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between text-[10px] font-ui uppercase tracking-widest text-muted">
+      <div className="border-b border-ink/5 dark:border-hairline bg-cream/30 dark:bg-panel/40 px-4 sm:px-6 py-1">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between text-[10px] font-ui uppercase tracking-widest text-muted dark:text-slate-muted">
           <div className="flex items-center gap-2">
             <span className="flex h-1.5 w-1.5 rounded-full bg-sage animate-pulse" />
-            <span className="font-semibold text-ink/80">CeylonSpicer Studio</span>
-            <span className="hidden sm:inline text-ink/30">•</span>
-            <span className="hidden sm:inline text-muted/70">Sri Lankan Culinary CMS</span>
+            <span className="font-semibold text-ink/80 dark:text-ice/90">CeylonSpicer Studio</span>
+            <span className="hidden sm:inline text-ink/30 dark:text-ice/20">•</span>
+            <span className="hidden sm:inline text-muted/70 dark:text-slate-muted/70">Sri Lankan Culinary CMS</span>
           </div>
           <div className="flex items-center gap-3">
             {session && (
-              <span className="hidden md:inline text-ink/70">
-                Signed in as <strong className="text-ink">{session.name}</strong>
+              <span className="hidden md:inline text-ink/70 dark:text-ice/70">
+                Signed in as <strong className="text-ink dark:text-ice">{session.name}</strong>
               </span>
             )}
             <Link
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-bold text-sage hover:text-sage-dark transition-colors"
+              className="inline-flex items-center gap-1 font-bold text-sage dark:text-amber-text hover:text-sage-dark dark:hover:text-gold transition-colors"
             >
               <span>Live Website</span>
               <ExternalLink className="h-2.5 w-2.5" />
@@ -104,7 +105,7 @@ export default function AdminHeader({ session }: Props) {
             href="/admin"
             className="group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           >
-            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-ink/15 bg-white shadow-xs transition-transform group-hover:scale-105">
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel shadow-xs transition-transform group-hover:scale-105">
               <Image
                 src="/favicon.ico"
                 alt="CeylonSpicer favicon logo"
@@ -116,14 +117,14 @@ export default function AdminHeader({ session }: Props) {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-display text-xl sm:text-2xl text-ink tracking-tight leading-none">
+                <span className="font-display text-xl sm:text-2xl text-ink dark:text-ice tracking-tight leading-none">
                   CeylonSpicer
                 </span>
-                <span className="inline-flex items-center rounded-sm bg-sunshine/25 px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-widest text-ink border border-sunshine/40">
+                <span className="inline-flex items-center rounded-sm bg-sunshine/25 dark:bg-amber-primary/20 px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-widest text-ink dark:text-ice border border-sunshine/40 dark:border-amber-primary/40">
                   Admin
                 </span>
               </div>
-              <span className="font-ui text-[9px] uppercase tracking-wider text-muted mt-0.5">
+              <span className="font-ui text-[9px] uppercase tracking-wider text-muted dark:text-slate-muted mt-0.5">
                 Content & Recipe Studio
               </span>
             </div>
@@ -132,7 +133,7 @@ export default function AdminHeader({ session }: Props) {
 
         {/* Desktop Navigation Tabs */}
         <nav
-          className="hidden md:flex items-center gap-1.5 rounded-lg border border-ink/10 bg-white/70 p-1 shadow-2xs"
+          className="hidden md:flex items-center gap-1.5 rounded-lg border border-ink/10 dark:border-hairline bg-white/70 dark:bg-panel/70 p-1 shadow-2xs"
           aria-label="Admin Navigation"
         >
           {navItems.map((item) => {
@@ -144,39 +145,41 @@ export default function AdminHeader({ session }: Props) {
                 className={`flex items-center gap-2 px-3.5 py-1.5 font-ui text-xs font-bold uppercase tracking-wider rounded-md transition-all ${
                   item.active
                     ? "bg-sage text-white shadow-xs"
-                    : "text-muted hover:text-ink hover:bg-linen/50"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-linen/50 dark:hover:bg-surface"
                 } focus:outline-none focus-visible:ring-2 focus-visible:ring-sage`}
               >
-                <Icon className={`h-3.5 w-3.5 ${item.active ? "text-white" : "text-muted"}`} />
+                <Icon className={`h-3.5 w-3.5 ${item.active ? "text-white" : "text-muted dark:text-slate-muted"}`} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Right Actions: Public Link & User Profile / Logout */}
+        {/* Right Actions: Theme Toggle, Public Link & User Profile / Logout */}
         <div className="hidden sm:flex items-center gap-3">
+          <ThemeToggle variant="minimal" />
+
           <Link
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-[38px] items-center gap-2 rounded-md border border-ink/15 bg-white px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-ink shadow-2xs transition-all hover:border-sage hover:text-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            className="inline-flex min-h-[38px] items-center gap-2 rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider text-ink dark:text-ice shadow-2xs transition-all hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           >
-            <ChefHat className="h-3.5 w-3.5 text-sage" />
+            <ChefHat className="h-3.5 w-3.5 text-sage dark:text-gold" />
             <span>View Public</span>
           </Link>
 
           {session && (
-            <div className="flex items-center gap-2 border-l border-ink/10 pl-3">
+            <div className="flex items-center gap-2 border-l border-ink/10 dark:border-hairline pl-3">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cream border border-ink/15 text-ink font-display text-xs font-bold shadow-2xs">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cream dark:bg-panel border border-ink/15 dark:border-hairline text-ink dark:text-ice font-display text-xs font-bold shadow-2xs">
                   {session.name ? session.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
                 </div>
                 <div className="hidden lg:flex flex-col text-left">
-                  <span className="font-ui text-xs font-bold text-ink leading-tight line-clamp-1 max-w-[120px]">
+                  <span className="font-ui text-xs font-bold text-ink dark:text-ice leading-tight line-clamp-1 max-w-[120px]">
                     {session.name}
                   </span>
-                  <span className="font-ui text-[9px] uppercase tracking-wider text-muted">
+                  <span className="font-ui text-[9px] uppercase tracking-wider text-muted dark:text-slate-muted">
                     {session.role}
                   </span>
                 </div>
@@ -186,7 +189,7 @@ export default function AdminHeader({ session }: Props) {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isPending}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/15 bg-white text-muted hover:text-red-600 hover:border-red-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel text-muted dark:text-slate-muted hover:text-red-600 hover:border-red-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 title="Sign Out"
                 aria-label="Sign out of admin studio"
               >
@@ -196,14 +199,16 @@ export default function AdminHeader({ session }: Props) {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button & Theme Toggle */}
         <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle variant="minimal" />
+
           {session && (
             <button
               type="button"
               onClick={handleSignOut}
               disabled={isPending}
-              className="inline-flex min-h-[38px] items-center gap-1 rounded-md border border-ink/15 bg-white px-2.5 py-1 text-xs text-muted hover:text-red-600"
+              className="inline-flex min-h-[38px] items-center gap-1 rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel px-2.5 py-1 text-xs text-muted dark:text-slate-muted hover:text-red-600"
               title="Sign Out"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -214,7 +219,7 @@ export default function AdminHeader({ session }: Props) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-ink/15 bg-white text-ink shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel text-ink dark:text-ice shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             aria-label="Toggle admin navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -225,24 +230,24 @@ export default function AdminHeader({ session }: Props) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="border-t border-ink/10 bg-[#fdfbf7] px-4 py-4 md:hidden shadow-lg animate-in slide-in-from-top-2">
+        <div className="border-t border-ink/10 dark:border-hairline bg-white dark:bg-surface px-4 py-4 md:hidden shadow-lg animate-in slide-in-from-top-2">
           {session && (
-            <div className="mb-3 flex items-center gap-3 border-b border-ink/10 pb-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-cream border border-ink/15 font-display text-sm font-bold text-ink">
+            <div className="mb-3 flex items-center gap-3 border-b border-ink/10 dark:border-hairline pb-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-cream dark:bg-panel border border-ink/15 dark:border-hairline font-display text-sm font-bold text-ink dark:text-ice">
                 {session.name ? session.name.charAt(0).toUpperCase() : "A"}
               </div>
               <div>
-                <p className="font-ui text-xs font-bold text-ink">{session.name}</p>
+                <p className="font-ui text-xs font-bold text-ink dark:text-ice">{session.name}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   {session.role && (
-                    <span className="font-ui text-[9px] uppercase tracking-wider text-muted font-medium">
+                    <span className="font-ui text-[9px] uppercase tracking-wider text-muted dark:text-slate-muted font-medium">
                       {session.role}
                     </span>
                   )}
                   {session.role && session.email && (
                     <span className="text-muted/40 text-[9px]">•</span>
                   )}
-                  <p className="font-ui text-[10px] text-muted">{session.email}</p>
+                  <p className="font-ui text-[10px] text-muted dark:text-slate-muted">{session.email}</p>
                 </div>
               </div>
             </div>
@@ -259,7 +264,7 @@ export default function AdminHeader({ session }: Props) {
                   className={`flex min-h-[44px] items-center gap-3 px-3 py-2.5 rounded-md font-ui text-xs font-bold uppercase tracking-wider transition-colors ${
                     item.active
                       ? "bg-sage text-white"
-                      : "text-muted hover:text-ink hover:bg-cream/40"
+                      : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-cream/40 dark:hover:bg-panel"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -273,13 +278,13 @@ export default function AdminHeader({ session }: Props) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 flex min-h-[44px] items-center justify-between rounded-md border border-ink/15 bg-white px-3 py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-ink shadow-2xs"
+              className="mt-2 flex min-h-[44px] items-center justify-between rounded-md border border-ink/15 dark:border-hairline bg-white dark:bg-panel px-3 py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice shadow-2xs"
             >
               <div className="flex items-center gap-2">
-                <ChefHat className="h-4 w-4 text-sage" />
+                <ChefHat className="h-4 w-4 text-sage dark:text-gold" />
                 <span>Open Public Blog</span>
               </div>
-              <ExternalLink className="h-4 w-4 text-muted" />
+              <ExternalLink className="h-4 w-4 text-muted dark:text-slate-muted" />
             </Link>
 
             {session && (
@@ -287,7 +292,7 @@ export default function AdminHeader({ session }: Props) {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isPending}
-                className="mt-1 flex min-h-[44px] w-full items-center justify-between rounded-md border border-red-200 bg-red-50/60 px-3 py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-red-700"
+                className="mt-1 flex min-h-[44px] w-full items-center justify-between rounded-md border border-red-200 dark:border-red-900/50 bg-red-50/60 dark:bg-red-950/20 px-3 py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400"
               >
                 <span>Sign Out of Studio</span>
                 <LogOut className="h-4 w-4" />

@@ -91,7 +91,7 @@ export default async function RecipeDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">
       {/* Recipe JSON-LD structured data */}
       <script
         type="application/ld+json"
@@ -102,30 +102,30 @@ export default async function RecipeDetailPage({ params }: Props) {
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
             <Link
               href="/"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Home
             </Link>
             <span aria-hidden="true">/</span>
             <Link
               href="/recipes"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Recipes
             </Link>
             <span aria-hidden="true">/</span>
             <Link
               href={`/category/${recipe.category.toLowerCase()}`}
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               {recipe.category}
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-ink truncate max-w-xs">{recipe.title}</span>
+            <span className="text-ink dark:text-ice truncate max-w-xs">{recipe.title}</span>
           </div>
         </div>
 
@@ -134,7 +134,7 @@ export default async function RecipeDetailPage({ params }: Props) {
           {/* Back link */}
           <Link
             href="/recipes"
-            className="inline-flex min-h-[44px] items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-wider text-muted hover:text-ink transition-colors mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            className="inline-flex min-h-[44px] items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice transition-colors mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>All Recipes</span>
@@ -142,21 +142,21 @@ export default async function RecipeDetailPage({ params }: Props) {
 
           {/* 1. Category Tag, Title & Rating Header */}
           <div className="text-center max-w-3xl mx-auto">
-            <span className="inline-block bg-cream px-3 py-1 font-ui text-[10px] font-bold uppercase tracking-widest text-ink">
+            <span className="inline-block bg-cream dark:bg-surface px-3 py-1 font-ui text-[10px] font-bold uppercase tracking-widest text-ink dark:text-ice border border-transparent dark:border-hairline">
               {recipe.category}
             </span>
 
-            <h1 className="mt-3 font-display text-3xl sm:text-4xl md:text-[44px] text-ink leading-tight">
+            <h1 className="mt-3 font-display text-3xl sm:text-4xl md:text-[44px] text-ink dark:text-ice leading-tight">
               {recipe.title}
             </h1>
 
             <div className="mt-3 flex items-center justify-center gap-2">
               <StarRating value={recipe.rating} />
-              <span className="font-ui text-xs font-semibold text-ink">
+              <span className="font-ui text-xs font-semibold text-ink dark:text-ice">
                 {recipe.rating.toFixed(1)}
               </span>
               {recipe.ratingCount && (
-                <span className="font-ui text-xs text-muted">
+                <span className="font-ui text-xs text-muted dark:text-slate-muted">
                   ({recipe.ratingCount} reviews)
                 </span>
               )}
@@ -165,7 +165,7 @@ export default async function RecipeDetailPage({ params }: Props) {
             {/* Author & Date Bar */}
             {recipe.author && (
               <div className="mt-5 flex items-center justify-center gap-3">
-                <div className="relative h-10 w-10 overflow-hidden rounded-full border border-ink/10">
+                <div className="relative h-10 w-10 overflow-hidden rounded-full border border-ink/10 dark:border-hairline">
                   <Image
                     src={recipe.author.avatar}
                     alt={recipe.author.name}
@@ -175,10 +175,10 @@ export default async function RecipeDetailPage({ params }: Props) {
                   />
                 </div>
                 <div className="text-left">
-                  <p className="font-ui text-xs font-bold text-ink">
+                  <p className="font-ui text-xs font-bold text-ink dark:text-ice">
                     By {recipe.author.name}
                   </p>
-                  <p className="font-ui text-[10px] uppercase tracking-wider text-muted">
+                  <p className="font-ui text-[10px] uppercase tracking-wider text-muted dark:text-slate-muted">
                     {recipe.author.role} • {recipe.publishedDate}
                   </p>
                 </div>
@@ -187,7 +187,7 @@ export default async function RecipeDetailPage({ params }: Props) {
           </div>
 
           {/* 2. Hero Photo */}
-          <div className="mt-8 md:mt-10 relative aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden bg-linen shadow-xs">
+          <div className="mt-8 md:mt-10 relative aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden bg-linen dark:bg-panel border border-transparent dark:border-hairline shadow-xs">
             <Image
               src={recipe.image}
               alt={recipe.title}
@@ -199,46 +199,46 @@ export default async function RecipeDetailPage({ params }: Props) {
           </div>
 
           {/* Quick Meta Stats Strip */}
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-y border-ink/10 py-5 text-center bg-cream/20">
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-y border-ink/10 dark:border-hairline py-5 text-center bg-cream/20 dark:bg-panel/40">
             <div>
-              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted flex items-center justify-center gap-1">
-                <Clock className="h-3 w-3 text-sage" />
+              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
+                <Clock className="h-3 w-3 text-sage dark:text-gold" />
                 Prep Time
               </p>
-              <p className="mt-1 font-display text-lg text-ink">
+              <p className="mt-1 font-display text-lg text-ink dark:text-ice">
                 {recipe.prepTime}
               </p>
             </div>
             <div>
-              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted flex items-center justify-center gap-1">
-                <Clock className="h-3 w-3 text-sage" />
+              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
+                <Clock className="h-3 w-3 text-sage dark:text-gold" />
                 Cook Time
               </p>
-              <p className="mt-1 font-display text-lg text-ink">
+              <p className="mt-1 font-display text-lg text-ink dark:text-ice">
                 {recipe.cookTime}
               </p>
             </div>
             <div>
-              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted flex items-center justify-center gap-1">
-                <Users className="h-3 w-3 text-sage" />
+              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
+                <Users className="h-3 w-3 text-sage dark:text-gold" />
                 Servings
               </p>
-              <p className="mt-1 font-display text-lg text-ink">
+              <p className="mt-1 font-display text-lg text-ink dark:text-ice">
                 {recipe.servings} people
               </p>
             </div>
             <div>
-              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted flex items-center justify-center gap-1">
-                <ChefHat className="h-3 w-3 text-sage" />
+              <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
+                <ChefHat className="h-3 w-3 text-sage dark:text-gold" />
                 Cuisine
               </p>
-              <p className="mt-1 font-display text-lg text-ink">Sri Lankan</p>
+              <p className="mt-1 font-display text-lg text-ink dark:text-ice">Sri Lankan</p>
             </div>
           </div>
 
           {/* 3. Short Editorial Intro */}
           <div className="mx-auto max-w-3xl py-8 md:py-10">
-            <p className="font-display text-lg md:text-xl text-ink leading-relaxed first-letter:text-4xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:text-sage">
+            <p className="font-display text-lg md:text-xl text-ink dark:text-ice leading-relaxed first-letter:text-4xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:text-sage dark:first-letter:text-amber-text">
               {recipe.intro || recipe.excerpt}
             </p>
           </div>
@@ -255,14 +255,14 @@ export default async function RecipeDetailPage({ params }: Props) {
                 {/* Recipe Tags */}
                 {recipe.tags && recipe.tags.length > 0 && (
                   <div className="mt-6">
-                    <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted mb-2">
+                    <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted mb-2">
                       Tags
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {recipe.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="bg-linen px-2.5 py-1 font-ui text-[10px] uppercase tracking-wider text-ink"
+                          className="bg-linen dark:bg-panel px-2.5 py-1 font-ui text-[10px] uppercase tracking-wider text-ink dark:text-ice border border-transparent dark:border-hairline"
                         >
                           #{tag}
                         </span>
@@ -276,7 +276,7 @@ export default async function RecipeDetailPage({ params }: Props) {
             {/* Instructions Column (Right 7 cols) */}
             <div className="lg:col-span-7 space-y-8">
               <div>
-                <h3 className="font-display text-2xl md:text-3xl text-ink border-b border-ink/10 pb-3 mb-6">
+                <h3 className="font-display text-2xl md:text-3xl text-ink dark:text-ice border-b border-ink/10 dark:border-hairline pb-3 mb-6">
                   Instructions
                 </h3>
 
@@ -289,16 +289,16 @@ export default async function RecipeDetailPage({ params }: Props) {
                       key={inst.step}
                       className="flex items-start gap-4 sm:gap-5"
                     >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage text-white font-ui text-xs font-bold">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage dark:bg-amber-primary text-white font-ui text-xs font-bold">
                         {inst.step}
                       </span>
                       <div className="pt-0.5">
                         {inst.title && (
-                          <h4 className="font-display font-semibold text-lg text-ink mb-1">
+                          <h4 className="font-display font-semibold text-lg text-ink dark:text-ice mb-1">
                             {inst.title}
                           </h4>
                         )}
-                        <p className="font-display text-base sm:text-[17px] text-ink leading-relaxed">
+                        <p className="font-display text-base sm:text-[17px] text-ink dark:text-ice leading-relaxed">
                           {inst.text}
                         </p>
                       </div>
@@ -309,11 +309,11 @@ export default async function RecipeDetailPage({ params }: Props) {
 
               {/* 6. Notes and Tips Card */}
               {recipe.notes && recipe.notes.length > 0 && (
-                <div className="border-l-4 border-sunshine bg-cream/30 p-6 md:p-8 mt-10">
-                  <h4 className="font-display text-xl text-ink mb-3">
+                <div className="border-l-4 border-sunshine dark:border-gold bg-cream/30 dark:bg-panel p-6 md:p-8 mt-10">
+                  <h4 className="font-display text-xl text-ink dark:text-ice mb-3">
                     Cook&apos;s Notes & Tips
                   </h4>
-                  <ul className="space-y-2.5 font-display text-sm md:text-base text-ink/90 list-disc list-inside">
+                  <ul className="space-y-2.5 font-display text-sm md:text-base text-ink/90 dark:text-slate-muted list-disc list-inside">
                     {recipe.notes.map((note, idx) => (
                       <li key={idx} className="leading-relaxed">
                         {note}
@@ -329,8 +329,8 @@ export default async function RecipeDetailPage({ params }: Props) {
         {/* 7. Related Recipes Section */}
         {related.length > 0 && (
           <section className="mx-auto max-w-[1200px] px-4 sm:px-6 pt-16 md:pt-24">
-            <div className="border-t border-ink/10 pt-10">
-              <h2 className="font-display text-2xl md:text-3xl text-ink mb-8 text-center sm:text-left">
+            <div className="border-t border-ink/10 dark:border-hairline pt-10">
+              <h2 className="font-display text-2xl md:text-3xl text-ink dark:text-ice mb-8 text-center sm:text-left">
                 You Might Also Like
               </h2>
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

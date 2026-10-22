@@ -53,39 +53,39 @@ export default function PrivacyPage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors">
       <Header />
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
+            <Link href="/" className="hover:text-ink dark:hover:text-amber-text transition-colors">
               Home
             </Link>
             <span>/</span>
-            <span className="text-ink font-semibold">Privacy Policy</span>
+            <span className="text-ink dark:text-ice font-semibold">Privacy Policy</span>
           </div>
         </div>
 
         {/* Hero Section */}
-        <section className="bg-cream py-12 md:py-16 text-center border-b border-ink/10">
+        <section className="bg-cream dark:bg-surface/80 py-12 md:py-16 text-center border-b border-ink/10 dark:border-hairline">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 text-sage font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 dark:bg-sage/20 text-sage dark:text-sage-light font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
               <ShieldCheck className="h-3.5 w-3.5" />
               <span>Simple & Transparent</span>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight">
               Privacy Policy
             </h1>
 
-            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto leading-relaxed">
               We believe in honest home cooking and straightforward privacy. We
               do not track, collect, or sell your personal data.
             </p>
 
-            <p className="mt-4 font-ui text-xs text-muted">
+            <p className="mt-4 font-ui text-xs text-muted dark:text-slate-muted">
               Last updated: {lastUpdated}
             </p>
           </div>
@@ -100,17 +100,17 @@ export default function PrivacyPage() {
               return (
                 <div
                   key={item.title}
-                  className="border border-ink/10 bg-linen/20 p-6 flex flex-col justify-start"
+                  className="border border-ink/10 dark:border-hairline bg-linen/20 dark:bg-surface p-6 flex flex-col justify-start rounded-xs"
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/10 text-sage">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/10 dark:bg-sage/20 text-sage dark:text-sage-light">
                       <Icon className="h-4 w-4" />
                     </div>
-                    <h2 className="font-display text-lg text-ink">
+                    <h2 className="font-display text-lg text-ink dark:text-ice">
                       {item.title}
                     </h2>
                   </div>
-                  <p className="font-display text-xs sm:text-sm text-ink/80 leading-relaxed">
+                  <p className="font-display text-xs sm:text-sm text-ink/80 dark:text-slate-muted leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -119,13 +119,13 @@ export default function PrivacyPage() {
           </div>
 
           {/* Detailed Policy Text */}
-          <div className="space-y-8 font-display text-sm sm:text-base text-ink/85 leading-relaxed">
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+          <div className="space-y-8 font-display text-sm sm:text-base text-ink/85 dark:text-slate-muted leading-relaxed">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 1. Our Core Commitment
               </h2>
               <p>
-                At <strong>CeylonSpicer</strong>, our sole focus is celebrating
+                At <strong className="text-ink dark:text-ice">CeylonSpicer</strong>, our sole focus is celebrating
                 authentic Sri Lankan culinary heritage, traditional family
                 recipes, and spice stories. We have no desire to monitor your
                 private browsing habits or build digital profiles. You are free
@@ -134,8 +134,8 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 2. Information We Do Not Collect
               </h2>
               <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -157,8 +157,8 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 3. Newsletter Subscriptions
               </h2>
               <p>
@@ -170,8 +170,8 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 4. Cookies & Storage
               </h2>
               <p>
@@ -183,8 +183,8 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 5. Third-Party Media
               </h2>
               <p>
@@ -196,15 +196,15 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 6. Questions & Contact
               </h2>
               <p>
                 If you have any questions regarding our simple privacy
                 philosophy or recipe content, feel free to get in touch with us
                 at{" "}
-                <span className="font-mono text-xs bg-cream px-2 py-0.5 border border-ink/10">
+                <span className="font-mono text-xs bg-cream dark:bg-panel px-2 py-0.5 border border-ink/10 dark:border-hairline text-ink dark:text-ice">
                   hello@CeylonSpicer-recipes.com
                 </span>
                 .
@@ -213,10 +213,10 @@ export default function PrivacyPage() {
           </div>
 
           {/* Back Action */}
-          <div className="mt-12 pt-8 border-t border-ink/10 flex items-center justify-between">
+          <div className="mt-12 pt-8 border-t border-ink/10 dark:border-hairline flex items-center justify-between">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-sage hover:text-ink transition-colors"
+              className="inline-flex items-center gap-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-sage hover:text-ink dark:text-amber-text dark:hover:text-ice transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Recipes</span>
@@ -224,7 +224,7 @@ export default function PrivacyPage() {
 
             <Link
               href="/recipes"
-              className="inline-flex items-center gap-2 bg-sage px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage/90 transition-colors shadow-xs"
+              className="inline-flex items-center gap-2 bg-sage dark:bg-amber-primary px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white dark:text-obsidian hover:bg-sage/90 dark:hover:bg-amber-primary/90 transition-colors shadow-xs"
             >
               <span>Explore All Dishes</span>
             </Link>

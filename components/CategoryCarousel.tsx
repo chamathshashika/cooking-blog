@@ -32,21 +32,21 @@ export default function CategoryCarousel({ categories }: Props) {
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="relative flex items-center justify-between mb-10">
           <div className="w-10" />
-          <h2 className="text-center font-display text-3xl md:text-4xl text-ink lowercase">
+          <h2 className="text-center font-display text-3xl md:text-4xl text-ink dark:text-ice lowercase">
             explore by category
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => scroll("left")}
               aria-label="Previous categories"
-              className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors hover:border-sage hover:text-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full border border-ink/20 dark:border-hairline text-ink dark:text-ice bg-transparent dark:bg-panel transition-colors hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               onClick={() => scroll("right")}
               aria-label="Next categories"
-              className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors hover:border-sage hover:text-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center rounded-full border border-ink/20 dark:border-hairline text-ink dark:text-ice bg-transparent dark:bg-panel transition-colors hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -65,7 +65,7 @@ export default function CategoryCarousel({ categories }: Props) {
               href={`/category/${cat.slug}`}
               className="group flex flex-col items-center shrink-0 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 overflow-hidden rounded-full bg-cream border-2 border-transparent transition-all duration-200 group-hover:scale-105 group-hover:border-sage">
+              <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 overflow-hidden rounded-full bg-cream dark:bg-panel border-2 border-transparent dark:border-hairline transition-all duration-200 group-hover:scale-105 group-hover:border-sage dark:group-hover:border-amber-primary">
                 <Image
                   src={getBlobDisplayUrl(cat.image)}
                   alt={`${cat.name} category`}
@@ -75,7 +75,7 @@ export default function CategoryCarousel({ categories }: Props) {
                   className="object-cover"
                 />
               </div>
-              <span className="mt-3.5 font-display text-base md:text-lg lowercase text-ink transition-colors group-hover:text-sage">
+              <span className="mt-3.5 font-display text-base md:text-lg lowercase text-ink dark:text-ice transition-colors group-hover:text-sage dark:group-hover:text-amber-text">
                 {cat.name}
               </span>
             </Link>

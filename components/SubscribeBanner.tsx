@@ -1,70 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
+import { subscribeNewsletter, type SubscribeResponse } from "@/lib/actions/newsletter";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
 export default function SubscribeBanner() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setIsSubmitted(true);
-  };
+  const [state, formAction, isPending] = useActionState<SubscribeResponse | null, FormData>(
+    subscribeNewsletter,
+    null
+  );
 
   return (
     <section
       aria-label="Subscribe to newsletter"
-      className="w-full bg-sunshine py-12 md:py-16 text-center"
+      className="w-full bg-sunshine dark:bg-panel dark:border-y dark:border-hairline py-12 md:py-16 text-center transition-colors duration-200"
     >
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <p className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-ink">
+        <p className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-ink dark:text-amber-text">
           Subscribe via email
         </p>
-        <h2 className="mt-2 font-display text-3xl md:text-4xl text-ink">
+        <h2 className="mt-2 font-display text-3xl md:text-4xl text-ink dark:text-ice">
           Never miss a recipe
         </h2>
-        <p className="mt-1 text-sm md:text-base font-display text-ink/80 max-w-lg mx-auto">
+        <p className="mt-1 text-sm md:text-base font-display text-ink/80 dark:text-slate-muted max-w-lg mx-auto">
           Get weekly Sri Lankan dishes, family spice blends, and cooking tips delivered straight to your inbox.
         </p>
 
-        {isSubmitted ? (
-          <div className="mt-6 inline-block bg-white/90 px-6 py-3 font-ui text-sm font-semibold tracking-wide text-ink border border-sage/40">
-            Thank you for subscribing! Check your inbox soon for delicious recipes.
+        {state?.success ? (
+          <div className="mt-6 inline-flex items-center gap-2.5 bg-white/95 dark:bg-surface px-6 py-3.5 font-ui text-sm font-semibold tracking-wide text-ink dark:text-ice border border-sage/40 dark:border-success/40 shadow-xs">
+            <CheckCircle2 className="h-5 w-5 text-sage dark:text-success shrink-0" />
+            <span>{state.message}</span>
           </div>
         ) : (
           <form
-            onSubmit={handleSubmit}
+            action={formAction}
             className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row max-w-xl mx-auto"
           >
             <input
               type="text"
               name="name"
               placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               required
+              disabled={isPending}
               aria-label="Your name"
-              className="min-h-[44px] h-11 w-full sm:w-48 bg-white px-3.5 font-ui text-xs text-ink placeholder:text-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="min-h-[44px] h-11 w-full sm:w-48 bg-white dark:bg-surface px-3.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted/70 dark:placeholder:text-slate-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider border border-transparent dark:border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-60"
             />
             <input
               type="email"
               name="email"
               placeholder="Your email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isPending}
               aria-label="Your email address"
-              className="min-h-[44px] h-11 w-full sm:w-64 bg-white px-3.5 font-ui text-xs text-ink placeholder:text-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="min-h-[44px] h-11 w-full sm:w-64 bg-white dark:bg-surface px-3.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted/70 dark:placeholder:text-slate-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider border border-transparent dark:border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-60"
             />
             <button
               type="submit"
-              className="min-h-[44px] h-11 w-full sm:w-auto bg-sage px-7 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-150 hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              disabled={isPending}
+              className="min-h-[44px] h-11 w-full sm:w-auto bg-sage dark:bg-amber-primary px-7 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-150 hover:bg-sage-dark dark:hover:bg-amber-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-75 inline-flex items-center justify-center gap-2"
             >
-              Sign Up
+              {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              <span>{isPending ? "Subscribing..." : "Sign Up"}</span>
             </button>
           </form>
+        )}
+
+        {state?.success === false && (
+          <p
+            className="mt-3 font-ui text-xs font-medium text-red-700 dark:text-red-400 bg-red-50/80 dark:bg-red-950/40 inline-block px-3 py-1 border border-red-200 dark:border-red-900/50"
+            role="alert"
+          >
+            {state.message}
+          </p>
         )}
       </div>
     </section>

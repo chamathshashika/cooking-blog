@@ -53,39 +53,39 @@ export default function TermsPage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors">
       <Header />
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
+            <Link href="/" className="hover:text-ink dark:hover:text-amber-text transition-colors">
               Home
             </Link>
             <span>/</span>
-            <span className="text-ink font-semibold">Terms of Service</span>
+            <span className="text-ink dark:text-ice font-semibold">Terms of Service</span>
           </div>
         </div>
 
         {/* Hero Section */}
-        <section className="bg-cream py-12 md:py-16 text-center border-b border-ink/10">
+        <section className="bg-cream dark:bg-surface/80 py-12 md:py-16 text-center border-b border-ink/10 dark:border-hairline">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 text-sage font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 dark:bg-sage/20 text-sage dark:text-sage-light font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
               <FileText className="h-3.5 w-3.5" />
               <span>Fair Usage Guidelines</span>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight">
               Terms of Service
             </h1>
 
-            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto leading-relaxed">
               Simple, fair guidelines for enjoying our authentic Sri Lankan
               recipes, photography, and culinary stories.
             </p>
 
-            <p className="mt-4 font-ui text-xs text-muted">
+            <p className="mt-4 font-ui text-xs text-muted dark:text-slate-muted">
               Last updated: {lastUpdated}
             </p>
           </div>
@@ -100,17 +100,17 @@ export default function TermsPage() {
               return (
                 <div
                   key={item.title}
-                  className="border border-ink/10 bg-linen/20 p-6 flex flex-col justify-start"
+                  className="border border-ink/10 dark:border-hairline bg-linen/20 dark:bg-surface p-6 flex flex-col justify-start rounded-xs"
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/10 text-sage">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/10 dark:bg-sage/20 text-sage dark:text-sage-light">
                       <Icon className="h-4 w-4" />
                     </div>
-                    <h2 className="font-display text-lg text-ink">
+                    <h2 className="font-display text-lg text-ink dark:text-ice">
                       {item.title}
                     </h2>
                   </div>
-                  <p className="font-display text-xs sm:text-sm text-ink/80 leading-relaxed">
+                  <p className="font-display text-xs sm:text-sm text-ink/80 dark:text-slate-muted leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -119,13 +119,13 @@ export default function TermsPage() {
           </div>
 
           {/* Detailed Terms Text */}
-          <div className="space-y-8 font-display text-sm sm:text-base text-ink/85 leading-relaxed">
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+          <div className="space-y-8 font-display text-sm sm:text-base text-ink/85 dark:text-slate-muted leading-relaxed">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 1. Acceptance of Terms
               </h2>
               <p>
-                By accessing and using <strong>CeylonSpicer</strong>{" "}
+                By accessing and using <strong className="text-ink dark:text-ice">CeylonSpicer</strong>{" "}
                 (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;the
                 blog&rdquo;), you agree to abide by these simple and fair Terms
                 of Service. If you do not agree with any part of these terms,
@@ -133,8 +133,8 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 2. Personal & Non-Commercial Use
               </h2>
               <p>
@@ -148,8 +148,8 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 3. Intellectual Property & Attribution
               </h2>
               <p>
@@ -164,7 +164,7 @@ export default function TermsPage() {
                   copying verbatim.
                 </li>
                 <li>
-                  Credit <strong>CeylonSpicer</strong> clearly with an active
+                  Credit <strong className="text-ink dark:text-ice">CeylonSpicer</strong> clearly with an active
                   link back to the original recipe URL.
                 </li>
                 <li>
@@ -174,8 +174,8 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 4. Cooking, Allergies & Health Disclaimer
               </h2>
               <p>
@@ -185,7 +185,7 @@ export default function TermsPage() {
                 Cooking times and temperatures are recommendations and can vary
                 depending on your stove, cookware, and climate.
               </p>
-              <p className="mt-2 text-ink/75">
+              <p className="mt-2 text-ink/75 dark:text-slate-muted">
                 Cooks are responsible for confirming allergen safety for
                 themselves and their guests, practicing safe food handling
                 (especially with seafood, meats, and raw marinades), and
@@ -193,8 +193,8 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 5. External Links & Third-Party Content
               </h2>
               <p>
@@ -205,8 +205,8 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <section className="border-t border-ink/10 pt-8">
-              <h2 className="font-display text-2xl text-ink mb-3">
+            <section className="border-t border-ink/10 dark:border-hairline pt-8">
+              <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
                 6. Modifications & Contact
               </h2>
               <p>
@@ -217,7 +217,7 @@ export default function TermsPage() {
               <p className="mt-2">
                 For questions regarding recipe licensing, content syndication,
                 or friendly feedback, please contact us at{" "}
-                <span className="font-mono text-xs bg-cream px-2 py-0.5 border border-ink/10">
+                <span className="font-mono text-xs bg-cream dark:bg-panel px-2 py-0.5 border border-ink/10 dark:border-hairline text-ink dark:text-ice">
                   hello@CeylonSpicer-recipes.com
                 </span>
                 .
@@ -226,10 +226,10 @@ export default function TermsPage() {
           </div>
 
           {/* Back Action */}
-          <div className="mt-12 pt-8 border-t border-ink/10 flex items-center justify-between">
+          <div className="mt-12 pt-8 border-t border-ink/10 dark:border-hairline flex items-center justify-between">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-sage hover:text-ink transition-colors"
+              className="inline-flex items-center gap-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-sage hover:text-ink dark:text-amber-text dark:hover:text-ice transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Home</span>
@@ -237,7 +237,7 @@ export default function TermsPage() {
 
             <Link
               href="/recipes"
-              className="inline-flex items-center gap-2 bg-sage px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage/90 transition-colors shadow-xs"
+              className="inline-flex items-center gap-2 bg-sage dark:bg-amber-primary px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white dark:text-obsidian hover:bg-sage/90 dark:hover:bg-amber-primary/90 transition-colors shadow-xs"
             >
               <span>Explore Recipes</span>
             </Link>

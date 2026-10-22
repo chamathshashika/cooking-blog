@@ -17,45 +17,45 @@ export default function AdminStats({ recipes, categories }: Props) {
       label: "Total Recipes",
       value: totalRecipes,
       pill: "Published",
-      pillColor: "bg-sage/10 text-sage border-sage/20",
+      pillColor: "bg-sage/10 text-sage border-sage/20 dark:bg-sage/20 dark:text-sage-light dark:border-sage/40",
       description: "Traditional island dishes in database",
       icon: BookOpen,
       href: "/admin/recipes",
-      accentBorder: "border-t-4 border-t-sage",
-      iconBg: "bg-sage/10 text-sage",
+      accentBorder: "border-t-4 border-t-sage dark:border-t-sage",
+      iconBg: "bg-sage/10 text-sage dark:bg-sage/20 dark:text-sage-light",
     },
     {
       label: "Featured Recipes",
       value: featuredCount,
       pill: "Hero Display",
-      pillColor: "bg-sunshine/20 text-ink border-sunshine/40",
+      pillColor: "bg-sunshine/20 text-ink border-sunshine/40 dark:bg-amber-primary/20 dark:text-amber-text dark:border-amber-primary/40",
       description: "Showcased on the home hero banner",
       icon: Star,
       href: "/admin/recipes?featured=true",
-      accentBorder: "border-t-4 border-t-sunshine",
-      iconBg: "bg-sunshine/20 text-ink",
+      accentBorder: "border-t-4 border-t-sunshine dark:border-t-amber-primary",
+      iconBg: "bg-sunshine/20 text-ink dark:bg-amber-primary/20 dark:text-amber-text",
     },
     {
       label: "Categories",
       value: totalCategories,
       pill: "Taxonomy",
-      pillColor: "bg-cream text-ink border-ink/10",
+      pillColor: "bg-cream text-ink border-ink/10 dark:bg-panel dark:text-ice dark:border-hairline",
       description: "Curated Sri Lankan food themes",
       icon: Layers,
       href: "/admin/categories",
-      accentBorder: "border-t-4 border-t-[#D4AF37]",
-      iconBg: "bg-cream text-ink",
+      accentBorder: "border-t-4 border-t-star dark:border-t-gold",
+      iconBg: "bg-cream text-ink dark:bg-panel dark:text-ice",
     },
     {
       label: "Avg. Simmer Time",
       value: "25m",
       pill: "Cooking Prep",
-      pillColor: "bg-linen text-muted border-ink/10",
+      pillColor: "bg-linen text-muted border-ink/10 dark:bg-panel dark:text-slate-muted dark:border-hairline",
       description: "Average cook time across all dishes",
       icon: Clock,
       href: "/admin/recipes",
-      accentBorder: "border-t-4 border-t-muted/40",
-      iconBg: "bg-linen text-muted",
+      accentBorder: "border-t-4 border-t-muted/40 dark:border-t-panel",
+      iconBg: "bg-linen text-muted dark:bg-panel dark:text-slate-muted",
     },
   ];
 
@@ -67,11 +67,11 @@ export default function AdminStats({ recipes, categories }: Props) {
           <Link
             key={card.label}
             href={card.href}
-            className={`group relative flex flex-col justify-between overflow-hidden rounded-lg border border-ink/10 bg-white p-5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-ink/20 ${card.accentBorder}`}
+            className={`group relative flex flex-col justify-between overflow-hidden rounded-lg border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 ${card.accentBorder}`}
           >
             <div>
               <div className="flex items-center justify-between">
-                <span className="font-ui text-[11px] font-bold uppercase tracking-wider text-muted">
+                <span className="font-ui text-[11px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
                   {card.label}
                 </span>
                 <span
@@ -82,7 +82,7 @@ export default function AdminStats({ recipes, categories }: Props) {
               </div>
 
               <div className="mt-3 flex items-baseline justify-between">
-                <span className="font-display text-3xl sm:text-4xl text-ink tracking-tight">
+                <span className="font-display text-3xl sm:text-4xl text-ink dark:text-ice tracking-tight">
                   {card.value}
                 </span>
                 <div
@@ -93,11 +93,11 @@ export default function AdminStats({ recipes, categories }: Props) {
               </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between border-t border-ink/5 pt-3">
-              <span className="font-ui text-[11px] text-muted line-clamp-1">
+            <div className="mt-4 flex items-center justify-between border-t border-ink/5 dark:border-hairline pt-3">
+              <span className="font-ui text-[11px] text-muted dark:text-slate-muted line-clamp-1">
                 {card.description}
               </span>
-              <span className="inline-flex items-center gap-0.5 font-ui text-[10px] font-bold uppercase tracking-wider text-sage group-hover:text-sage-dark shrink-0">
+              <span className="inline-flex items-center gap-0.5 font-ui text-[10px] font-bold uppercase tracking-wider text-sage group-hover:text-sage-dark dark:text-amber-text dark:group-hover:text-amber-secondary shrink-0">
                 <span>View</span>
                 <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>

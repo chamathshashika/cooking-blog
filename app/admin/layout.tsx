@@ -23,7 +23,7 @@ export default async function AdminLayout({
   const session = await verifyAdminSession();
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfaf6] text-ink antialiased">
+    <div className="flex min-h-screen flex-col bg-linen/20 dark:bg-obsidian text-ink dark:text-ice antialiased transition-colors">
       {/* Admin Header with Authenticated Session */}
       <AdminHeader session={session} />
 
@@ -33,10 +33,10 @@ export default async function AdminLayout({
       </main>
 
       {/* Admin Footer */}
-      <footer className="border-t border-ink/10 bg-white/80 py-5 mt-auto">
-        <div className="mx-auto flex max-w-[1240px] flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
+      <footer className="border-t border-ink/10 dark:border-hairline bg-white/80 dark:bg-surface/80 py-5 mt-auto">
+        <div className="mx-auto flex max-w-[1240px] flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 text-sage" />
+            <ShieldCheck className="h-3.5 w-3.5 text-sage dark:text-amber-primary" />
             <span>CeylonSpicer Content Studio • Internal Management</span>
           </div>
 
@@ -44,21 +44,21 @@ export default async function AdminLayout({
             <Link
               href="/"
               target="_blank"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Public Site
             </Link>
-            <span className="text-ink/20">•</span>
+            <span className="text-ink/20 dark:text-hairline">•</span>
             <Link
               href="/admin/recipes"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Recipes
             </Link>
-            <span className="text-ink/20">•</span>
+            <span className="text-ink/20 dark:text-hairline">•</span>
             <Link
               href="/admin/categories"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Categories
             </Link>
