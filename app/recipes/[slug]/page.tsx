@@ -2,22 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  Clock,
-  Users,
-  ChefHat,
-  Calendar,
-  ArrowLeft,
-  Bookmark,
-  Share2,
-} from "lucide-react";
+import { Clock, Users, ChefHat, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StarRating from "@/components/StarRating";
 import RecipeCard from "@/components/RecipeCard";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import IngredientsList from "@/components/IngredientsList";
-import { getRecipeBySlug, getAllRecipes, getRelatedRecipes } from "@/lib/data";
+import { getAllRecipes, getRelatedRecipes } from "@/lib/data";
+import { findRecipeBySlug } from "@/lib/actions/recipe";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -32,7 +25,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const recipe = getRecipeBySlug(slug);
+  const recipe = await findRecipeBySlug(slug);
 
   if (!recipe) {
     return {
@@ -55,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RecipeDetailPage({ params }: Props) {
   const { slug } = await params;
-  const recipe = getRecipeBySlug(slug);
+  const recipe = await findRecipeBySlug(slug);
 
   if (!recipe) {
     notFound();

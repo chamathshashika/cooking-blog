@@ -49,12 +49,16 @@ export default function GlobalError({ error, reset }: Props) {
               <span>Retry</span>
             </button>
 
-            <a
-              href="/"
+            <button
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.location.reload();
+                }
+              }}
               className="w-full sm:w-auto inline-flex items-center justify-center border border-black/20 bg-white px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#1A1A1A] hover:bg-[#FDFBF7] transition-colors"
             >
               Reload App
-            </a>
+            </button>
           </div>
         </div>
       </body>

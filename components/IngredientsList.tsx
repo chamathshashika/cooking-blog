@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, ShoppingCart, ExternalLink } from "lucide-react";
 import type { Ingredient } from "@/lib/data";
 
 type Props = {
@@ -82,6 +82,22 @@ export default function IngredientsList({ ingredients }: Props) {
                   </span>
                 )}
               </span>
+
+              {(item.affiliateUrl || item.affiliateLink) && (
+                <a
+                  href={item.affiliateUrl || item.affiliateLink}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  onClick={(e) => e.stopPropagation()}
+                  className="ml-auto inline-flex items-center gap-1 rounded-sm border border-sage/40 bg-white/90 px-2 py-0.5 font-ui text-[10px] font-bold uppercase tracking-wider text-sage hover:bg-sage hover:text-white transition-all shadow-2xs shrink-0"
+                  title={`Buy ${item.name} online (partner link)`}
+                  aria-label={`Buy ${item.name} via partner link`}
+                >
+                  <ShoppingCart className="h-3 w-3" />
+                  <span>Shop</span>
+                  <ExternalLink className="h-2.5 w-2.5 opacity-70" />
+                </a>
+              )}
             </li>
           );
         })}

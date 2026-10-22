@@ -11,13 +11,19 @@
   "dependencies": {
     "@next/third-parties": "^16.4.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.8.2",
+    "joi": "^18.2.9",
+    "jose": "^6.2.12",
     "lucide-react": "^1.51.0",
+    "mongoose": "^9.11.2",
     "next": "16.3.8",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/joi": "^17.2.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

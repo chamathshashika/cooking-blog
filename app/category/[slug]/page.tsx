@@ -13,6 +13,7 @@ import {
   getCategoryBySlug,
   getRecipesByCategory,
 } from "@/lib/data";
+import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -98,10 +99,11 @@ export default async function CategoryPage({ params }: Props) {
             {/* Category Avatar Thumbnail */}
             <div className="mx-auto mb-5 relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full border-2 border-sage/40 bg-white shadow-xs">
               <Image
-                src={category.image}
+                src={getBlobDisplayUrl(category.image)}
                 alt={`${category.displayName} hero image`}
                 fill
                 sizes="(min-width: 640px) 112px, 96px"
+                unoptimized={isBlobProxyUrl(category.image)}
                 className="object-cover"
                 priority
               />
