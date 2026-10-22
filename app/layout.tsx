@@ -75,11 +75,52 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+import { headers, cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { decrypt } from "@/lib/session";
+import { getSiteStatus } from "@/lib/actions/siteStatus";
+import AdminSiteStatusBanner from "@/components/admin/AdminSiteStatusBanner";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const rawPath = headersList.get("x-pathname") || "";
+  const pathname = rawPath.replace(/\/$/, "") || "/";
+
+  // Check admin session
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  const session = await decrypt(sessionCookie);
+  const isAdmin = session?.role === "admin";
+
+  // Check site visibility mode
+  const siteStatus = await getSiteStatus();
+
+  // If site is in restricted mode and visitor is NOT admin
+  if (!isAdmin && siteStatus.mode !== "live" && rawPath) {
+    const isAuthRoute =
+      pathname === "/login" ||
+      pathname.startsWith("/login/") ||
+      pathname === "/signin" ||
+      pathname.startsWith("/signin/") ||
+      pathname.startsWith("/api");
+
+    if (!isAuthRoute) {
+      if (siteStatus.mode === "coming_soon" && pathname !== "/coming-soon") {
+        redirect("/coming-soon");
+      }
+      if (
+        siteStatus.mode === "under_construction" &&
+        pathname !== "/under-construction"
+      ) {
+        redirect("/under-construction");
+      }
+    }
+  }
+
   return (
     <html
       lang="en"
@@ -105,6 +146,12 @@ export default function RootLayout({
         suppressHydrationWarning
         className="bg-white font-display text-ink antialiased min-h-screen flex flex-col"
       >
+        {isAdmin && siteStatus.mode !== "live" && (
+          <AdminSiteStatusBanner
+            mode={siteStatus.mode}
+            headline={siteStatus.headline}
+          />
+        )}
         <ToastProvider>{children}</ToastProvider>
         <ScrollToTop />
         <Analytics />

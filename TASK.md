@@ -6,7 +6,7 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Phase 9 (Recipe Studio: Creation, Editing & Affiliate Monetization) Complete
+- **Active Phase**: Phase 10 (Site Status & Maintenance Modes: Coming Soon & Under Construction with Admin Bypass) Complete
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
 - **Last Updated**: 2026-10-22
 
@@ -269,4 +269,30 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Integrated automated Next.js path cache revalidation (`/admin/recipes`, `/admin/recipes/[slug]/edit`, `/recipes`, `/recipes/[slug]`, `/`).
   - Implemented `deleteRecipe(slug)` for MongoDB document cleanup and wired directly to admin list deletion handler.
   - Updated both table view and card grid view in `AdminRecipeList.tsx` to link edit buttons directly to `/admin/recipes/${recipe.slug}/edit`.
+
+### Phase 10: Site Status & Maintenance Modes (Coming Soon & Under Construction)
+
+- [x] Site Setting Mongoose Schema & Database Layer (`lib/models/SiteSetting.ts`):
+  - Created `SiteSettingModel` schema with `key: "site_status"`, `mode: "live" | "coming_soon" | "under_construction"`, custom `headline`, `message`, `expectedLaunchDate`, and `updatedBy`.
+- [x] Server Actions with Admin-Only Authorization (`lib/actions/siteStatus.ts`):
+  - `getSiteStatus()`: In-memory TTL caching with fallback to MongoDB and default `"live"` mode.
+  - `updateSiteStatus()`: Enforces strict admin check (`session.role === "admin"`), updates MongoDB, updates cache, and calls `revalidatePath` across the entire application layout and public routes.
+- [x] Dedicated Public Showcase Pages (`app/coming-soon/page.tsx`, `app/under-construction/page.tsx`):
+  - Refined `ComingSoonPage` to a clean, elegant, minimalist display centered exclusively on the "Coming Soon" heading with brand mark and discreet chef login.
+  - Refined `UnderConstructionPage` to a clean, minimalist display centered on the "Under Construction" heading with brief reassuring maintenance text and discreet chef login.
+  - Integrated admin preview headers displaying active bypass notices and direct navigation links.
+- [x] Admin Management Studio (`app/admin/settings/page.tsx`, `components/admin/SiteStatusManager.tsx`, `components/admin/AdminHeader.tsx`):
+  - Created dedicated settings page at `/admin/settings` accessible via the new "Site Status" tab in `AdminHeader.tsx`.
+  - Built interactive `SiteStatusManager` component with 3 distinct status cards (Live, Coming Soon, Under Construction), custom messaging inputs, target launch date picker, role guards, and instant preview links.
+- [x] Site Visibility Routing Guard & Admin Bypass (`proxy.ts`, `app/layout.tsx`, `components/admin/AdminSiteStatusBanner.tsx`):
+  - Configured `proxy.ts` to attach `x-pathname` header to all forwarded requests.
+  - Configured `app/layout.tsx` Server Component guard:
+    - If `mode === "coming_soon"`: redirects all non-admin visitors to `/coming-soon` (allowing auth routes `/login` and `/signin`).
+    - If `mode === "under_construction"`: redirects all non-admin visitors to `/under-construction` (allowing auth routes).
+    - If user is authenticated as `admin`: grants unrestricted access to the entire website with an unobtrusive, dismissible `AdminSiteStatusBanner` floating at the top of the viewport.
+- [x] SEO & Sitemap Synchronization (`app/sitemap.ts`, `app/robots.ts`):
+  - Registered `/coming-soon` and `/under-construction` in `app/sitemap.ts`.
+- [x] Vercel Blob Private Store Compatibility (`lib/actions/upload.ts`):
+  - Added graceful fallback to `access: "private"` in `uploadRecipeImage` with `/api/blob` proxy routing, resolving private store upload constraints.
+
 

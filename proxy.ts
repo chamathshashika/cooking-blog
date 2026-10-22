@@ -38,7 +38,15 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(destination, req.nextUrl));
   }
 
-  return NextResponse.next();
+  // 5. Pass current pathname to downstream server components
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-pathname", path);
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 // Routes proxy should run on (excludes static assets, images, favicons)

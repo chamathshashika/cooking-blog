@@ -262,16 +262,35 @@ export async function uploadRecipeImage(
 
     const blobPath = `recipes/${baseName}-${Date.now()}.${extension}`;
 
-    // 6. Upload to Vercel Blob
-    const blob = await put(blobPath, file, {
-      access: "public",
-      addRandomSuffix: true,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    });
+    // 6. Upload to Vercel Blob (attempts public, falls back to private if store requires it)
+    let blob;
+    try {
+      blob = await put(blobPath, file, {
+        access: "public",
+        addRandomSuffix: true,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "";
+      if (
+        errMsg.includes("private store") ||
+        errMsg.includes("private access") ||
+        errMsg.includes("Cannot use public access")
+      ) {
+        blob = await put(blobPath, file, {
+          access: "private",
+          addRandomSuffix: true,
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+      } else {
+        throw err;
+      }
+    }
 
-    // 7. Route through proxy if local blob server or configured
+    // 7. Route through proxy if private blob or local server
     let finalUrl = blob.url;
     if (
+      blob.url.includes(".private.blob.vercel-storage.com") ||
       blob.url.includes("localhost") ||
       blob.url.includes("127.0.0.1") ||
       !blob.url.startsWith("http")
