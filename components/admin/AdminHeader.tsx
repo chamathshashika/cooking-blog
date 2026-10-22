@@ -14,6 +14,7 @@ import {
   ChefHat,
   LogOut,
   User,
+  Sliders,
 } from "lucide-react";
 import { logout } from "@/lib/actions/auth";
 import type { UserRole } from "@/lib/definitions";
@@ -56,6 +57,12 @@ export default function AdminHeader({ session }: Props) {
       href: "/admin/categories",
       icon: Layers,
       active: pathname.startsWith("/admin/categories"),
+    },
+    {
+      label: "Site Status",
+      href: "/admin/settings",
+      icon: Sliders,
+      active: pathname.startsWith("/admin/settings"),
     },
   ];
 
