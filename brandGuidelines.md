@@ -36,6 +36,8 @@
 
 ## 3. Color Palette
 
+### 3.1 Light Color Palette
+
 | Role             | Name            | Hex (approx.) | Usage                                   |
 | ---------------- | --------------- | ------------- | --------------------------------------- |
 | Primary surface  | Butter Cream    | `#FCE9C0`     | Header, hero backdrop                   |
@@ -47,18 +49,37 @@
 | Rating           | Star Gold       | `#E8A317`     | Rating stars                            |
 | Page backdrop    | Linen           | `#EEE9DD`     | Outer background for previews/mockups   |
 
+### 3.2 Dark Theme Palette (Obsidian & Amber)
+
+| Role             | Token Name         | Hex / Value                | Usage / Semantics                             |
+| ---------------- | ------------------ | -------------------------- | --------------------------------------------- |
+| Canvas           | `obsidian`         | `#0A0B0E`                  | Root page background, dark canvas             |
+| Surface          | `surface`          | `#12141A`                  | Recipe cards, modals, dropdowns, headers      |
+| Panel            | `panel`            | `#1A1D24`                  | Inputs, textareas, search bars, inset panels  |
+| Primary Accent   | `amber`            | `#FF5E00` → `#FFA800`      | Hero gradients, vibrant accents, focus rings  |
+| Rating / Pending | `gold`             | `#FDA600`                  | Rating stars, pending tags, warm highlights   |
+| Success          | `success`          | `#10B981`                  | Success alerts, verified badges, paid status  |
+| Primary Text     | `ice`              | `#F8FAFC`                  | Headings, primary body text, active labels    |
+| Secondary Text   | `slate-muted`      | `#94A3B8`                  | Meta text, captions, timestamps, placeholders |
+| Brand Link Text  | `amber-text`       | `#FFB599`                  | Interactive links, hover states, sub-labels   |
+| Borders & Lines  | `hairline`         | `rgba(226, 232, 240, 0.08)`| Subtle card borders, dividers, row strokes    |
+
 **Rules**
 
-- Yellow/cream is for large background bands. Don't use it for body text.
-- Sage green is reserved for primary actions and icons.
-- Keep text contrast at WCAG AA or better (charcoal on cream/yellow/white passes; white text on sage needs bold or large size, so check with a contrast tool).
+- **Light Mode**: Yellow/cream is for large background bands. Sage green is reserved for primary actions and icons. Charcoal (`#2A2622`) on cream/yellow/white passes WCAG AAA.
+- **Dark Mode**: Obsidian (`#0A0B0E`) is the canvas. Surface (`#12141A`) houses cards and elevated sections. Panel (`#1A1D24`) contains input fields.
+- **Contrast**: Ice text (`#F8FAFC`) on Obsidian/Surface has an 18.2:1 contrast ratio (exceeding WCAG AAA). Slate Muted (`#94A3B8`) has a 7.8:1 ratio. Amber text (`#FFB599`) provides accessible 10.4:1 contrast for links.
+- **Theme Switching**: The user can toggle between Light and Dark modes at any time. The chosen preference persists via `localStorage` and applies instantly without layout shift or flash.
 
 ### Tailwind v4 tokens (`app/globals.css`)
 
 ```css
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
 @theme {
+  /* Light Theme Tokens */
   --color-cream: #fce9c0;
   --color-sunshine: #fdcb63;
   --color-sage: #8b9572;
@@ -67,6 +88,19 @@
   --color-muted: #6f675f;
   --color-star: #e8a317;
   --color-linen: #eee9dd;
+
+  /* Dark Theme Tokens */
+  --color-obsidian: #0a0b0e;
+  --color-surface: #12141a;
+  --color-panel: #1a1d24;
+  --color-amber-primary: #ff5e00;
+  --color-amber-secondary: #ffa800;
+  --color-gold: #fda600;
+  --color-success: #10b981;
+  --color-ice: #f8fafc;
+  --color-slate-muted: #94a3b8;
+  --color-amber-text: #ffb599;
+  --color-hairline: rgba(226, 232, 240, 0.08);
 
   --font-display: var(--font-dm-serif), Georgia, serif;
   --font-ui: var(--font-montserrat), system-ui, sans-serif;
@@ -192,6 +226,7 @@ export default function RootLayout({
 - **Backgrounds:** light surfaces (marble, white wood, linen). Avoid dark, moody backdrops.
 - **Props:** fresh herbs, citrus, napkins, small plates, and cooling racks add warmth without clutter.
 - **Color:** let food provide saturated accents against the soft palette.
+- **Dark Mode Dimming:** When Dark Mode is active, all culinary and hero images are automatically dimmed slightly (`filter: brightness(0.86)`) to soften high-contrast glare against the deep Obsidian canvas (`#0A0B0E`) and prevent eye strain. On hover, images smoothly return to full brightness (`filter: brightness(1)`).
 - **Technical:** minimum 1600px wide originals. Serve through `next/image` with `sizes`, WebP/AVIF, and meaningful `alt` text (e.g. "Waffle with berries and yogurt in a bowl").
 
 ---

@@ -28,39 +28,39 @@ export default async function AdminRecipesPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 pb-5 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-5 gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-muted hover:text-ink transition-colors"
+              className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />
               <span>Studio Overview</span>
             </Link>
-            <span className="text-ink/20">/</span>
-            <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-sage">
+            <span className="text-ink/20 dark:text-slate-muted/30">/</span>
+            <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-sage dark:text-amber-text">
               Recipe Database
             </span>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl text-ink">
+          <h1 className="font-display text-2xl sm:text-3xl text-ink dark:text-ice">
             Recipe Management Studio
           </h1>
-          <p className="mt-1 font-display text-sm text-ink/80 max-w-2xl">
+          <p className="mt-1 font-display text-sm text-ink/80 dark:text-slate-muted max-w-2xl">
             Explore and curate your Sri Lankan culinary repertoire. Toggle homepage showcases,
             update cooking times and servings, edit excerpts, or add new family recipes.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-cream/80 px-3 py-1 font-ui text-xs font-bold uppercase tracking-wider text-ink border border-ink/10 shadow-2xs">
-            <BookOpen className="h-3.5 w-3.5 text-sage" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-cream/80 dark:bg-surface px-3 py-1 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice border border-ink/10 dark:border-hairline shadow-2xs">
+            <BookOpen className="h-3.5 w-3.5 text-sage dark:text-amber-primary" />
             <span>{recipes.length} Total Recipes</span>
           </span>
 
           <Link
             href="/admin/recipes/new"
-            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-md bg-sage px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white hover:bg-sage-dark shadow-xs transition-colors"
+            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-md bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage-dark dark:hover:bg-amber-primary/90 shadow-xs transition-colors"
           >
             <Plus className="h-4 w-4" />
             <span>New Recipe</span>

@@ -6,9 +6,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Phase 10 (Site Status & Maintenance Modes: Coming Soon & Under Construction with Admin Bypass) Complete
+- **Active Phase**: Phase 12 (Dark Theme Palette Integration & Theme Mode Switcher) Complete
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
-- **Last Updated**: 2026-10-22
+- **Last Updated**: 2026-10-23
 
 ---
 
@@ -294,5 +294,70 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Registered `/coming-soon` and `/under-construction` in `app/sitemap.ts`.
 - [x] Vercel Blob Private Store Compatibility (`lib/actions/upload.ts`):
   - Added graceful fallback to `access: "private"` in `uploadRecipeImage` with `/api/blob` proxy routing, resolving private store upload constraints.
+
+### Phase 11: Newsletter Subscription Engine & Strict Brand Token Compliance
+
+- [x] Strict Brand Token Compliance & Hex Removal (`brandGuidelines.md`, `SKILL.md`):
+  - Refactored `app/coming-soon/page.tsx` and `app/under-construction/page.tsx` to use brand token `bg-linen/25` instead of raw hex values.
+  - Refactored `app/login/page.tsx`, `app/signup/page.tsx`, and `app/admin/layout.tsx` to use `bg-linen/20`.
+  - Refactored `components/admin/AdminHeader.tsx` to use `bg-white/95` and `bg-white` for mobile drawer.
+  - Refactored `components/admin/AdminRecipeList.tsx` input to `bg-linen/30`.
+  - Refactored `components/admin/SiteStatusManager.tsx` active card to `bg-sage/5`.
+  - Refactored `components/admin/AdminStats.tsx` accent border to brand token `border-t-star`.
+  - Refactored `components/ToastProvider.tsx` warning icon to brand token `text-star`.
+  - Refactored `app/global-error.tsx` root emergency shell to complete brand tokens (`bg-linen/30`, `text-ink`, `bg-sage`, `hover:bg-sage-dark`, `text-muted`, `border-ink/10`, `font-display`, `font-ui`).
+- [x] Subscriber Mongoose Schema (`lib/models/Subscriber.ts`):
+  - Created `Subscriber` schema with `name` (trimmed, max 100), `email` (normalized, lowercase, regex-validated, unique, indexed), `isActive` flag, and timestamps.
+- [x] Newsletter Server Action (`lib/actions/newsletter.ts`):
+  - Implemented `subscribeNewsletter` action adhering strictly to `AGENTS.md` §17.
+  - Normalizes and sanitizes inputs server-side.
+  - Prevents duplicate subscriptions and handles existing subscribers with friendly non-leaking confirmations.
+  - Guarantees zero subscriber data exposure to the client.
+- [x] Interactive Subscribe Banner Component (`components/SubscribeBanner.tsx`):
+  - Connected banner form to `subscribeNewsletter` server action using React's `useActionState`.
+  - Provided accessible loading spinner (`Loader2`), clear success confirmation badge (`CheckCircle2`), and accessible error alerts (`role="alert"`).
+  - Maintained 44px minimum touch targets and brand aesthetics (`bg-sunshine`, `bg-sage`, `text-ink`).
+
+### Phase 12: Dark Theme Palette Integration & Theme Mode Switcher
+
+- [x] Palette Extraction & Documentation (`brandGuidelines.md`):
+  - Analyzed dark palette image artifact (`media_1792692388835.jpg`) and extracted semantic color tokens:
+    - **Obsidian** (`#0A0B0E`): Deep canvas & root background.
+    - **Surface** (`#12141A`): Cards, elevated containers, dialogs, dropdowns.
+    - **Panel** (`#1A1D24`): Inputs, search bars, textareas, table heads.
+    - **Amber** (`#FF5E00` -> `#FFA800`): Vibrant hero accents & active brand elements.
+    - **Gold** (`#FDA600`): Pending states & star ratings.
+    - **Success** (`#10B981`): Success indicators & completed states.
+    - **Ice** (`#F8FAFC`): Primary high-contrast serif headings & text.
+    - **Muted** (`#94A3B8`): Secondary text, timestamps, captions, metadata.
+    - **Amber Text** (`#FFB599`): Brand links, warm highlights, interactive hover accents.
+    - **Hairline** (`rgba(226, 232, 240, 0.08)`): High-precision subtle borders & dividers.
+  - Documented Section 3.2 "Dark Theme Palette (Obsidian & Amber)" in `brandGuidelines.md` including contrast ratios, semantic rules, and Tailwind token mapping.
+- [x] Tailwind CSS v4 Theme Engine (`app/globals.css`):
+  - Configured `@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));` to ensure full compatibility with Tailwind v4 selector scoping.
+  - Defined design tokens as CSS custom variables: `--color-obsidian`, `--color-surface`, `--color-panel`, `--color-amber-primary`, `--color-amber-secondary`, `--color-gold`, `--color-success`, `--color-ice`, `--color-slate-muted`, `--color-amber-text`, `--color-hairline`.
+  - Set dark mode root defaults (`.dark body { background-color: var(--color-obsidian); color: var(--color-ice); }`).
+- [x] Theme State Engine & FOUC Prevention (`components/ThemeProvider.tsx`, `app/layout.tsx`):
+  - Built `ThemeProvider` supporting `"light" | "dark" | "system"` with cookie persistence (`theme=...`), `localStorage` sync, and system `matchMedia` listeners.
+  - Injected inline blocking FOUC-prevention script in `app/layout.tsx` `<head>` to evaluate preference before DOM render and prevent bright white flashes.
+- [x] Accessible Theme Mode Switcher Component (`components/ThemeToggle.tsx`):
+  - Designed interactive multi-mode toggle with Sun, Moon, and Monitor icons.
+  - Provided `default`, `minimal`, and `pill` variants meeting WCAG AA minimum 44×44px touch targets.
+  - Integrated into public `Header.tsx` (desktop bar & mobile navigation drawer), `Footer.tsx`, and studio `AdminHeader.tsx`.
+- [x] Whole-Website Dark Mode Integration:
+  - **Public Core Components**: `Header.tsx`, `Footer.tsx`, `RecipeCard.tsx`, `FeaturedRow.tsx`, `SubscribeBanner.tsx`, `CategoryCarousel.tsx`, `SectionHeading.tsx`, `IngredientsList.tsx`, `RecipesFilterView.tsx`, `ContactForm.tsx`, `StarRating.tsx`, `ToastProvider.tsx`.
+  - **Public Routes**: Home (`app/page.tsx`), Recipe Catalog (`app/recipes/page.tsx`), Recipe Detail (`app/recipes/[slug]/page.tsx`), Categories Overview (`app/category/page.tsx`), Category Detail (`app/category/[slug]/page.tsx`), About Us (`app/about/page.tsx`), Contact Us (`app/contact/page.tsx`).
+  - **Static & Error Pages**: Privacy Policy (`app/privacy/page.tsx`), Terms of Service (`app/terms/page.tsx`), 404 (`app/not-found.tsx`), 500 (`app/error.tsx`), Critical Shell (`app/global-error.tsx`), Maintenance (`app/coming-soon/page.tsx`, `app/under-construction/page.tsx`).
+  - **Auth & Studio Admin**: Login (`app/login/page.tsx`), Signup (`app/signup/page.tsx`), Auth Forms (`SignInForm.tsx`, `SignUpForm.tsx`), Admin Layout (`app/admin/layout.tsx`), Admin Header (`AdminHeader.tsx`), Overview (`app/admin/page.tsx`), Stats (`AdminStats.tsx`), Settings (`app/admin/settings/page.tsx`), Site Status Manager (`SiteStatusManager.tsx`), Recipe Management (`AdminRecipeList.tsx`), Category Management (`AdminCategoryList.tsx`), Recipe Editor & Creator (`RecipeForm.tsx`), Image Uploaders (`RecipeImageUploader.tsx`, `CategoryImageUploader.tsx`), Admin Recipe Pages (`app/admin/recipes/page.tsx`, `app/admin/recipes/new/page.tsx`, `app/admin/recipes/[slug]/edit/page.tsx`), Admin Category Page (`app/admin/categories/page.tsx`).
+- [x] Code Quality & Verification:
+  - Zero raw hex values committed; all dark mode styles strictly use semantic utility tokens (`dark:bg-obsidian`, `dark:bg-surface`, `dark:bg-panel`, `dark:text-ice`, `dark:text-slate-muted`, `dark:text-amber-text`, `dark:border-hairline`, `dark:bg-amber-primary`).
+  - Verified touch target accessibility (>= 44x44px) across all interactive theme toggles and input controls.
+- [x] Dark Mode Image Dimming & Visual Comfort (`app/globals.css`, `brandGuidelines.md`):
+  - Configured global dark mode image dimming (`filter: brightness(0.86)`) in `app/globals.css` with smooth transition (`transition: filter 0.25s ease`), preventing harsh high-contrast glare against the Obsidian `#0A0B0E` canvas.
+  - Implemented interactive hover restoration (`filter: brightness(1)`) so readers can inspect food photography with full clarity on interaction.
+  - Explicitly exempted brand favicons and vector icons (`img[src*="favicon"]`, `img[data-no-dim]`) from dimming.
+  - Documented rules in Section 8 of `brandGuidelines.md`.
+
+
 
 

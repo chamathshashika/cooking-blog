@@ -18,45 +18,45 @@ export default function ErrorPage({ error, reset }: Props) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors">
       <Header />
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
-            <Link href="/" className="hover:text-ink transition-colors">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
+            <Link href="/" className="hover:text-ink dark:hover:text-amber-text transition-colors">
               Home
             </Link>
             <span>/</span>
-            <span className="text-ink font-semibold">500 Server Error</span>
+            <span className="text-ink dark:text-ice font-semibold">500 Server Error</span>
           </div>
         </div>
 
         {/* 500 Error Hero Section */}
-        <section className="bg-cream py-16 md:py-24 text-center border-b border-ink/10">
+        <section className="bg-cream dark:bg-surface/80 py-16 md:py-24 text-center border-b border-ink/10 dark:border-hairline">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             {/* Visual Icon Badge */}
-            <div className="mx-auto mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-white border-2 border-red-300 text-red-700 shadow-xs">
+            <div className="mx-auto mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-white dark:bg-panel border-2 border-red-300 dark:border-red-900/60 text-red-700 dark:text-red-400 shadow-xs">
               <AlertCircle className="h-9 w-9 sm:h-11 sm:w-11" />
             </div>
 
-            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.18em] text-muted mb-3">
+            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.18em] text-muted dark:text-slate-muted mb-3">
               Error 500 &bull; Kitchen Disturbance
             </p>
 
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-ink leading-tight">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-ink dark:text-ice leading-tight">
               Something Spilled in the Kitchen
             </h1>
 
-            <p className="mt-4 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-4 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto leading-relaxed">
               A culinary hiccup occurred while preparing this page. Don&apos;t worry—our chefs have
               been alerted and are inspecting the clay pots.
             </p>
 
             {error.digest && (
-              <p className="mt-3 font-mono text-xs text-muted/70">
-                Reference ID: <code className="bg-white/80 px-2 py-0.5 rounded border border-ink/10">{error.digest}</code>
+              <p className="mt-3 font-mono text-xs text-muted/70 dark:text-slate-muted">
+                Reference ID: <code className="bg-white/80 dark:bg-panel px-2 py-0.5 rounded border border-ink/10 dark:border-hairline text-ink dark:text-ice">{error.digest}</code>
               </p>
             )}
 
@@ -64,7 +64,7 @@ export default function ErrorPage({ error, reset }: Props) {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <button
                 onClick={() => reset()}
-                className="inline-flex items-center gap-2 bg-sage px-6 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage/90 transition-colors shadow-xs focus:outline-none focus:ring-2 focus:ring-sage"
+                className="inline-flex items-center gap-2 bg-sage dark:bg-amber-primary px-6 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white dark:text-obsidian hover:bg-sage/90 dark:hover:bg-amber-primary/90 transition-colors shadow-xs focus:outline-none focus:ring-2 focus:ring-sage"
               >
                 <RotateCcw className="h-4 w-4" />
                 <span>Try Again</span>
@@ -72,7 +72,7 @@ export default function ErrorPage({ error, reset }: Props) {
 
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 border border-ink/20 bg-white px-6 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-cream hover:border-ink/40 transition-colors"
+                className="inline-flex items-center gap-2 border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-6 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink dark:text-ice hover:bg-cream dark:hover:bg-surface hover:border-ink/40 dark:hover:border-amber-primary/40 transition-colors"
               >
                 <Home className="h-4 w-4" />
                 <span>Return to Home</span>
@@ -80,7 +80,7 @@ export default function ErrorPage({ error, reset }: Props) {
 
               <Link
                 href="/recipes"
-                className="inline-flex items-center gap-2 border border-ink/20 bg-white px-6 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-cream hover:border-ink/40 transition-colors"
+                className="inline-flex items-center gap-2 border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-6 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink dark:text-ice hover:bg-cream dark:hover:bg-surface hover:border-ink/40 dark:hover:border-amber-primary/40 transition-colors"
               >
                 <Compass className="h-4 w-4" />
                 <span>Browse Recipes</span>
@@ -91,32 +91,32 @@ export default function ErrorPage({ error, reset }: Props) {
 
         {/* Helpful Assistance Section */}
         <section className="mx-auto max-w-2xl px-4 sm:px-6 py-12 text-center">
-          <h2 className="font-display text-xl text-ink mb-2">Need Help Finding a Dish?</h2>
-          <p className="font-display text-sm text-muted mb-6 leading-relaxed">
+          <h2 className="font-display text-xl text-ink dark:text-ice mb-2">Need Help Finding a Dish?</h2>
+          <p className="font-display text-sm text-muted dark:text-slate-muted mb-6 leading-relaxed">
             If the problem persists, feel free to navigate directly to one of our primary collections:
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/category/breakfast"
-              className="rounded-full bg-linen/40 border border-ink/10 px-4 py-2 font-ui text-xs font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
+              className="rounded-full bg-linen/40 dark:bg-panel border border-ink/10 dark:border-hairline px-4 py-2 font-ui text-xs font-semibold text-ink dark:text-ice hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text transition-colors"
             >
               Breakfast Recipes
             </Link>
             <Link
               href="/category/dinner"
-              className="rounded-full bg-linen/40 border border-ink/10 px-4 py-2 font-ui text-xs font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
+              className="rounded-full bg-linen/40 dark:bg-panel border border-ink/10 dark:border-hairline px-4 py-2 font-ui text-xs font-semibold text-ink dark:text-ice hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text transition-colors"
             >
               Curries & Dinners
             </Link>
             <Link
               href="/category/desserts"
-              className="rounded-full bg-linen/40 border border-ink/10 px-4 py-2 font-ui text-xs font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
+              className="rounded-full bg-linen/40 dark:bg-panel border border-ink/10 dark:border-hairline px-4 py-2 font-ui text-xs font-semibold text-ink dark:text-ice hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text transition-colors"
             >
               Sweets & Treats
             </Link>
             <Link
               href="/category"
-              className="rounded-full bg-linen/40 border border-ink/10 px-4 py-2 font-ui text-xs font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
+              className="rounded-full bg-linen/40 dark:bg-panel border border-ink/10 dark:border-hairline px-4 py-2 font-ui text-xs font-semibold text-ink dark:text-ice hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text transition-colors"
             >
               All Categories
             </Link>

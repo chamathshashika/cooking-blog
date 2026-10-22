@@ -129,7 +129,7 @@ export default function RecipeImageUploader({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-5 items-start">
         {/* Live Recipe Image Preview */}
-        <div className="relative h-44 w-full sm:w-56 shrink-0 overflow-hidden rounded-lg border-2 border-dashed border-ink/20 bg-linen/50 flex flex-col items-center justify-center shadow-xs">
+        <div className="relative h-44 w-full sm:w-56 shrink-0 overflow-hidden rounded-lg border-2 border-dashed border-ink/20 dark:border-hairline bg-linen/50 dark:bg-panel/40 flex flex-col items-center justify-center shadow-xs">
           {currentDisplayUrl && !isImageFailed ? (
             <div className="relative h-full w-full group">
               <Image
@@ -144,30 +144,30 @@ export default function RecipeImageUploader({
                 }
                 onError={() => setFailedUrl(currentDisplayUrl)}
               />
-              <div className="absolute inset-0 bg-ink/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-ink/10 dark:bg-obsidian/30 opacity-0 group-hover:opacity-100 transition-opacity" />
               {isVercelBlob && (
-                <div className="absolute top-2 right-2 rounded bg-ink/75 px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-xs flex items-center gap-1 shadow-xs">
-                  <CheckCircle2 className="h-2.5 w-2.5 text-sage" />
+                <div className="absolute top-2 right-2 rounded bg-ink/75 dark:bg-obsidian/80 px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-wider text-white dark:text-ice backdrop-blur-xs flex items-center gap-1 shadow-xs border border-transparent dark:border-hairline">
+                  <CheckCircle2 className="h-2.5 w-2.5 text-sage dark:text-amber-primary" />
                   <span>Vercel Blob</span>
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center p-4 text-center text-muted">
-              <ImageIcon className="h-10 w-10 text-muted/40 mb-1" />
-              <span className="font-ui text-xs font-medium">
+            <div className="flex flex-col items-center justify-center p-4 text-center text-muted dark:text-slate-muted">
+              <ImageIcon className="h-10 w-10 text-muted/40 dark:text-slate-muted/40 mb-1" />
+              <span className="font-ui text-xs font-medium text-ink dark:text-ice">
                 {isImageFailed ? "Failed to load image" : "No image selected"}
               </span>
-              <span className="font-ui text-[10px] text-muted/70 mt-0.5">
+              <span className="font-ui text-[10px] text-muted/70 dark:text-slate-muted/70 mt-0.5">
                 Recommended 4:3 or 3:4 ratio
               </span>
             </div>
           )}
 
           {isUploading && (
-            <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 z-10">
-              <Loader2 className="h-6 w-6 animate-spin text-sage" />
-              <span className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink">
+            <div className="absolute inset-0 bg-white/80 dark:bg-surface/90 backdrop-blur-xs flex flex-col items-center justify-center gap-2 z-10">
+              <Loader2 className="h-6 w-6 animate-spin text-sage dark:text-amber-primary" />
+              <span className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink dark:text-ice">
                 Uploading image...
               </span>
             </div>
@@ -188,8 +188,8 @@ export default function RecipeImageUploader({
             }}
             className={`cursor-pointer rounded-lg border-2 border-dashed p-4 text-center transition-all ${
               dragActive
-                ? "border-sage bg-sage/5 scale-[1.01]"
-                : "border-ink/20 hover:border-sage hover:bg-linen/30"
+                ? "border-sage dark:border-amber-primary bg-sage/5 dark:bg-amber-primary/10 scale-[1.01]"
+                : "border-ink/20 dark:border-hairline hover:border-sage dark:hover:border-amber-primary/50 hover:bg-linen/30 dark:hover:bg-panel/60 bg-transparent"
             } ${disabled || isUploading ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             <input
@@ -205,13 +205,13 @@ export default function RecipeImageUploader({
               }}
             />
             <div className="flex flex-col items-center justify-center gap-1.5">
-              <div className="rounded-full bg-cream p-2 text-ink shadow-2xs">
-                <Upload className="h-4 w-4 text-sage" />
+              <div className="rounded-full bg-cream dark:bg-surface p-2 text-ink dark:text-ice shadow-2xs border border-transparent dark:border-hairline">
+                <Upload className="h-4 w-4 text-sage dark:text-amber-primary" />
               </div>
-              <p className="font-ui text-xs font-semibold text-ink">
-                <span className="text-sage hover:underline">Click to upload</span> or drag and drop
+              <p className="font-ui text-xs font-semibold text-ink dark:text-ice">
+                <span className="text-sage dark:text-amber-text hover:underline">Click to upload</span> or drag and drop
               </p>
-              <p className="font-ui text-[11px] text-muted">
+              <p className="font-ui text-[11px] text-muted dark:text-slate-muted">
                 JPG, PNG, WebP, AVIF up to 5MB (Stored on Vercel Blob)
               </p>
             </div>
@@ -221,13 +221,13 @@ export default function RecipeImageUploader({
             <button
               type="button"
               onClick={() => setShowUrlInput(!showUrlInput)}
-              className="inline-flex items-center gap-1.5 font-ui text-[11px] font-semibold text-muted hover:text-ink transition-colors"
+              className="inline-flex items-center gap-1.5 font-ui text-[11px] font-semibold text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice transition-colors"
             >
               <LinkIcon className="h-3 w-3" />
               <span>{showUrlInput ? "Hide custom URL input" : "Or enter custom image URL"}</span>
             </button>
             {imageUrl && (
-              <span className="font-ui text-[10px] text-muted truncate max-w-[200px]" title={imageUrl}>
+              <span className="font-ui text-[10px] text-muted dark:text-slate-muted truncate max-w-[200px]" title={imageUrl}>
                 {imageUrl.startsWith("/api/blob") ? "Vercel Blob Image" : imageUrl}
               </span>
             )}
@@ -235,7 +235,7 @@ export default function RecipeImageUploader({
 
           {showUrlInput && (
             <div className="mt-2 space-y-1">
-              <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-muted">
+              <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
                 Direct Image URL or Path
               </label>
               <div className="flex gap-2">
@@ -249,7 +249,7 @@ export default function RecipeImageUploader({
                     onImageChange(e.target.value);
                   }}
                   disabled={disabled || isUploading}
-                  className="flex-1 rounded-md border border-ink/20 px-3 py-1.5 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="flex-1 rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-1.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
               </div>
             </div>
