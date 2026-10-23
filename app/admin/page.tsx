@@ -3,14 +3,16 @@ import { ArrowRight, BookOpen, Layers, Sparkles } from "lucide-react";
 import AdminStats from "@/components/admin/AdminStats";
 import AdminRecipeList from "@/components/admin/AdminRecipeList";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
-import { allRecipes, categories as defaultCategories } from "@/lib/data";
 import { getCategories } from "@/lib/actions/category";
+import { getRecipes } from "@/lib/actions/recipe";
 import { verifyAdminSession } from "@/lib/dal";
 
 export default async function AdminDashboardPage() {
-  const session = await verifyAdminSession();
-  const dbCategories = await getCategories();
-  const categoriesList = dbCategories.length > 0 ? dbCategories : defaultCategories;
+  const [session, recipes, categoriesList] = await Promise.all([
+    verifyAdminSession(),
+    getRecipes({ includeDrafts: true }),
+    getCategories(),
+  ]);
   const isAdmin = session.role === "admin";
   return (
     <div className="space-y-10">
@@ -56,7 +58,7 @@ export default async function AdminDashboardPage() {
 
       {/* Overview Stat Cards */}
       <section aria-label="Studio Statistics">
-        <AdminStats recipes={allRecipes} categories={categoriesList} />
+        <AdminStats recipes={recipes} categories={categoriesList} />
       </section>
 
       {/* Recipes Section */}
@@ -82,7 +84,7 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
 
-        <AdminRecipeList initialRecipes={allRecipes} categories={categoriesList} />
+        <AdminRecipeList initialRecipes={recipes} categories={categoriesList} />
       </section>
 
       {/* Categories Section */}
@@ -110,7 +112,7 @@ export default async function AdminDashboardPage() {
 
         <AdminCategoryList
           initialCategories={categoriesList}
-          recipes={allRecipes}
+          recipes={recipes}
           isAdmin={isAdmin}
         />
       </section>

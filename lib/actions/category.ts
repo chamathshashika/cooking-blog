@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { CategoryModel } from "@/lib/models/Category";
 import { verifySession } from "@/lib/dal";
-import { categories as defaultCategories, type Category } from "@/lib/data";
+import { type Category } from "@/lib/data";
+import { seedCategories } from "@/lib/seedData";
 import { deleteBlobByUrl } from "@/lib/actions/upload";
+import { generateSlug } from "@/lib/slug";
 
 /**
  * Fetch all categories from MongoDB.
- * If collection is empty on initial setup, seeds from default categories.
+ * If collection is empty on initial setup, seeds from seedCategories.
  */
 export async function getCategories(): Promise<Category[]> {
   try {
@@ -19,7 +21,7 @@ export async function getCategories(): Promise<Category[]> {
     // Seed defaults if empty
     if (!docs || docs.length === 0) {
       await CategoryModel.insertMany(
-        defaultCategories.map((c) => ({
+        seedCategories.map((c) => ({
           name: c.name,
           displayName: c.displayName,
           slug: c.slug,
@@ -38,9 +40,39 @@ export async function getCategories(): Promise<Category[]> {
       image: doc.image,
     }));
   } catch (error) {
-    console.error("Failed to load categories from database, falling back to static data:", error);
-    return defaultCategories;
+    console.error("Failed to load categories from database:", error);
+    return [];
   }
+}
+
+/**
+ * Fetch single category from MongoDB by slug.
+ */
+export async function getCategoryBySlug(
+  slug: string
+): Promise<Category | undefined> {
+  try {
+    await connectToDatabase();
+    const target = slug?.toLowerCase().trim();
+    if (!target) return undefined;
+
+    const doc = await CategoryModel.findOne({
+      $or: [{ slug: target }, { name: target }],
+    }).lean();
+
+    if (doc) {
+      return {
+        name: doc.name,
+        displayName: doc.displayName,
+        slug: doc.slug,
+        description: doc.description,
+        image: doc.image,
+      };
+    }
+  } catch (error) {
+    console.error("Failed to load category by slug from database:", error);
+  }
+  return undefined;
 }
 
 /**
@@ -89,25 +121,26 @@ export async function createCategory(data: {
       };
     }
 
-    const slug = (
-      data.slug?.trim() ||
-      displayName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
-    ).toLowerCase();
-
-    const name = (data.name?.trim() || slug).toLowerCase();
+    // 3. Format or auto-generate SEO-friendly slug
+    const baseSlug = generateSlug(data.slug || displayName);
+    if (!baseSlug) {
+      return {
+        success: false,
+        error: "Could not generate a valid SEO URL slug for this category.",
+      };
+    }
 
     await connectToDatabase();
 
-    const existing = await CategoryModel.findOne({ slug });
-    if (existing) {
-      return {
-        success: false,
-        error: `A category with slug "${slug}" already exists. Please choose a different title or slug.`,
-      };
+    // Auto-resolve duplicate slug for clean SEO URLs
+    let slug = baseSlug;
+    let counter = 2;
+    while (await CategoryModel.exists({ slug })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
     }
+
+    const name = (data.name?.trim() || slug).toLowerCase();
 
     const newDoc = await CategoryModel.create({
       name,
@@ -191,7 +224,7 @@ export async function updateCategory(
     }
 
     const newSlug = data.newSlug
-      ? data.newSlug.trim().toLowerCase()
+      ? generateSlug(data.newSlug)
       : originalSlug;
 
     await connectToDatabase();
@@ -228,7 +261,7 @@ export async function updateCategory(
         description,
         image,
       },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!updated) {

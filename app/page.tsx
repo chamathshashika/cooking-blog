@@ -5,11 +5,16 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import SectionHeading from "@/components/SectionHeading";
 import RecipeCard from "@/components/RecipeCard";
 import Footer from "@/components/Footer";
-import { categories } from "@/lib/data";
 import { getRecipes } from "@/lib/actions/recipe";
+import { getCategories } from "@/lib/actions/category";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const recipes = await getRecipes();
+  const [recipes, categories] = await Promise.all([
+    getRecipes(),
+    getCategories(),
+  ]);
   const explicitFeatured = recipes.filter((r) => r.isFeatured);
   const featuredRecipes =
     explicitFeatured.length >= 4

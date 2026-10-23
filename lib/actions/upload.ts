@@ -325,3 +325,122 @@ export async function uploadRecipeImage(
   }
 }
 
+/**
+ * Server action to securely upload a user profile picture (avatar) to Vercel Blob.
+ * Validates session authentication, file type (images only), and max file size (up to 5MB).
+ */
+export async function uploadAvatarImage(
+  formData: FormData
+): Promise<UploadResult> {
+  try {
+    // 1. Authorization check
+    const session = await verifySession();
+    if (!session.isAuth || !session.userId) {
+      return {
+        success: false,
+        error: "Unauthorized: You must be logged in to update your profile picture.",
+      };
+    }
+
+    // 2. Extract file from FormData
+    const file = formData.get("file");
+    if (!file || !(file instanceof File) || file.size === 0) {
+      return {
+        success: false,
+        error: "No image file provided.",
+      };
+    }
+
+    // 3. Validate image MIME type
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/avif",
+      "image/gif",
+    ];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      return {
+        success: false,
+        error: "Invalid file type. Allowed formats: JPEG, PNG, WebP, AVIF, GIF.",
+      };
+    }
+
+    // 4. Validate file size (max 5MB)
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      return {
+        success: false,
+        error: "Image exceeds maximum allowed size of 5MB.",
+      };
+    }
+
+    // 5. Generate clean filename
+    const originalName = file.name || "avatar";
+    const extension = originalName.split(".").pop()?.toLowerCase() || "jpg";
+    const blobPath = `avatars/user-${session.userId}-${Date.now()}.${extension}`;
+
+    // 6. Upload to Vercel Blob (attempts public, falls back to private if store requires it)
+    let blob;
+    try {
+      blob = await put(blobPath, file, {
+        access: "public",
+        addRandomSuffix: true,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "";
+      if (
+        errMsg.includes("private store") ||
+        errMsg.includes("private access") ||
+        errMsg.includes("Cannot use public access")
+      ) {
+        blob = await put(blobPath, file, {
+          access: "private",
+          addRandomSuffix: true,
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+      } else {
+        throw err;
+      }
+    }
+
+    // 7. Route through proxy if private blob or local server
+    let finalUrl = blob.url;
+    if (
+      blob.url.includes(".private.blob.vercel-storage.com") ||
+      blob.url.includes("localhost") ||
+      blob.url.includes("127.0.0.1") ||
+      !blob.url.startsWith("http")
+    ) {
+      finalUrl = `/api/blob?url=${encodeURIComponent(blob.url)}`;
+    } else if (process.env.BLOB_STORE_URL) {
+      try {
+        const base = process.env.BLOB_STORE_URL.replace(/\/+$/, "");
+        const path = blob.pathname.startsWith("/")
+          ? blob.pathname
+          : `/${blob.pathname}`;
+        finalUrl = `${base}${path}`;
+      } catch {
+        finalUrl = blob.url;
+      }
+    }
+
+    return {
+      success: true,
+      url: finalUrl,
+    };
+  } catch (error: unknown) {
+    console.error("Vercel Blob avatar upload failed:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "An unexpected error occurred while uploading your profile picture.";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+

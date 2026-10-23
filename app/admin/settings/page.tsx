@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Sliders, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import SiteStatusManager from "@/components/admin/SiteStatusManager";
 import { getSiteStatus } from "@/lib/actions/siteStatus";
 import { verifyAdminSession } from "@/lib/dal";

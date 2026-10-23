@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import SubscribeBanner from "@/components/SubscribeBanner";
-import { categories } from "@/lib/data";
+import { getCategories } from "@/lib/actions/category";
 
 export const metadata: Metadata = {
   title: "404 - Recipe Not Found | CeylonSpicer",
@@ -13,7 +13,8 @@ export const metadata: Metadata = {
     "The page or recipe you are looking for doesn't exist or has moved. Explore our authentic Sri Lankan recipes.",
 };
 
-export default function NotFound() {
+export default async function NotFound() {
+  const categories = await getCategories();
   const quickLinks = [
     { label: "Breakfast Dishes", href: "/category/breakfast" },
     { label: "Curries & Dinners", href: "/category/dinner" },

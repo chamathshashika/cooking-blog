@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Clock, Sliders, ExternalLink, X, Eye } from "lucide-react";
+import { AlertTriangle, Clock, Sliders, X, Eye } from "lucide-react";
 import type { SiteMode } from "@/lib/actions/siteStatus";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
   headline?: string;
 };
 
-export default function AdminSiteStatusBanner({ mode, headline }: Props) {
+export default function AdminSiteStatusBanner({ mode }: Props) {
   const [isDismissed, setIsDismissed] = useState(false);
 
   if (mode === "live" || isDismissed) {
@@ -27,7 +27,7 @@ export default function AdminSiteStatusBanner({ mode, headline }: Props) {
       aria-live="polite"
       className="sticky top-0 z-50 w-full border-b border-amber-300 dark:border-amber-primary/40 bg-amber-50/95 dark:bg-panel/95 px-4 py-2 text-ink dark:text-ice shadow-sm backdrop-blur-md transition-all"
     >
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-2 text-xs">
+      <div className="w-full flex flex-wrap items-center justify-between gap-2 text-xs px-4 sm:px-6 md:px-8 xl:px-12">
         {/* Left: Indicator & Status message */}
         <div className="flex items-center gap-2.5">
           <span className="flex h-2 w-2 rounded-full bg-amber-500 dark:bg-amber-primary animate-pulse" />

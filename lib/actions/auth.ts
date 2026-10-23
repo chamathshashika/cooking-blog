@@ -1,37 +1,13 @@
 "use server";
 
-import crypto from "crypto";
 import { redirect } from "next/navigation";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { createSession, deleteSession } from "@/lib/session";
 import type { FormState, UserRole } from "@/lib/definitions";
 import { DEFAULT_USER_ROLE, hasAdminAccess } from "@/lib/definitions";
+import { hashPassword, verifyPassword } from "@/lib/password";
 
-/**
- * Hash password with random salt using Node.js crypto scrypt.
- */
-function hashPassword(password: string): string {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${derivedKey}`;
-}
-
-/**
- * Timing-safe password verification.
- */
-function verifyPassword(password: string, storedHash: string): boolean {
-  try {
-    const [salt, key] = storedHash.split(":");
-    if (!salt || !key) return false;
-
-    const keyBuffer = Buffer.from(key, "hex");
-    const derivedKey = crypto.scryptSync(password, salt, 64);
-    return crypto.timingSafeEqual(keyBuffer, derivedKey);
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Server action to sign up a new user, following official Next.js documentation.
@@ -107,7 +83,8 @@ export async function signup(
       newUser._id.toString(),
       newUser.role,
       newUser.name,
-      newUser.email
+      newUser.email,
+      newUser.avatar || ""
     );
   } catch (error) {
     console.error("Signup error in server action:", error);
@@ -186,7 +163,8 @@ export async function login(
       user._id.toString(),
       user.role,
       user.name,
-      user.email
+      user.email,
+      user.avatar || ""
     );
   } catch (error) {
     console.error("Login error in server action:", error);

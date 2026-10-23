@@ -12,9 +12,7 @@ import {
   Star,
   Check,
   Loader2,
-  HelpCircle,
   ExternalLink,
-  Tag,
   BookOpen,
   ChefHat,
   ChevronUp,
@@ -30,6 +28,7 @@ import {
 import { useToast } from "@/components/ToastProvider";
 import RecipeImageUploader from "@/components/admin/RecipeImageUploader";
 import type { Category, Recipe } from "@/lib/data";
+import { generateSlug } from "@/lib/slug";
 
 type Props = {
   categories: Category[];
@@ -164,15 +163,11 @@ export default function RecipeForm({
   );
   const [newTag, setNewTag] = useState("");
 
-  // Auto-generate slug from title
+  // Auto-generate SEO-friendly slug from title
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (!slugManuallyEdited) {
-      const generated = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      setSlug(generated);
+      setSlug(generateSlug(val));
     }
   };
 
@@ -418,7 +413,7 @@ export default function RecipeForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-6 py-2.5 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-50"
+            className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-6 py-2.5 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? (
               <>
@@ -464,11 +459,27 @@ export default function RecipeForm({
               {/* URL Slug */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
-                    URL Slug
-                  </label>
-                  <span className="font-ui text-[10px] text-muted dark:text-slate-muted">
-                    https://ceylonspicer.com/recipes/<strong>{slug || "..."}</strong>
+                  <div className="flex items-center gap-2">
+                    <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
+                      URL Slug
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const regenerated = generateSlug(title);
+                        setSlug(regenerated);
+                        setSlugManuallyEdited(false);
+                        showToast("Slug regenerated from recipe title.", "info");
+                      }}
+                      title="Auto-generate SEO slug from title"
+                      className="inline-flex items-center gap-1 font-ui text-[10px] font-semibold uppercase tracking-wider text-sage dark:text-amber-primary hover:underline cursor-pointer"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      <span>Auto-Generate</span>
+                    </button>
+                  </div>
+                  <span className="font-ui text-[10px] text-muted dark:text-slate-muted hidden sm:inline">
+                    /recipes/<strong>{slug || "..."}</strong>
                   </span>
                 </div>
                 <input
@@ -478,9 +489,17 @@ export default function RecipeForm({
                     setSlugManuallyEdited(true);
                     setSlug(e.target.value);
                   }}
+                  onBlur={() => {
+                    if (slug) {
+                      setSlug(generateSlug(slug));
+                    }
+                  }}
                   placeholder="jaffna-spiced-crab-curry"
                   className="w-full min-h-[42px] rounded-md border border-ink/20 dark:border-hairline bg-linen/20 dark:bg-panel/50 px-3 py-2 font-mono text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
+                <p className="mt-1 font-ui text-[10px] text-muted dark:text-slate-muted">
+                  Auto-formatted with lowercase ASCII, hyphens, and optimized for search engine indexing.
+                </p>
               </div>
 
               {/* Excerpt */}
@@ -1059,9 +1078,9 @@ export default function RecipeForm({
                 <button
                   type="button"
                   onClick={() => setStatus("published")}
-                  className={`min-h-[40px] rounded-md border font-ui text-xs font-bold uppercase tracking-wider transition-colors ${
+                  className={`min-h-[40px] rounded-md border font-ui text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                     status === "published"
-                      ? "border-sage bg-sage text-white dark:border-amber-primary dark:bg-amber-primary dark:text-obsidian"
+                      ? "border-sage bg-sage text-white hover:bg-sage-dark dark:border-emerald-500 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 shadow-xs"
                       : "border-ink/20 dark:border-hairline bg-white dark:bg-panel text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                   }`}
                 >
@@ -1091,7 +1110,7 @@ export default function RecipeForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-6 py-3 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-50"
+              className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-6 py-3 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

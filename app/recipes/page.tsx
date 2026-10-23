@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import RecipesFilterView from "@/components/RecipesFilterView";
-import { categories } from "@/lib/data";
 import { getRecipes } from "@/lib/actions/recipe";
+import { getCategories } from "@/lib/actions/category";
 
 export const metadata: Metadata = {
   title: "All Recipes | Authentic Sri Lankan Cooking | CeylonSpicer",
@@ -23,11 +23,16 @@ type Props = {
   searchParams?: Promise<{ category?: string; search?: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RecipesPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
   const initialCategory = resolvedSearchParams?.category || "all";
   const initialSearch = resolvedSearchParams?.search || "";
-  const allRecipes = await getRecipes();
+  const [allRecipes, categories] = await Promise.all([
+    getRecipes(),
+    getCategories(),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">

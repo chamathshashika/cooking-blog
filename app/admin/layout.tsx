@@ -28,13 +28,13 @@ export default async function AdminLayout({
       <AdminHeader session={session} />
 
       {/* Main Admin Content Area */}
-      <main className="flex-1 mx-auto w-full max-w-[1240px] px-4 sm:px-6 py-6 sm:py-8">
+      <main className="flex-1 w-full px-4 sm:px-6 md:px-8 xl:px-12 py-6 sm:py-8">
         {children}
       </main>
 
       {/* Admin Footer */}
       <footer className="border-t border-ink/10 dark:border-hairline bg-white/80 dark:bg-surface/80 py-5 mt-auto">
-        <div className="mx-auto flex max-w-[1240px] flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 md:px-8 xl:px-12 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-3.5 w-3.5 text-sage dark:text-amber-primary" />
             <span>CeylonSpicer Content Studio • Internal Management</span>
@@ -61,6 +61,13 @@ export default async function AdminLayout({
               className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Categories
+            </Link>
+            <span className="text-ink/20 dark:text-hairline">•</span>
+            <Link
+              href="/admin/profile"
+              className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
+              Profile
             </Link>
           </div>
         </div>
