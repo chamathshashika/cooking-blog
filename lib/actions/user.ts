@@ -7,6 +7,10 @@ import { verifySession } from "@/lib/dal";
 import { createSession } from "@/lib/session";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { deleteBlobByUrl } from "@/lib/actions/upload";
+import {
+  sanitizeMongoInput,
+  hasSqlInjection,
+} from "@/lib/security";
 
 export type UserProfileData = {
   id: string;
@@ -82,9 +86,14 @@ export async function updateUserProfile(data: {
       return { success: false, error: "Unauthorized: Please log in." };
     }
 
-    const trimmedName = data.name?.trim();
+    const safeData = sanitizeMongoInput(data);
+    const trimmedName = safeData.name?.trim();
     if (!trimmedName || trimmedName.length < 2) {
       return { success: false, error: "Name must be at least 2 characters long." };
+    }
+
+    if (hasSqlInjection(trimmedName)) {
+      return { success: false, error: "Invalid characters in name." };
     }
 
     if (trimmedName.length > 100) {

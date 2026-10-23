@@ -78,18 +78,9 @@ export default function AdminProfileForm({ initialUser }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/avif",
-      "image/gif",
-    ];
+    const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
-      showToast(
-        "Invalid file format. Please choose a JPG, PNG, WebP, AVIF, or GIF image.",
-        "error"
-      );
+      showToast("Invalid file format. Please choose a JPG or PNG image.", "error");
       return;
     }
 
@@ -340,7 +331,7 @@ export default function AdminProfileForm({ initialUser }: Props) {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+                    accept="image/jpeg,image/png,.jpg,.jpeg,.png"
                     onChange={handleFileSelect}
                     className="hidden"
                   />
@@ -399,7 +390,7 @@ export default function AdminProfileForm({ initialUser }: Props) {
                 )}
 
                 <p className="font-sans text-xs text-muted dark:text-slate-muted">
-                  Supports JPEG, PNG, WebP, or GIF (max 5MB). Photo is automatically cropped into a round chef avatar.
+                  Supports JPEG or PNG (max 5MB). Photo is automatically cropped into a round chef avatar.
                 </p>
               </div>
             </div>

@@ -1,12 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decrypt } from "@/lib/session";
 import { hasAdminAccess } from "@/lib/definitions";
+import { isAllowedHttpMethod, verifyCsrfOrigin } from "@/lib/security";
 
 // 1. Specify protected and public auth routes
 const protectedRoutes = ["/admin", "/dashboard"];
 const publicAuthRoutes = ["/login", "/signup", "/signin"];
 
 export default async function proxy(req: NextRequest) {
+  // A. Enforce allowed HTTP methods (GET, POST, HEAD only)
+  if (!isAllowedHttpMethod(req.method)) {
+    return new NextResponse("Method Not Allowed", {
+      status: 405,
+      headers: {
+        Allow: "GET, POST, HEAD",
+      },
+    });
+  }
+
+  // B. Protect every mutating request against Cross-Site Request Forgery (CSRF)
+  const csrf = verifyCsrfOrigin(req);
+  if (!csrf.valid) {
+    return new NextResponse(csrf.reason || "Forbidden: CSRF check failed", {
+      status: 403,
+    });
+  }
+
   const path = req.nextUrl.pathname;
 
   const isProtectedRoute = protectedRoutes.some(
@@ -52,6 +71,6 @@ export default async function proxy(req: NextRequest) {
 // Routes proxy should run on (excludes static assets, images, favicons)
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

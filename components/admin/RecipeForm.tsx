@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,6 +19,10 @@ import {
   ChevronDown,
   Sparkles,
   DollarSign,
+  Save,
+  RotateCcw,
+  CheckCircle2,
+  PauseCircle,
 } from "lucide-react";
 import {
   createRecipe,
@@ -52,6 +56,29 @@ type InstructionStep = {
   text: string;
 };
 
+const AUTOSAVE_STORAGE_KEY = "cooking_blog_recipe_create_draft";
+const AUTOSAVE_ENABLED_KEY = "cooking_blog_recipe_create_autosave_enabled";
+
+type SavedDraftData = {
+  title: string;
+  slug: string;
+  category: string;
+  image: string;
+  prepTime: string;
+  cookTime: string;
+  totalTime: string;
+  servings: number;
+  excerpt: string;
+  intro: string;
+  isFeatured: boolean;
+  status: "draft" | "published";
+  ingredients: IngredientRow[];
+  instructions: InstructionStep[];
+  notes: string[];
+  tags: string[];
+  updatedAt: number;
+};
+
 export default function RecipeForm({
   categories,
   authorName = "Chef Amara Perera",
@@ -63,6 +90,13 @@ export default function RecipeForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEditing);
+
+  // Autosave State
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
+  const [discoveredDraft, setDiscoveredDraft] = useState<SavedDraftData | null>(null);
+  const isInitialMount = useRef(true);
 
   // Form State
   const [title, setTitle] = useState(initialRecipe?.title || "");
@@ -162,6 +196,203 @@ export default function RecipeForm({
       : ["curry", "authentic", "coconut milk"]
   );
   const [newTag, setNewTag] = useState("");
+
+  // Load draft & preference on mount for recipe create
+  useEffect(() => {
+    if (isEditing) return;
+
+    const timeout = setTimeout(() => {
+      try {
+        const storedPref = localStorage.getItem(AUTOSAVE_ENABLED_KEY);
+        if (storedPref !== null) {
+          setAutoSaveEnabled(storedPref === "true");
+        }
+
+        const rawDraft = localStorage.getItem(AUTOSAVE_STORAGE_KEY);
+        if (rawDraft) {
+          const parsed = JSON.parse(rawDraft) as SavedDraftData;
+          if (
+            parsed &&
+            (parsed.title ||
+              parsed.excerpt ||
+              (parsed.ingredients && parsed.ingredients.some((i) => i.name)))
+          ) {
+            setDiscoveredDraft(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to read draft from localStorage:", e);
+      }
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [isEditing]);
+
+  // Toggle autosave on/off
+  const handleToggleAutoSave = () => {
+    const next = !autoSaveEnabled;
+    setAutoSaveEnabled(next);
+    try {
+      localStorage.setItem(AUTOSAVE_ENABLED_KEY, String(next));
+    } catch (err) {
+      console.warn("Failed to save autosave preference:", err);
+    }
+    showToast(
+      next
+        ? "Autosave enabled: your draft will save automatically."
+        : "Autosave paused.",
+      "info"
+    );
+  };
+
+  // Save current form state to localStorage
+  const saveDraftLocally = useCallback(() => {
+    if (isEditing) return;
+
+    // Skip if form is essentially empty
+    if (!title && !excerpt && ingredients.every((i) => !i.name)) {
+      return;
+    }
+
+    try {
+      setIsAutoSaving(true);
+      const draftData: SavedDraftData = {
+        title,
+        slug,
+        category,
+        image,
+        prepTime,
+        cookTime,
+        totalTime,
+        servings: Number(servings) || 4,
+        excerpt,
+        intro,
+        isFeatured,
+        status,
+        ingredients,
+        instructions,
+        notes,
+        tags,
+        updatedAt: Date.now(),
+      };
+      localStorage.setItem(AUTOSAVE_STORAGE_KEY, JSON.stringify(draftData));
+      const formatted = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      setLastSavedTime(formatted);
+    } catch (err) {
+      console.warn("Failed to autosave recipe draft:", err);
+    } finally {
+      setTimeout(() => {
+        setIsAutoSaving(false);
+      }, 350);
+    }
+  }, [
+    isEditing,
+    title,
+    slug,
+    category,
+    image,
+    prepTime,
+    cookTime,
+    totalTime,
+    servings,
+    excerpt,
+    intro,
+    isFeatured,
+    status,
+    ingredients,
+    instructions,
+    notes,
+    tags,
+  ]);
+
+  // Autosave debouncer
+  useEffect(() => {
+    if (isEditing) return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (!autoSaveEnabled) return;
+
+    const timer = setTimeout(() => {
+      saveDraftLocally();
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [
+    isEditing,
+    autoSaveEnabled,
+    saveDraftLocally,
+    title,
+    slug,
+    category,
+    image,
+    prepTime,
+    cookTime,
+    totalTime,
+    servings,
+    excerpt,
+    intro,
+    isFeatured,
+    status,
+    ingredients,
+    instructions,
+    notes,
+    tags,
+  ]);
+
+  // Restore draft handler
+  const handleRestoreDraft = () => {
+    if (!discoveredDraft) return;
+    setTitle(discoveredDraft.title || "");
+    setSlug(discoveredDraft.slug || "");
+    setCategory(discoveredDraft.category || categories[0]?.name || "Curries & Dinners");
+    setImage(discoveredDraft.image || "/images/recipes/sri-lankan-chicken-curry.jpg");
+    setPrepTime(discoveredDraft.prepTime || "20 min");
+    setCookTime(discoveredDraft.cookTime || "30 min");
+    setTotalTime(discoveredDraft.totalTime || "");
+    setServings(discoveredDraft.servings || 4);
+    setExcerpt(discoveredDraft.excerpt || "");
+    setIntro(discoveredDraft.intro || "");
+    setIsFeatured(Boolean(discoveredDraft.isFeatured));
+    setStatus(discoveredDraft.status || "draft");
+    if (discoveredDraft.ingredients && discoveredDraft.ingredients.length > 0) {
+      setIngredients(discoveredDraft.ingredients);
+    }
+    if (discoveredDraft.instructions && discoveredDraft.instructions.length > 0) {
+      setInstructions(discoveredDraft.instructions);
+    }
+    if (discoveredDraft.notes) setNotes(discoveredDraft.notes);
+    if (discoveredDraft.tags) setTags(discoveredDraft.tags);
+
+    const savedAt = new Date(discoveredDraft.updatedAt).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setLastSavedTime(savedAt);
+    setDiscoveredDraft(null);
+    showToast("Unsaved recipe draft restored!", "success");
+  };
+
+  // Discard draft handler
+  const handleDiscardDraft = () => {
+    try {
+      localStorage.removeItem(AUTOSAVE_STORAGE_KEY);
+    } catch {}
+    setDiscoveredDraft(null);
+    setLastSavedTime(null);
+    showToast("Unsaved draft discarded.", "info");
+  };
+
+  // Manual save draft handler
+  const handleManualSaveDraft = () => {
+    saveDraftLocally();
+    showToast("Draft saved locally!", "success");
+  };
 
   // Auto-generate SEO-friendly slug from title
   const handleTitleChange = (val: string) => {
@@ -339,6 +570,11 @@ export default function RecipeForm({
       }
 
       if (result.success && result.slug) {
+        if (!isEditing) {
+          try {
+            localStorage.removeItem(AUTOSAVE_STORAGE_KEY);
+          } catch {}
+        }
         showToast(
           isEditing
             ? `Recipe "${title}" updated successfully!`
@@ -390,7 +626,70 @@ export default function RecipeForm({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Autosave Switch & Indicator for Recipe Creation */}
+          {!isEditing && (
+            <div className="flex items-center gap-2.5 rounded-lg border border-ink/15 dark:border-hairline bg-white/90 dark:bg-panel px-3 py-1.5 shadow-2xs">
+              <button
+                type="button"
+                onClick={handleToggleAutoSave}
+                role="switch"
+                aria-checked={autoSaveEnabled}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-sage ${
+                  autoSaveEnabled ? "bg-sage dark:bg-emerald-600" : "bg-ink/20 dark:bg-hairline"
+                }`}
+                title={autoSaveEnabled ? "Autosave is ON (click to turn OFF)" : "Autosave is OFF (click to turn ON)"}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${
+                    autoSaveEnabled ? "translate-x-4" : "translate-x-0"
+                  }`}
+                />
+              </button>
+
+              <div className="flex items-center gap-1.5 font-ui text-[11px]">
+                <span className="font-bold uppercase tracking-wider text-ink dark:text-ice">
+                  Autosave
+                </span>
+                {autoSaveEnabled ? (
+                  <span className="flex items-center gap-1 text-muted dark:text-slate-muted">
+                    {isAutoSaving ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin text-sage dark:text-emerald-400" />
+                        <span>Saving...</span>
+                      </>
+                    ) : lastSavedTime ? (
+                      <>
+                        <CheckCircle2 className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                        <span className="hidden sm:inline">Saved {lastSavedTime}</span>
+                        <span className="sm:hidden">Saved</span>
+                      </>
+                    ) : (
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">ON</span>
+                    )}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-muted dark:text-slate-muted font-medium">
+                    <PauseCircle className="h-3 w-3" />
+                    <span>OFF</span>
+                  </span>
+                )}
+              </div>
+
+              {!autoSaveEnabled && (
+                <button
+                  type="button"
+                  onClick={handleManualSaveDraft}
+                  className="ml-1 inline-flex items-center gap-1 rounded bg-cream/70 dark:bg-surface px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-cream dark:hover:bg-panel transition-colors cursor-pointer"
+                  title="Save draft now"
+                >
+                  <Save className="h-2.5 w-2.5 text-sage dark:text-amber-primary" />
+                  <span>Save</span>
+                </button>
+              )}
+            </div>
+          )}
+
           {isEditing && initialRecipe && (
             <Link
               href={`/recipes/${initialRecipe.slug}`}
@@ -429,6 +728,43 @@ export default function RecipeForm({
           </button>
         </div>
       </div>
+
+      {/* Discovered Unsaved Draft Alert Banner */}
+      {!isEditing && discoveredDraft && (
+        <div className="rounded-xl border border-sunshine/50 dark:border-amber-primary/40 bg-sunshine/10 dark:bg-amber-primary/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-2xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="rounded-full bg-sunshine/30 dark:bg-amber-primary/20 p-2 text-ink dark:text-ice shrink-0">
+              <Sparkles className="h-4 w-4 text-ink dark:text-amber-text" />
+            </div>
+            <div>
+              <p className="font-display font-semibold text-sm sm:text-base text-ink dark:text-ice">
+                Unsaved recipe draft found
+              </p>
+              <p className="font-ui text-xs text-muted dark:text-slate-muted mt-0.5">
+                {discoveredDraft.title ? `"${discoveredDraft.title}"` : "Untitled dish"} • Last saved at {new Date(discoveredDraft.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ({new Date(discoveredDraft.updatedAt).toLocaleDateString()})
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleRestoreDraft}
+              className="inline-flex items-center gap-1.5 rounded-md bg-sage dark:bg-emerald-600 px-3.5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white shadow-2xs hover:bg-sage-dark dark:hover:bg-emerald-500 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Restore Draft</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDiscardDraft}
+              className="inline-flex items-center gap-1.5 rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-3 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 transition-colors cursor-pointer"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Discard</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content Column (Left 2 Columns) */}
@@ -1103,6 +1439,54 @@ export default function RecipeForm({
             <div className="pt-2 text-muted dark:text-slate-muted font-ui text-[11px]">
               Author: <strong className="text-ink dark:text-ice">{authorName}</strong>
             </div>
+
+            {/* Autosave Sidebar Status & Manual Save for Recipe Create */}
+            {!isEditing && (
+              <div className="rounded-lg border border-ink/10 dark:border-hairline bg-linen/30 dark:bg-panel/40 p-3.5 space-y-2 mt-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
+                    Autosave Status
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleToggleAutoSave}
+                    className={`font-ui text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded transition-colors cursor-pointer ${
+                      autoSaveEnabled
+                        ? "bg-sage/15 text-sage dark:text-emerald-400 hover:bg-sage/25"
+                        : "bg-ink/10 dark:bg-panel text-muted dark:text-slate-muted hover:bg-ink/20"
+                    }`}
+                  >
+                    {autoSaveEnabled ? "Active (ON)" : "Paused (OFF)"}
+                  </button>
+                </div>
+                <p className="font-ui text-[11px] text-muted dark:text-slate-muted">
+                  {autoSaveEnabled
+                    ? lastSavedTime
+                      ? `Draft automatically saved at ${lastSavedTime}.`
+                      : "Changes are automatically saved to your browser as you type."
+                    : "Autosave is paused. Click the toggle or 'Save Draft Now' to update your draft."}
+                </p>
+                <div className="pt-1 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={handleManualSaveDraft}
+                    className="inline-flex items-center gap-1.5 rounded border border-ink/15 dark:border-hairline bg-white dark:bg-surface px-2.5 py-1 font-ui text-[11px] font-semibold text-ink dark:text-ice hover:bg-linen/50 dark:hover:bg-panel transition-colors cursor-pointer"
+                  >
+                    <Save className="h-3 w-3 text-sage dark:text-amber-primary" />
+                    <span>Save Draft Now</span>
+                  </button>
+                  {lastSavedTime && (
+                    <button
+                      type="button"
+                      onClick={handleDiscardDraft}
+                      className="font-ui text-[10px] text-muted hover:text-red-600 dark:hover:text-red-400 cursor-pointer"
+                    >
+                      Clear Draft
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sticky Submit Button on Desktop */}

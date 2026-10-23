@@ -560,3 +560,47 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Complete Recipe Ingestion & Type Safety (`lib/actions/recipe.ts`):
   - Added `includeDrafts?: boolean` option to `getRecipes()`.
   - Added strongly-typed `PopulatedRecipeDoc` interface, eliminating explicit `any` casts in Mongoose queries and satisfying strict lint rules.
+
+### Phase 22: Comprehensive Security Hardening (CSRF, Allowed HTTP Methods, SQL/NoSQL Injection, and JPEG/PNG Uploads)
+
+- [x] Universal CSRF Protection (`proxy.ts`, `lib/security.ts`, `lib/session.ts`):
+  - State-mutating requests (`POST`) are verified at the `proxy.ts` routing boundary using `verifyCsrfOrigin`.
+  - Validates `Origin` and `Referer` headers against the incoming request's `Host` / `x-forwarded-host`. Blocks cross-origin forging attempts with HTTP 403 Forbidden.
+  - Augmented by Next.js Server Actions native origin checks and `SameSite=lax`, `httpOnly: true` encrypted JWT session cookies in `lib/session.ts`.
+- [x] Strict HTTP Method Whitelisting (`proxy.ts`, `lib/security.ts`, `app/api/blob/route.ts`):
+  - Enforced `ALLOWED_HTTP_METHODS = ["GET", "POST", "HEAD"]` across all application routes in `proxy.ts`.
+  - Rejects unneeded or risky methods (`PUT`, `DELETE`, `PATCH`, `TRACE`, `CONNECT`) with HTTP 405 Method Not Allowed (`Allow: GET, POST, HEAD`).
+  - Hardened `/api/blob` stream proxy to reject non-GET requests with 405.
+- [x] Multi-Tier SQL & NoSQL Injection Protection (`lib/security.ts`, `lib/actions/recipe.ts`, `lib/actions/category.ts`, `lib/actions/auth.ts`, `lib/actions/newsletter.ts`, `lib/actions/user.ts`, `app/api/blob/route.ts`):
+  - `hasSqlInjection`: Scans input strings for SQL injection signatures, tautologies (`' OR '1'='1`), statement terminators, and comment indicators.
+  - `sanitizeSqlInput`: Strips null bytes and trims untrusted input strings.
+  - `sanitizeMongoInput`: Deeply strips MongoDB operator keys starting with `$` (`$gt`, `$ne`, `$where`, etc.) and dot notation to neutralize NoSQL operator injection.
+  - `escapeRegex`: Escapes special regex characters in dynamic pattern searches (e.g. category matching).
+  - Sanitized all database queries and parameters across recipes, categories, auth, user profiles, and newsletter subscriptions.
+  - Hardened `/api/blob` against SSRF by validating that target URLs match authorized Vercel Blob storage domains.
+- [x] Strict JPEG and PNG Only Image Uploads (`lib/security.ts`, `lib/actions/upload.ts`, `components/admin/RecipeImageUploader.tsx`, `components/admin/CategoryImageUploader.tsx`, `components/admin/AdminProfileForm.tsx`):
+  - Enforced server-side in `validateImageFile`:
+    1. MIME type validation: strictly `image/jpeg` and `image/png`.
+    2. File extension validation: strictly `.jpg`, `.jpeg`, and `.png`.
+    3. Binary magic bytes inspection (JPEG: `0xFF, 0xD8, 0xFF`, PNG: `0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A`) to prevent MIME spoofing and disguised payloads.
+  - Applied across `uploadRecipeImage`, `uploadCategoryImage`, and `uploadAvatarImage`.
+  - Updated all client dropzones and file inputs with `accept="image/jpeg,image/png,.jpg,.jpeg,.png"` and clear UI notices.
+
+### Phase 23: Recipe Create Autosave Process with User On/Off Toggle
+
+- [x] Autosave Engine & Local Storage Persistence (`components/admin/RecipeForm.tsx`):
+  - Created automatic draft saving mechanism that debounces form modifications (title, slug, category, hero photo, prep/cook/total times, servings, excerpt, intro, featured toggle, publication status, ingredients, instruction steps, notes, and tags) and serializes them to `localStorage` (`cooking_blog_recipe_create_draft`).
+  - Active on recipe creation (`!isEditing`) to safeguard authors against browser crashes, accidental tab closures, and network interruptions.
+- [x] User-Controlled Autosave On / Off Switch (`components/admin/RecipeForm.tsx`):
+  - Added interactive toggle switch in both the top header action bar and the sidebar settings card.
+  - Persists author preference in `localStorage` (`cooking_blog_recipe_create_autosave_enabled`) across sessions.
+  - Clear user feedback with toast confirmations when toggling ON vs OFF.
+- [x] Real-Time Status Indicator & Manual Save (`components/admin/RecipeForm.tsx`):
+  - Displays dynamic state: `Saving...` with animated spinner, `Saved [HH:MM:SS]` with green checkmark, or `OFF` with pause indicator.
+  - Provides a manual "Save Draft Now" button allowing authors to take instant snapshots at any moment.
+- [x] Unsaved Draft Recovery & Automatic Cleanup (`components/admin/RecipeForm.tsx`):
+  - Automatically detects previous unsaved drafts on page load and presents a recovery banner with dish title and timestamp.
+  - Includes one-click "Restore Draft" to populate all fields and "Discard" to purge stale drafts.
+  - Automatically clears the draft upon successful recipe publication so future recipe creations start fresh.
+- [x] Deduplicated Autosave Toggle Toast Notification (`components/admin/RecipeForm.tsx`):
+  - Moved `showToast` and `localStorage` side effects outside of the React state updater function (`setAutoSaveEnabled`) so that toggling autosave fires strictly once per user interaction.

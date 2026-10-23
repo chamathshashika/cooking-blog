@@ -4,6 +4,7 @@ import { put, del } from "@vercel/blob";
 import { verifySession } from "@/lib/dal";
 import { hasAdminAccess } from "@/lib/definitions";
 import { extractVercelBlobUrl } from "@/lib/blob-util";
+import { validateImageFile } from "@/lib/security";
 
 export type UploadResult = {
   success: boolean;
@@ -30,36 +31,13 @@ export async function uploadCategoryImage(
       };
     }
 
-    // 2. Extract file from FormData
+    // 2. Extract and strictly validate file (JPEG and PNG only, validated via magic bytes)
     const file = formData.get("file");
-    if (!file || !(file instanceof File) || file.size === 0) {
+    const validation = await validateImageFile(file as File);
+    if (!validation.valid || !(file instanceof File)) {
       return {
         success: false,
-        error: "No image file provided.",
-      };
-    }
-
-    // 3. Validate image MIME type
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/avif",
-      "image/gif",
-    ];
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
-      return {
-        success: false,
-        error: "Invalid file type. Allowed formats: JPEG, PNG.",
-      };
-    }
-
-    // 4. Validate file size (max 5MB)
-    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
-    if (file.size > MAX_SIZE_BYTES) {
-      return {
-        success: false,
-        error: "Image size exceeds 5MB limit. Please choose a smaller image.",
+        error: validation.error || "Invalid image file provided.",
       };
     }
 
@@ -217,36 +195,13 @@ export async function uploadRecipeImage(
       };
     }
 
-    // 2. Extract file from FormData
+    // 2. Extract and strictly validate file (JPEG and PNG only, validated via magic bytes)
     const file = formData.get("file");
-    if (!file || !(file instanceof File) || file.size === 0) {
+    const validation = await validateImageFile(file as File);
+    if (!validation.valid || !(file instanceof File)) {
       return {
         success: false,
-        error: "No image file provided.",
-      };
-    }
-
-    // 3. Validate image MIME type
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/avif",
-      "image/gif",
-    ];
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
-      return {
-        success: false,
-        error: "Invalid file type. Allowed formats: JPEG, PNG, WebP, AVIF, GIF.",
-      };
-    }
-
-    // 4. Validate file size (max 5MB)
-    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
-    if (file.size > MAX_SIZE_BYTES) {
-      return {
-        success: false,
-        error: "Image exceeds maximum allowed size of 5MB.",
+        error: validation.error || "Invalid image file provided.",
       };
     }
 
@@ -342,36 +297,13 @@ export async function uploadAvatarImage(
       };
     }
 
-    // 2. Extract file from FormData
+    // 2. Extract and strictly validate file (JPEG and PNG only, validated via magic bytes)
     const file = formData.get("file");
-    if (!file || !(file instanceof File) || file.size === 0) {
+    const validation = await validateImageFile(file as File);
+    if (!validation.valid || !(file instanceof File)) {
       return {
         success: false,
-        error: "No image file provided.",
-      };
-    }
-
-    // 3. Validate image MIME type
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/avif",
-      "image/gif",
-    ];
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
-      return {
-        success: false,
-        error: "Invalid file type. Allowed formats: JPEG, PNG, WebP, AVIF, GIF.",
-      };
-    }
-
-    // 4. Validate file size (max 5MB)
-    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
-    if (file.size > MAX_SIZE_BYTES) {
-      return {
-        success: false,
-        error: "Image exceeds maximum allowed size of 5MB.",
+        error: validation.error || "Invalid image file provided.",
       };
     }
 

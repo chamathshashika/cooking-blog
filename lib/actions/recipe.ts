@@ -12,6 +12,12 @@ import { type Recipe, type RecipeAuthor } from "@/lib/data";
 import { seedRecipes } from "@/lib/seedData";
 import { generateSlug } from "@/lib/slug";
 import { deleteBlobByUrl } from "@/lib/actions/upload";
+import {
+  sanitizeSqlInput,
+  sanitizeMongoInput,
+  escapeRegex,
+  hasSqlInjection,
+} from "@/lib/security";
 
 /**
  * Safely format populated author document into RecipeAuthor.
@@ -416,9 +422,14 @@ export async function findRecipeBySlug(
   slug: string
 ): Promise<Recipe | undefined> {
   try {
+    const cleanSlug = sanitizeSqlInput(slug);
+    if (!cleanSlug || hasSqlInjection(cleanSlug)) {
+      return undefined;
+    }
+
     await connectToDatabase();
     await ensureRecipeAuthorsMigrated();
-    const doc = (await RecipeModel.findOne({ slug })
+    const doc = (await RecipeModel.findOne({ slug: cleanSlug })
       .populate("author", "name email role avatar")
       .lean()) as unknown as PopulatedRecipeDoc | null;
     if (doc) {
@@ -464,9 +475,12 @@ export async function getRelatedRecipes(
   try {
     await connectToDatabase();
     await ensureRecipeAuthorsMigrated();
+    const cleanSlug = sanitizeSqlInput(currentSlug);
+    const cleanCategory = escapeRegex(sanitizeSqlInput(category));
+
     const sameCategoryDocs = await RecipeModel.find({
-      slug: { $ne: currentSlug },
-      category: { $regex: new RegExp(`^${category}$`, "i") },
+      slug: { $ne: cleanSlug },
+      category: { $regex: new RegExp(`^${cleanCategory}$`, "i") },
       status: { $ne: "draft" as const },
     })
       .populate("author", "name email role avatar")
@@ -562,8 +576,15 @@ export async function updateRecipe(
       };
     }
 
-    // 2. Validate basic input fields
-    const title = data.title?.trim();
+    // 2. Sanitize against NoSQL operator and SQL injection
+    const safeData = sanitizeMongoInput(data);
+    const cleanOriginalSlug = sanitizeSqlInput(originalSlug);
+    if (hasSqlInjection(cleanOriginalSlug)) {
+      return { success: false, error: "Invalid recipe identifier." };
+    }
+
+    // 3. Validate basic input fields
+    const title = safeData.title?.trim();
     if (!title || title.length < 3) {
       return {
         success: false,
@@ -819,8 +840,8 @@ export async function rateRecipe(
   rating: number
 ): Promise<RateRecipeResult> {
   try {
-    const trimmedSlug = slug?.trim();
-    if (!trimmedSlug) {
+    const trimmedSlug = sanitizeSqlInput(slug);
+    if (!trimmedSlug || hasSqlInjection(trimmedSlug)) {
       return { success: false, error: "Recipe slug is required." };
     }
 

@@ -7,6 +7,7 @@ import { createSession, deleteSession } from "@/lib/session";
 import type { FormState, UserRole } from "@/lib/definitions";
 import { DEFAULT_USER_ROLE, hasAdminAccess } from "@/lib/definitions";
 import { hashPassword, verifyPassword } from "@/lib/password";
+import { sanitizeSqlInput, hasSqlInjection } from "@/lib/security";
 
 
 /**
@@ -16,10 +17,18 @@ export async function signup(
   state: FormState,
   formData: FormData
 ): Promise<FormState> {
-  const name = (formData.get("name") as string)?.trim();
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
+  const rawName = formData.get("name");
+  const rawEmail = formData.get("email");
+  const name = typeof rawName === "string" ? sanitizeSqlInput(rawName) : "";
+  const email = typeof rawEmail === "string" ? sanitizeSqlInput(rawEmail).toLowerCase() : "";
+  const password = typeof formData.get("password") === "string" ? (formData.get("password") as string) : "";
+  const confirmPassword = typeof formData.get("confirmPassword") === "string" ? (formData.get("confirmPassword") as string) : "";
+
+  if (hasSqlInjection(name) || hasSqlInjection(email)) {
+    return {
+      message: "Invalid characters detected in form submission.",
+    };
+  }
 
   // Validation
   const errors: {
@@ -108,8 +117,16 @@ export async function login(
   state: FormState,
   formData: FormData
 ): Promise<FormState> {
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
-  const password = formData.get("password") as string;
+  const rawEmail = formData.get("email");
+  const rawPassword = formData.get("password");
+  const email = typeof rawEmail === "string" ? sanitizeSqlInput(rawEmail).toLowerCase() : "";
+  const password = typeof rawPassword === "string" ? rawPassword : "";
+
+  if (hasSqlInjection(email)) {
+    return {
+      message: "Invalid email or password.",
+    };
+  }
 
   const errors: {
     email?: string[];

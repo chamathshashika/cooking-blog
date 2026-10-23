@@ -2,6 +2,7 @@
 
 import { connectToDatabase } from "@/lib/mongodb";
 import { Subscriber } from "@/lib/models/Subscriber";
+import { sanitizeSqlInput, hasSqlInjection } from "@/lib/security";
 
 export type SubscribeResponse = {
   success: boolean;
@@ -22,8 +23,17 @@ export async function subscribeNewsletter(
   _prevState: SubscribeResponse | null,
   formData: FormData
 ): Promise<SubscribeResponse> {
-  const name = (formData.get("name") as string)?.trim();
-  const rawEmail = (formData.get("email") as string)?.trim();
+  const rawName = formData.get("name");
+  const rawEmailInput = formData.get("email");
+  const name = typeof rawName === "string" ? sanitizeSqlInput(rawName) : "";
+  const rawEmail = typeof rawEmailInput === "string" ? sanitizeSqlInput(rawEmailInput) : "";
+
+  if (hasSqlInjection(name) || hasSqlInjection(rawEmail)) {
+    return {
+      success: false,
+      message: "Invalid input detected.",
+    };
+  }
 
   // 1. Validation
   if (!name || name.length < 2) {

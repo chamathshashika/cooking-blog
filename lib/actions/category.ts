@@ -8,6 +8,11 @@ import { type Category } from "@/lib/data";
 import { seedCategories } from "@/lib/seedData";
 import { deleteBlobByUrl } from "@/lib/actions/upload";
 import { generateSlug } from "@/lib/slug";
+import {
+  sanitizeSqlInput,
+  sanitizeMongoInput,
+  hasSqlInjection,
+} from "@/lib/security";
 
 /**
  * Fetch all categories from MongoDB.
@@ -52,10 +57,10 @@ export async function getCategoryBySlug(
   slug: string
 ): Promise<Category | undefined> {
   try {
-    await connectToDatabase();
-    const target = slug?.toLowerCase().trim();
-    if (!target) return undefined;
+    const target = sanitizeSqlInput(slug)?.toLowerCase().trim();
+    if (!target || hasSqlInjection(target)) return undefined;
 
+    await connectToDatabase();
     const doc = await CategoryModel.findOne({
       $or: [{ slug: target }, { name: target }],
     }).lean();
@@ -97,7 +102,8 @@ export async function createCategory(data: {
       };
     }
 
-    const displayName = data.displayName?.trim();
+    const safeData = sanitizeMongoInput(data);
+    const displayName = safeData.displayName?.trim();
     if (!displayName || displayName.length < 2) {
       return {
         success: false,
@@ -199,7 +205,13 @@ export async function updateCategory(
       };
     }
 
-    const displayName = data.displayName?.trim();
+    const cleanOriginalSlug = sanitizeSqlInput(originalSlug);
+    if (!cleanOriginalSlug || hasSqlInjection(cleanOriginalSlug)) {
+      return { success: false, error: "Invalid category identifier." };
+    }
+
+    const safeData = sanitizeMongoInput(data);
+    const displayName = safeData.displayName?.trim();
     if (!displayName || displayName.length < 2) {
       return {
         success: false,
@@ -306,6 +318,11 @@ export async function updateCategory(
  */
 export async function deleteCategory(slug: string) {
   try {
+    const cleanSlug = sanitizeSqlInput(slug);
+    if (!cleanSlug || hasSqlInjection(cleanSlug)) {
+      return { success: false, error: "Invalid category identifier." };
+    }
+
     const session = await verifySession();
 
     // Enforce role authorization: only admin can delete category

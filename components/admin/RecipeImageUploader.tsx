@@ -43,18 +43,9 @@ export default function RecipeImageUploader({
   }, [localPreview]);
 
   const handleFileSelect = async (file: File) => {
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/avif",
-      "image/gif",
-    ];
+    const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
-      showToast(
-        "Invalid file format. Please select a JPG, PNG, WebP, AVIF, or GIF image.",
-        "error"
-      );
+      showToast("Invalid file format. Please select a JPG or PNG image.", "error");
       return;
     }
 
@@ -195,7 +186,7 @@ export default function RecipeImageUploader({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+              accept="image/jpeg,image/png,.jpg,.jpeg,.png"
               className="hidden"
               disabled={disabled || isUploading}
               onChange={(e) => {
@@ -212,7 +203,7 @@ export default function RecipeImageUploader({
                 <span className="text-sage dark:text-amber-text hover:underline">Click to upload</span> or drag and drop
               </p>
               <p className="font-ui text-[11px] text-muted dark:text-slate-muted">
-                JPG, PNG, WebP, AVIF up to 5MB (Stored on Vercel Blob)
+                JPG or PNG up to 5MB (Stored on Vercel Blob)
               </p>
             </div>
           </div>
