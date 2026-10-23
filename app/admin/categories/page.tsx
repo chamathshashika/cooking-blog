@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Layers, ShieldCheck } from "lucide-react";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
-import { allRecipes } from "@/lib/data";
 import { getCategories } from "@/lib/actions/category";
+import { getRecipes } from "@/lib/actions/recipe";
 import { verifyAdminSession } from "@/lib/dal";
 
 export const metadata: Metadata = {
@@ -12,8 +12,11 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminCategoriesPage() {
-  const session = await verifyAdminSession();
-  const categoriesList = await getCategories();
+  const [session, categoriesList, recipes] = await Promise.all([
+    verifyAdminSession(),
+    getCategories(),
+    getRecipes({ includeDrafts: true }),
+  ]);
   const isAdmin = session.role === "admin";
 
   return (
@@ -63,7 +66,7 @@ export default async function AdminCategoriesPage() {
 
       <AdminCategoryList
         initialCategories={categoriesList}
-        recipes={allRecipes}
+        recipes={recipes}
         isAdmin={isAdmin}
       />
     </div>

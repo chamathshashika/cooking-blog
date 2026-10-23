@@ -22,12 +22,13 @@ export const verifySession = cache(async () => {
     redirect("/login");
   }
 
-  return {
+    return {
     isAuth: true,
     userId: session.userId,
     role: (session.role as UserRole) || DEFAULT_USER_ROLE,
     name: session.name || "Chef",
     email: session.email || "",
+    avatar: session.avatar || "",
   };
 });
 

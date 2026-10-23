@@ -9,15 +9,20 @@ import StarRating from "@/components/StarRating";
 import RecipeCard from "@/components/RecipeCard";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import IngredientsList from "@/components/IngredientsList";
-import { getAllRecipes, getRelatedRecipes } from "@/lib/data";
-import { findRecipeBySlug } from "@/lib/actions/recipe";
+import RecipeRatingWidget from "@/components/RecipeRatingWidget";
+import {
+  findRecipeBySlug,
+  getRecipes,
+  getRelatedRecipes,
+} from "@/lib/actions/recipe";
+import { verifySession } from "@/lib/dal";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
-  const recipes = getAllRecipes();
+  const recipes = await getRecipes();
   return recipes.map((recipe) => ({
     slug: recipe.slug,
   }));
@@ -27,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const recipe = await findRecipeBySlug(slug);
 
-  if (!recipe) {
+  if (!recipe || recipe.status === "draft") {
     return {
       title: "Recipe Not Found | CeylonSpicer",
     };
@@ -54,7 +59,17 @@ export default async function RecipeDetailPage({ params }: Props) {
     notFound();
   }
 
-  const related = getRelatedRecipes(recipe.slug, recipe.category, 3);
+  // Prevent draft recipe exposure on the public website (allow only admin/editor to preview)
+  let isDraftPreview = false;
+  if (recipe.status === "draft") {
+    const session = await verifySession();
+    if (!session.isAuth || (session.role !== "admin" && session.role !== "editor")) {
+      notFound();
+    }
+    isDraftPreview = true;
+  }
+
+  const related = await getRelatedRecipes(recipe.slug, recipe.category, 3);
 
   // Schema.org Recipe JSON-LD for rich SEO snippets
   const jsonLd = {
@@ -95,10 +110,17 @@ export default async function RecipeDetailPage({ params }: Props) {
       {/* Recipe JSON-LD structured data */}
       <script
         type="application/ld+json"
+        suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <Header />
+
+      {isDraftPreview && (
+        <div className="bg-amber-500/15 dark:bg-amber-500/25 border-b border-amber-500/30 px-4 py-2.5 text-center font-ui text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-200">
+          Draft Preview Mode — This recipe is unpublished and invisible to public website visitors.
+        </div>
+      )}
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
@@ -160,6 +182,13 @@ export default async function RecipeDetailPage({ params }: Props) {
                   ({recipe.ratingCount} reviews)
                 </span>
               )}
+              <span aria-hidden="true" className="text-ink/20 dark:text-slate-muted/40">•</span>
+              <a
+                href="#rate-recipe"
+                className="font-ui text-xs font-semibold text-sage dark:text-amber-text hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-sage"
+              >
+                Rate this recipe
+              </a>
             </div>
 
             {/* Author & Date Bar */}
@@ -322,6 +351,16 @@ export default async function RecipeDetailPage({ params }: Props) {
                   </ul>
                 </div>
               )}
+
+              {/* 7. Reader Rating & Review Box */}
+              <div className="mt-10 sm:mt-12">
+                <RecipeRatingWidget
+                  recipeSlug={recipe.slug}
+                  recipeTitle={recipe.title}
+                  initialRating={recipe.rating}
+                  initialRatingCount={recipe.ratingCount || 0}
+                />
+              </div>
             </div>
           </div>
         </article>

@@ -26,6 +26,7 @@ type Props = {
     role?: UserRole;
     name?: string;
     email?: string;
+    avatar?: string;
   } | null;
 };
 
@@ -65,13 +66,19 @@ export default function AdminHeader({ session }: Props) {
       icon: Sliders,
       active: pathname.startsWith("/admin/settings"),
     },
+    {
+      label: "Profile",
+      href: "/admin/profile",
+      icon: User,
+      active: pathname.startsWith("/admin/profile"),
+    },
   ];
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-ink/10 dark:border-hairline bg-white/95 dark:bg-surface/95 backdrop-blur-md transition-all">
       {/* Top micro-bar */}
-      <div className="border-b border-ink/5 dark:border-hairline bg-cream/30 dark:bg-panel/40 px-4 sm:px-6 py-1">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between text-[10px] font-ui uppercase tracking-widest text-muted dark:text-slate-muted">
+      <div className="border-b border-ink/5 dark:border-hairline bg-cream/30 dark:bg-panel/40 px-4 sm:px-6 md:px-8 xl:px-12 py-1">
+        <div className="w-full flex items-center justify-between text-[10px] font-ui uppercase tracking-widest text-muted dark:text-slate-muted">
           <div className="flex items-center gap-2">
             <span className="flex h-1.5 w-1.5 rounded-full bg-sage animate-pulse" />
             <span className="font-semibold text-ink/80 dark:text-ice/90">CeylonSpicer Studio</span>
@@ -98,7 +105,7 @@ export default function AdminHeader({ session }: Props) {
       </div>
 
       {/* Main Navbar */}
-      <div className="mx-auto flex max-w-[1240px] items-center justify-between px-4 sm:px-6 py-3.5">
+      <div className="w-full flex items-center justify-between px-4 sm:px-6 md:px-8 xl:px-12 py-3.5">
         {/* Brand & Admin Badge */}
         <div className="flex items-center gap-3.5">
           <Link
@@ -144,9 +151,9 @@ export default function AdminHeader({ session }: Props) {
                 href={item.href}
                 className={`flex items-center gap-2 px-3.5 py-1.5 font-ui text-xs font-bold uppercase tracking-wider rounded-md transition-all ${
                   item.active
-                    ? "bg-sage text-white shadow-xs"
+                    ? "bg-sage dark:bg-emerald-600 text-white shadow-xs"
                     : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-linen/50 dark:hover:bg-surface"
-                } focus:outline-none focus-visible:ring-2 focus-visible:ring-sage`}
+                } focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-emerald-500`}
               >
                 <Icon className={`h-3.5 w-3.5 ${item.active ? "text-white" : "text-muted dark:text-slate-muted"}`} />
                 <span>{item.label}</span>
@@ -171,19 +178,35 @@ export default function AdminHeader({ session }: Props) {
 
           {session && (
             <div className="flex items-center gap-2 border-l border-ink/10 dark:border-hairline pl-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cream dark:bg-panel border border-ink/15 dark:border-hairline text-ink dark:text-ice font-display text-xs font-bold shadow-2xs">
-                  {session.name ? session.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+              <Link
+                href="/admin/profile"
+                className="flex items-center gap-2.5 group p-1 -m-1 rounded-lg hover:bg-linen/50 dark:hover:bg-panel transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                title="Profile & Security Settings"
+              >
+                <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-cream dark:bg-panel border border-ink/15 dark:border-hairline text-ink dark:text-ice font-display text-xs font-bold shadow-2xs overflow-hidden shrink-0 group-hover:border-sage dark:group-hover:border-emerald-500 transition-colors">
+                  {session.avatar ? (
+                    <Image
+                      src={session.avatar}
+                      alt={session.name || "Chef"}
+                      fill
+                      sizes="32px"
+                      className="object-cover"
+                    />
+                  ) : session.name ? (
+                    session.name.charAt(0).toUpperCase()
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
                 </div>
                 <div className="hidden lg:flex flex-col text-left">
-                  <span className="font-ui text-xs font-bold text-ink dark:text-ice leading-tight line-clamp-1 max-w-[120px]">
+                  <span className="font-ui text-xs font-bold text-ink dark:text-ice leading-tight line-clamp-1 max-w-[120px] group-hover:text-sage dark:group-hover:text-emerald-400 transition-colors">
                     {session.name}
                   </span>
                   <span className="font-ui text-[9px] uppercase tracking-wider text-muted dark:text-slate-muted">
                     {session.role}
                   </span>
                 </div>
-              </div>
+              </Link>
 
               <button
                 type="button"
@@ -232,25 +255,46 @@ export default function AdminHeader({ session }: Props) {
       {mobileMenuOpen && (
         <div className="border-t border-ink/10 dark:border-hairline bg-white dark:bg-surface px-4 py-4 md:hidden shadow-lg animate-in slide-in-from-top-2">
           {session && (
-            <div className="mb-3 flex items-center gap-3 border-b border-ink/10 dark:border-hairline pb-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-cream dark:bg-panel border border-ink/15 dark:border-hairline font-display text-sm font-bold text-ink dark:text-ice">
-                {session.name ? session.name.charAt(0).toUpperCase() : "A"}
-              </div>
-              <div>
-                <p className="font-ui text-xs font-bold text-ink dark:text-ice">{session.name}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  {session.role && (
-                    <span className="font-ui text-[9px] uppercase tracking-wider text-muted dark:text-slate-muted font-medium">
-                      {session.role}
-                    </span>
+            <Link
+              href="/admin/profile"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mb-3 flex items-center justify-between border-b border-ink/10 dark:border-hairline pb-3 hover:opacity-90 transition-opacity"
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-cream dark:bg-panel border border-ink/15 dark:border-hairline font-display text-sm font-bold text-ink dark:text-ice overflow-hidden shrink-0">
+                  {session.avatar ? (
+                    <Image
+                      src={session.avatar}
+                      alt={session.name || "Chef"}
+                      fill
+                      sizes="40px"
+                      className="object-cover"
+                    />
+                  ) : session.name ? (
+                    session.name.charAt(0).toUpperCase()
+                  ) : (
+                    "A"
                   )}
-                  {session.role && session.email && (
-                    <span className="text-muted/40 text-[9px]">•</span>
-                  )}
-                  <p className="font-ui text-[10px] text-muted dark:text-slate-muted">{session.email}</p>
+                </div>
+                <div>
+                  <p className="font-ui text-xs font-bold text-ink dark:text-ice">{session.name}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {session.role && (
+                      <span className="font-ui text-[9px] uppercase tracking-wider text-muted dark:text-slate-muted font-medium">
+                        {session.role}
+                      </span>
+                    )}
+                    {session.role && session.email && (
+                      <span className="text-muted/40 text-[9px]">•</span>
+                    )}
+                    <p className="font-ui text-[10px] text-muted dark:text-slate-muted">{session.email}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+              <span className="font-ui text-[10px] uppercase font-bold text-sage dark:text-emerald-400 border border-sage/30 dark:border-emerald-500/30 rounded px-2 py-0.5">
+                Edit
+              </span>
+            </Link>
           )}
 
           <nav className="flex flex-col gap-1.5">
@@ -263,7 +307,7 @@ export default function AdminHeader({ session }: Props) {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex min-h-[44px] items-center gap-3 px-3 py-2.5 rounded-md font-ui text-xs font-bold uppercase tracking-wider transition-colors ${
                     item.active
-                      ? "bg-sage text-white"
+                      ? "bg-sage dark:bg-emerald-600 text-white shadow-xs"
                       : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-cream/40 dark:hover:bg-panel"
                   }`}
                 >

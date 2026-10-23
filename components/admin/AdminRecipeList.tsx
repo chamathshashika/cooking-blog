@@ -27,6 +27,7 @@ type Props = {
   categories: Category[];
   initialCategoryFilter?: string;
   initialFeaturedFilter?: boolean;
+  compact?: boolean;
 };
 
 export default function AdminRecipeList({
@@ -34,6 +35,7 @@ export default function AdminRecipeList({
   categories,
   initialCategoryFilter,
   initialFeaturedFilter,
+  compact = false,
 }: Props) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,6 +45,7 @@ export default function AdminRecipeList({
   const [featuredFilter, setFeaturedFilter] = useState<string>(
     initialFeaturedFilter ? "featured" : "all"
   );
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
   const [sortBy, setSortBy] = useState<"title" | "prep" | "servings">("title");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
@@ -67,14 +70,19 @@ export default function AdminRecipeList({
 
   // Delete Recipe
   const handleDeleteRecipe = async (id: string, title: string, slug?: string) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${title}"? This will permanently delete the recipe, its ratings, and its uploaded image.`)) {
       setRecipes((prev) => prev.filter((r) => r.id !== id));
-      showToast(`Recipe "${title}" removed from listing.`);
       if (slug) {
         try {
-          await deleteRecipe(slug);
+          const res = await deleteRecipe(slug);
+          if (res.success) {
+            showToast(`Recipe "${title}" and associated image deleted successfully.`, "success");
+          } else {
+            showToast(res.error || "Failed to delete recipe on server.", "error");
+          }
         } catch (err) {
           console.error("Failed to delete recipe on server:", err);
+          showToast("An error occurred while deleting the recipe.", "error");
         }
       }
     }
@@ -105,7 +113,13 @@ export default function AdminRecipeList({
           (featuredFilter === "featured" && recipe.isFeatured) ||
           (featuredFilter === "standard" && !recipe.isFeatured);
 
-        return matchesSearch && matchesCategory && matchesFeatured;
+        // Status Filter (published vs draft)
+        const matchesStatus =
+          statusFilter === "all" ||
+          (statusFilter === "published" && (!recipe.status || recipe.status === "published")) ||
+          (statusFilter === "draft" && recipe.status === "draft");
+
+        return matchesSearch && matchesCategory && matchesFeatured && matchesStatus;
       })
       .sort((a, b) => {
         if (sortBy === "title") return a.title.localeCompare(b.title);
@@ -117,7 +131,7 @@ export default function AdminRecipeList({
         }
         return 0;
       });
-  }, [recipes, searchQuery, selectedCategory, featuredFilter, sortBy]);
+  }, [recipes, searchQuery, selectedCategory, featuredFilter, statusFilter, sortBy]);
 
   return (
     <div className="space-y-5">
@@ -244,6 +258,40 @@ export default function AdminRecipeList({
               </button>
             </div>
 
+            {/* Status Filter Segmented Tabs */}
+            <div className="flex items-center rounded-md border border-ink/15 dark:border-hairline bg-linen/30 dark:bg-panel p-0.5">
+              <button
+                onClick={() => setStatusFilter("all")}
+                className={`px-2.5 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider rounded transition-colors ${
+                  statusFilter === "all"
+                    ? "bg-white dark:bg-surface text-ink dark:text-ice shadow-2xs font-extrabold"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setStatusFilter("published")}
+                className={`px-2.5 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider rounded transition-colors ${
+                  statusFilter === "published"
+                    ? "bg-sage dark:bg-amber-primary text-white dark:text-obsidian shadow-2xs font-extrabold"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
+                }`}
+              >
+                Published
+              </button>
+              <button
+                onClick={() => setStatusFilter("draft")}
+                className={`px-2.5 py-1.5 font-ui text-[11px] font-bold uppercase tracking-wider rounded transition-colors ${
+                  statusFilter === "draft"
+                    ? "bg-amber-600 text-white shadow-2xs font-extrabold"
+                    : "text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
+                }`}
+              >
+                Drafts
+              </button>
+            </div>
+
             {/* Sort Selector */}
             <div className="relative">
               <select
@@ -318,16 +366,35 @@ export default function AdminRecipeList({
                             />
                           </div>
                           <div className="min-w-0">
-                            <Link
-                              href={`/recipes/${recipe.slug}`}
-                              target="_blank"
-                              className="font-display text-base font-semibold text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text transition-colors line-clamp-1"
-                            >
-                              {recipe.title}
-                            </Link>
-                            <p className="font-ui text-[11px] text-muted dark:text-slate-muted line-clamp-1 mt-0.5 max-w-md">
-                              {recipe.excerpt}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/recipes/${recipe.slug}`}
+                                target="_blank"
+                                className="font-display text-base font-semibold text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text transition-colors line-clamp-1"
+                              >
+                                {recipe.title}
+                              </Link>
+                              {recipe.status === "draft" ? (
+                                <span className="shrink-0 rounded px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
+                                  Draft
+                                </span>
+                              ) : (
+                                <span className="shrink-0 rounded px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-wider bg-sage/15 text-sage dark:text-emerald-400 border border-sage/30">
+                                  Published
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-0.5 font-ui text-[11px] text-muted dark:text-slate-muted">
+                              {recipe.author?.name && (
+                                <>
+                                  <span className="font-semibold text-ink dark:text-ice">
+                                    By {recipe.author.name}
+                                  </span>
+                                  <span>•</span>
+                                </>
+                              )}
+                              <span className="line-clamp-1 max-w-md">{recipe.excerpt}</span>
+                            </div>
                             <div className="flex items-center gap-2 mt-1 sm:hidden font-ui text-[10px] uppercase text-muted dark:text-slate-muted">
                               <span className="font-semibold text-sage dark:text-amber-text">{recipe.category}</span>
                               <span>•</span>
@@ -445,6 +512,7 @@ export default function AdminRecipeList({
                 setSearchQuery("");
                 setSelectedCategory("all");
                 setFeaturedFilter("all");
+                setStatusFilter("all");
               }}
               className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage-dark dark:hover:bg-amber-primary/90"
             >
@@ -455,7 +523,13 @@ export default function AdminRecipeList({
       ) : (
         /* Recipe List: Card Grid View */
         filteredRecipes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            className={
+              compact
+                ? "grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
+            }
+          >
             {filteredRecipes.map((recipe) => (
               <div
                 key={recipe.id}
@@ -467,7 +541,7 @@ export default function AdminRecipeList({
                     src={recipe.image}
                     alt={recipe.title}
                     fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    sizes="(min-width: 1536px) 20vw, (min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-103"
                   />
                   <div className="absolute top-3 left-3">
@@ -498,13 +572,29 @@ export default function AdminRecipeList({
                 {/* Content */}
                 <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <Link
-                      href={`/recipes/${recipe.slug}`}
-                      target="_blank"
-                      className="font-display text-lg font-semibold text-ink dark:text-ice group-hover:text-sage dark:group-hover:text-amber-text transition-colors line-clamp-1"
-                    >
-                      {recipe.title}
-                    </Link>
+                    <div className="flex items-start justify-between gap-2">
+                      <Link
+                        href={`/recipes/${recipe.slug}`}
+                        target="_blank"
+                        className="font-display text-lg font-semibold text-ink dark:text-ice group-hover:text-sage dark:group-hover:text-amber-text transition-colors line-clamp-1"
+                      >
+                        {recipe.title}
+                      </Link>
+                      {recipe.status === "draft" ? (
+                        <span className="shrink-0 rounded px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30">
+                          Draft
+                        </span>
+                      ) : (
+                        <span className="shrink-0 rounded px-1.5 py-0.5 font-ui text-[9px] font-bold uppercase tracking-wider bg-sage/15 text-sage dark:text-emerald-400 border border-sage/30">
+                          Published
+                        </span>
+                      )}
+                    </div>
+                    {recipe.author?.name && (
+                      <p className="mt-1 font-ui text-[10px] uppercase tracking-wider text-sage dark:text-amber-text font-bold">
+                        By {recipe.author.name}
+                      </p>
+                    )}
                     <p className="mt-1 font-display text-xs text-muted dark:text-slate-muted line-clamp-2 leading-relaxed">
                       {recipe.excerpt}
                     </p>

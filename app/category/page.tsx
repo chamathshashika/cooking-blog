@@ -6,7 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import CategoryCarousel from "@/components/CategoryCarousel";
-import { categories, getCategoryCount } from "@/lib/data";
+import { getCategories } from "@/lib/actions/category";
+import { getRecipes } from "@/lib/actions/recipe";
 import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
 
 export const metadata: Metadata = {
@@ -20,7 +21,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const [categories, recipes] = await Promise.all([
+    getCategories(),
+    getRecipes(),
+  ]);
+
+  const getCount = (catSlug: string, catName: string) => {
+    const s = catSlug.toLowerCase();
+    const n = catName.toLowerCase();
+    return recipes.filter((r) => {
+      const c = r.category.toLowerCase();
+      return (
+        c === s ||
+        c === n ||
+        (s === "dinner" &&
+          (c.includes("curry") ||
+            c === "entrees" ||
+            c === "meat" ||
+            c === "seafood"))
+      );
+    }).length;
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">
       <Header />
@@ -62,46 +85,46 @@ export default function CategoriesPage() {
           aria-label="Recipe Categories Collection"
         >
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/category/${category.slug}`}
-                className="group flex flex-col bg-linen/30 dark:bg-surface border border-ink/10 dark:border-hairline p-6 text-center transition-all duration-200 hover:border-sage dark:hover:border-amber-primary hover:bg-cream/30 dark:hover:bg-panel hover:shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-              >
-                {/* Circular Category Thumbnail */}
-                <div className="mx-auto relative h-28 w-28 overflow-hidden rounded-full border-2 border-transparent dark:border-hairline transition-transform duration-200 group-hover:scale-105 group-hover:border-sage dark:group-hover:border-amber-primary mb-4">
-                  <Image
-                    src={getBlobDisplayUrl(category.image)}
-                    alt={`${category.displayName} category`}
-                    fill
-                    sizes="112px"
-                    unoptimized={isBlobProxyUrl(category.image)}
-                    className="object-cover"
-                  />
-                </div>
+            {categories.map((category) => {
+              const recipeCount = getCount(category.slug, category.name);
+              return (
+                <Link
+                  key={category.slug}
+                  href={`/category/${category.slug}`}
+                  className="group flex flex-col bg-linen/30 dark:bg-surface border border-ink/10 dark:border-hairline p-6 text-center transition-all duration-200 hover:border-sage dark:hover:border-amber-primary hover:bg-cream/30 dark:hover:bg-panel hover:shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                >
+                  {/* Circular Category Thumbnail */}
+                  <div className="mx-auto relative h-28 w-28 overflow-hidden rounded-full border-2 border-transparent dark:border-hairline transition-transform duration-200 group-hover:scale-105 group-hover:border-sage dark:group-hover:border-amber-primary mb-4">
+                    <Image
+                      src={getBlobDisplayUrl(category.image)}
+                      alt={`${category.displayName} category`}
+                      fill
+                      sizes="112px"
+                      unoptimized={isBlobProxyUrl(category.image)}
+                      className="object-cover"
+                    />
+                  </div>
 
-                <h2 className="font-display text-xl text-ink dark:text-ice transition-colors group-hover:text-sage dark:group-hover:text-amber-text">
-                  {category.displayName}
-                </h2>
+                  <h2 className="font-display text-xl text-ink dark:text-ice transition-colors group-hover:text-sage dark:group-hover:text-amber-text">
+                    {category.displayName}
+                  </h2>
 
-                <p className="mt-2 font-display text-xs text-muted dark:text-slate-muted leading-relaxed flex-1 line-clamp-3">
-                  {category.description}
-                </p>
+                  <p className="mt-2 font-display text-xs text-muted dark:text-slate-muted leading-relaxed flex-1 line-clamp-3">
+                    {category.description}
+                  </p>
 
-                <div className="mt-5 pt-3 border-t border-ink/10 dark:border-hairline flex items-center justify-between">
-                  <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
-                    {getCategoryCount(category.slug)}{" "}
-                    {getCategoryCount(category.slug) === 1
-                      ? "Recipe"
-                      : "Recipes"}
-                  </span>
-                  <span className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-sage dark:text-amber-text group-hover:translate-x-0.5 transition-transform">
-                    <span>Explore</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+                  <div className="mt-5 pt-3 border-t border-ink/10 dark:border-hairline flex items-center justify-between">
+                    <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
+                      {recipeCount} {recipeCount === 1 ? "Recipe" : "Recipes"}
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-sage dark:text-amber-text group-hover:translate-x-0.5 transition-transform">
+                      <span>Explore</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Plus } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import AdminRecipeList from "@/components/admin/AdminRecipeList";
 import { getRecipes } from "@/lib/actions/recipe";
 import { getCategories } from "@/lib/actions/category";
@@ -22,7 +22,7 @@ export default async function AdminRecipesPage({ searchParams }: Props) {
       : undefined;
   const initialFeatured = resolvedParams.featured === "true";
 
-  const recipes = await getRecipes();
+  const recipes = await getRecipes({ includeDrafts: true });
   const categories = await getCategories();
 
   return (
@@ -57,14 +57,6 @@ export default async function AdminRecipesPage({ searchParams }: Props) {
             <BookOpen className="h-3.5 w-3.5 text-sage dark:text-amber-primary" />
             <span>{recipes.length} Total Recipes</span>
           </span>
-
-          <Link
-            href="/admin/recipes/new"
-            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-md bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage-dark dark:hover:bg-amber-primary/90 shadow-xs transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Recipe</span>
-          </Link>
         </div>
       </div>
 

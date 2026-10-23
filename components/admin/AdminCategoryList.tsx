@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Loader2,
   ShieldAlert,
+  Sparkles,
 } from "lucide-react";
 import type { Category, Recipe } from "@/lib/data";
 import { useToast } from "@/components/ToastProvider";
@@ -25,17 +26,20 @@ import {
 } from "@/lib/actions/category";
 import CategoryImageUploader from "@/components/admin/CategoryImageUploader";
 import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
+import { generateSlug } from "@/lib/slug";
 
 type Props = {
   initialCategories: Category[];
   recipes: Recipe[];
   isAdmin?: boolean;
+  compact?: boolean;
 };
 
 export default function AdminCategoryList({
   initialCategories,
   recipes,
   isAdmin = false,
+  compact = false,
 }: Props) {
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,6 +56,7 @@ export default function AdminCategoryList({
     description: "",
     image: "",
   });
+  const [categorySlugManuallyEdited, setCategorySlugManuallyEdited] = useState(false);
 
   const { showToast } = useToast();
 
@@ -169,6 +174,7 @@ export default function AdminCategoryList({
         setCategories((prev) => [...prev, res.category!]);
         showToast(res.message || "Category created successfully.", "success");
         setCreateModalOpen(false);
+        setCategorySlugManuallyEdited(false);
         setNewCategoryData({
           name: "",
           displayName: "",
@@ -284,14 +290,22 @@ export default function AdminCategoryList({
 
       {/* Categories Grid */}
       {filteredCategories.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div
+          className={
+            compact
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-2 gap-4"
+              : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5"
+          }
+        >
           {filteredCategories.map((category) => {
             const count = getRecipeCount(category.slug);
 
             return (
               <div
                 key={category.slug}
-                className="group flex flex-col justify-between rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-5 shadow-2xs hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 transition-all"
+                className={`group flex flex-col justify-between rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface shadow-2xs hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 transition-all ${
+                  compact ? "p-4" : "p-5"
+                }`}
               >
                 <div>
                   <div className="flex items-start gap-4">
@@ -341,7 +355,11 @@ export default function AdminCategoryList({
                   </div>
 
                   {/* Description */}
-                  <p className="mt-4 font-display text-xs text-ink/80 dark:text-slate-muted leading-relaxed line-clamp-3">
+                  <p
+                    className={`font-display text-xs text-ink/80 dark:text-slate-muted leading-relaxed ${
+                      compact ? "mt-2.5 line-clamp-2" : "mt-4 line-clamp-3"
+                    }`}
+                  >
                     {category.description}
                   </p>
                 </div>
@@ -573,33 +591,74 @@ export default function AdminCategoryList({
                   disabled={isPending}
                   placeholder="e.g. Street Food Snacks"
                   value={newCategoryData.displayName}
-                  onChange={(e) =>
-                    setNewCategoryData({
-                      ...newCategoryData,
-                      displayName: e.target.value,
-                    })
-                  }
+                  onChange={(e) => {
+                    const newDisplayName = e.target.value;
+                    setNewCategoryData((prev) => ({
+                      ...prev,
+                      displayName: newDisplayName,
+                      slug: categorySlugManuallyEdited
+                        ? prev.slug
+                        : generateSlug(newDisplayName),
+                    }));
+                  }}
                   className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
               </div>
 
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
-                  Slug (Optional - auto-generated)
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
+                      Slug (Auto-generated for SEO)
+                    </label>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => {
+                        const regenerated = generateSlug(newCategoryData.displayName);
+                        setNewCategoryData((prev) => ({
+                          ...prev,
+                          slug: regenerated,
+                        }));
+                        setCategorySlugManuallyEdited(false);
+                        showToast("Slug regenerated from category display name.", "info");
+                      }}
+                      title="Auto-generate SEO slug from category display name"
+                      className="inline-flex items-center gap-1 font-ui text-[10px] font-semibold uppercase tracking-wider text-sage dark:text-amber-primary hover:underline cursor-pointer disabled:opacity-50"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      <span>Auto-Generate</span>
+                    </button>
+                  </div>
+                  <span className="font-ui text-[10px] text-muted dark:text-slate-muted hidden sm:inline">
+                    /category/<strong>{newCategoryData.slug || "..."}</strong>
+                  </span>
+                </div>
                 <input
                   type="text"
                   disabled={isPending}
                   placeholder="street-food-snacks"
                   value={newCategoryData.slug}
-                  onChange={(e) =>
-                    setNewCategoryData({
-                      ...newCategoryData,
+                  onChange={(e) => {
+                    setCategorySlugManuallyEdited(true);
+                    setNewCategoryData((prev) => ({
+                      ...prev,
                       slug: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-2 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+                    }));
+                  }}
+                  onBlur={() => {
+                    if (newCategoryData.slug) {
+                      setNewCategoryData((prev) => ({
+                        ...prev,
+                        slug: generateSlug(prev.slug),
+                      }));
+                    }
+                  }}
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-2 font-mono text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
                 />
+                <p className="mt-1 font-ui text-[10px] text-muted dark:text-slate-muted">
+                  Auto-formatted with lowercase ASCII, hyphens, and optimized for search engine indexing.
+                </p>
               </div>
 
               <CategoryImageUploader

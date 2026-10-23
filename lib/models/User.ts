@@ -7,6 +7,8 @@ export interface IUser {
   email: string;
   password: string;
   role: UserRole;
+  avatar?: string;
+  bio?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -38,6 +40,15 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: USER_ROLES,
       default: DEFAULT_USER_ROLE,
+    },
+    avatar: {
+      type: String,
+      trim: true,
+      default: "/images/recipes/sri-lankan-chicken-curry.jpg",
+    },
+    bio: {
+      type: String,
+      trim: true,
     },
   },
   {

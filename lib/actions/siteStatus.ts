@@ -43,6 +43,7 @@ export async function getSiteStatus(): Promise<SiteStatusData> {
 
   try {
     await connectToDatabase();
+
     const doc = (await SiteSettingModel.findOne({
       key: "site_status",
     }).lean()) as ISiteSetting | null;
@@ -131,7 +132,7 @@ export async function updateSiteStatus(
           updatedBy,
         },
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     );
 
     // 4. Update in-memory cache immediately

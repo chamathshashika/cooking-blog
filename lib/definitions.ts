@@ -27,5 +27,7 @@ export type SessionPayload = {
   name?: string;
   email?: string;
   role?: UserRole;
+  avatar?: string;
   expiresAt: Date;
 };
+

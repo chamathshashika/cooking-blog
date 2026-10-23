@@ -45,12 +45,9 @@ export default function CategoryImageUploader({
 
   const handleFileSelect = async (file: File) => {
     // 1. Client-side validation
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+    const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
-      showToast(
-        "Invalid file format. Please select a JPG, PNG, WebP, AVIF, or GIF image.",
-        "error"
-      );
+      showToast("Invalid file format. Please select a JPG or PNG image.", "error");
       return;
     }
 
@@ -167,7 +164,7 @@ export default function CategoryImageUploader({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
             disabled={disabled || isUploading}
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
@@ -199,7 +196,7 @@ export default function CategoryImageUploader({
                 or drag and drop
               </div>
               <p className="font-ui text-[10px] text-muted dark:text-slate-muted">
-                JPG, PNG, WebP or AVIF (Max 5MB) • Hosted via @vercel/blob
+                JPG or PNG (Max 5MB) • Hosted via @vercel/blob
               </p>
             </div>
           )}

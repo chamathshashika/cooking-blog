@@ -7,12 +7,10 @@ import {
   Clock,
   Wrench,
   CheckCircle2,
-  AlertTriangle,
   Loader2,
   ExternalLink,
   ShieldAlert,
   Calendar,
-  Sparkles,
   Info,
 } from "lucide-react";
 import {
@@ -28,9 +26,24 @@ type Props = {
   userRole?: string;
 };
 
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+function formatDisplayDate(dateStr?: string): string {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  } catch {
+    return dateStr;
+  }
+}
+
 export default function SiteStatusManager({
   initialStatus,
-  adminName = "Administrator",
   userRole = "admin",
 }: Props) {
   const { showToast } = useToast();
@@ -359,11 +372,11 @@ export default function SiteStatusManager({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-4 sm:p-5 shadow-2xs">
         <div className="flex items-center gap-2 font-ui text-xs text-muted dark:text-slate-muted">
           <Info className="h-4 w-4 text-sage dark:text-amber-primary shrink-0" />
-          <span>
+          <span suppressHydrationWarning>
             {initialStatus.updatedAt ? (
               <>
                 Last updated by <strong className="text-ink dark:text-ice">{initialStatus.updatedBy || "Administrator"}</strong> on{" "}
-                {new Date(initialStatus.updatedAt).toLocaleDateString()}
+                {formatDisplayDate(initialStatus.updatedAt)}
               </>
             ) : (
               "Default live mode active"
