@@ -55,6 +55,33 @@ function formatPopulatedAuthor(rawAuthor: unknown): RecipeAuthor {
 }
 
 /**
+ * Lean populated recipe document returned by Mongoose queries.
+ */
+interface PopulatedRecipeDoc {
+  _id?: Types.ObjectId;
+  slug: string;
+  title: string;
+  category: string;
+  image: string;
+  rating: number;
+  ratingCount: number;
+  prepTime: string;
+  cookTime: string;
+  totalTime?: string;
+  servings: number;
+  excerpt: string;
+  intro?: string;
+  isFeatured: boolean;
+  ingredients: IIngredient[];
+  instructions: IInstruction[];
+  notes?: string;
+  tags?: string[];
+  author?: unknown;
+  publishedDate?: string;
+  status?: "draft" | "published";
+}
+
+/**
  * Retrieve an existing admin or user ObjectId to use as a fallback author foreign key.
  */
 async function getOrCreateDefaultAuthorId(): Promise<Types.ObjectId> {
@@ -198,7 +225,7 @@ export async function getRecipes(options?: {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc: any) => ({
+    return (docs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
       id: doc._id ? doc._id.toString() : doc.slug,
       slug: doc.slug,
       title: doc.title,
@@ -393,7 +420,7 @@ export async function findRecipeBySlug(
     await ensureRecipeAuthorsMigrated();
     const doc = (await RecipeModel.findOne({ slug })
       .populate("author", "name email role avatar")
-      .lean()) as any;
+      .lean()) as unknown as PopulatedRecipeDoc | null;
     if (doc) {
       return {
         id: doc._id ? doc._id.toString() : doc.slug,
@@ -446,7 +473,7 @@ export async function getRelatedRecipes(
       .limit(limit)
       .lean();
 
-    let related = sameCategoryDocs.map((doc: any) => ({
+    let related = (sameCategoryDocs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
       id: doc._id ? doc._id.toString() : doc.slug,
       slug: doc.slug,
       title: doc.title,
@@ -482,7 +509,7 @@ export async function getRelatedRecipes(
 
       related = [
         ...related,
-        ...otherDocs.map((doc: any) => ({
+        ...(otherDocs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
           id: doc._id ? doc._id.toString() : doc.slug,
           slug: doc.slug,
           title: doc.title,

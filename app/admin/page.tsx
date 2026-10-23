@@ -61,61 +61,69 @@ export default async function AdminDashboardPage() {
         <AdminStats recipes={recipes} categories={categoriesList} />
       </section>
 
-      {/* Recipes Section */}
-      <section className="space-y-4" aria-label="Recipes Management">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-4 gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-sage dark:bg-amber-primary" />
-              <h2 className="font-display text-xl sm:text-2xl text-ink dark:text-ice">
-                Published Recipes
-              </h2>
+      {/* Studio Split Grid: Left Side Recipes (Published & Drafts) | Right Side Category List */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Side: Recipe Management */}
+        <section className="lg:col-span-7 xl:col-span-8 space-y-4" aria-label="Recipes Management">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-4 gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-sage dark:bg-amber-primary" />
+                <h2 className="font-display text-xl sm:text-2xl text-ink dark:text-ice">
+                  Recipes (Published & Drafts)
+                </h2>
+              </div>
+              <p className="font-ui text-xs text-muted dark:text-slate-muted mt-1">
+                Browse, search, and manage all published dishes and unpublished drafts
+              </p>
             </div>
-            <p className="font-ui text-xs text-muted dark:text-slate-muted mt-1">
-              Live search, filter by taxonomy or featured status, edit details, or preview live dishes
-            </p>
+            <Link
+              href="/admin/recipes"
+              className="inline-flex items-center gap-1.5 font-ui text-xs font-bold uppercase tracking-wider text-sage hover:text-sage-dark dark:text-amber-text dark:hover:text-amber-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
+              <span>Dedicated Recipe View</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <Link
-            href="/admin/recipes"
-            className="inline-flex items-center gap-1.5 font-ui text-xs font-bold uppercase tracking-wider text-sage hover:text-sage-dark dark:text-amber-text dark:hover:text-amber-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-          >
-            <span>Dedicated Recipe View</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
 
-        <AdminRecipeList initialRecipes={recipes} categories={categoriesList} />
-      </section>
+          <AdminRecipeList
+            initialRecipes={recipes}
+            categories={categoriesList}
+            compact={true}
+          />
+        </section>
 
-      {/* Categories Section */}
-      <section className="space-y-4 pt-4" aria-label="Categories Management">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-4 gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-sunshine dark:bg-gold" />
-              <h2 className="font-display text-xl sm:text-2xl text-ink dark:text-ice">
-                Culinary Categories & Taxonomy
-              </h2>
+        {/* Right Side: Category List */}
+        <section className="lg:col-span-5 xl:col-span-4 space-y-4" aria-label="Categories Management">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-4 gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-sunshine dark:bg-gold" />
+                <h2 className="font-display text-xl sm:text-2xl text-ink dark:text-ice">
+                  Category List
+                </h2>
+              </div>
+              <p className="font-ui text-xs text-muted dark:text-slate-muted mt-1">
+                Taxonomies, live dish counts, and quick management
+              </p>
             </div>
-            <p className="font-ui text-xs text-muted dark:text-slate-muted mt-1">
-              Taxonomy overview, live recipe count assignments, and culinary descriptions
-            </p>
+            <Link
+              href="/admin/categories"
+              className="inline-flex items-center gap-1.5 font-ui text-xs font-bold uppercase tracking-wider text-sage hover:text-sage-dark dark:text-amber-text dark:hover:text-amber-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            >
+              <span>Full View</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <Link
-            href="/admin/categories"
-            className="inline-flex items-center gap-1.5 font-ui text-xs font-bold uppercase tracking-wider text-sage hover:text-sage-dark dark:text-amber-text dark:hover:text-amber-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-          >
-            <span>Dedicated Categories View</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
 
-        <AdminCategoryList
-          initialCategories={categoriesList}
-          recipes={recipes}
-          isAdmin={isAdmin}
-        />
-      </section>
+          <AdminCategoryList
+            initialCategories={categoriesList}
+            recipes={recipes}
+            isAdmin={isAdmin}
+            compact={true}
+          />
+        </section>
+      </div>
     </div>
   );
 }

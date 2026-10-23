@@ -32,12 +32,14 @@ type Props = {
   initialCategories: Category[];
   recipes: Recipe[];
   isAdmin?: boolean;
+  compact?: boolean;
 };
 
 export default function AdminCategoryList({
   initialCategories,
   recipes,
   isAdmin = false,
+  compact = false,
 }: Props) {
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [searchQuery, setSearchQuery] = useState("");
@@ -288,14 +290,22 @@ export default function AdminCategoryList({
 
       {/* Categories Grid */}
       {filteredCategories.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+        <div
+          className={
+            compact
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-2 gap-4"
+              : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5"
+          }
+        >
           {filteredCategories.map((category) => {
             const count = getRecipeCount(category.slug);
 
             return (
               <div
                 key={category.slug}
-                className="group flex flex-col justify-between rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-5 shadow-2xs hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 transition-all"
+                className={`group flex flex-col justify-between rounded-xl border border-ink/10 dark:border-hairline bg-white dark:bg-surface shadow-2xs hover:shadow-md hover:border-ink/20 dark:hover:border-amber-primary/30 transition-all ${
+                  compact ? "p-4" : "p-5"
+                }`}
               >
                 <div>
                   <div className="flex items-start gap-4">
@@ -345,7 +355,11 @@ export default function AdminCategoryList({
                   </div>
 
                   {/* Description */}
-                  <p className="mt-4 font-display text-xs text-ink/80 dark:text-slate-muted leading-relaxed line-clamp-3">
+                  <p
+                    className={`font-display text-xs text-ink/80 dark:text-slate-muted leading-relaxed ${
+                      compact ? "mt-2.5 line-clamp-2" : "mt-4 line-clamp-3"
+                    }`}
+                  >
                     {category.description}
                   </p>
                 </div>

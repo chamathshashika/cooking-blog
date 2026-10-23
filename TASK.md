@@ -547,6 +547,16 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Expanded password and profile forms to `w-full max-w-4xl` to harmonize with full-width screen layouts.
 - [x] Verified Production Build:
   - Clean TypeScript checks and successful `pnpm build` (22/22 pages generated).
+### Phase 21: Admin Studio Overview Side-by-Side Split Layout (All Recipes & Category List)
 
-
-
+- [x] Dual-Column Dashboard Architecture (`app/admin/page.tsx`):
+  - Converted admin overview from stacked vertical sections into a responsive split 2-column view (`grid grid-cols-1 lg:grid-cols-12 gap-8 items-start`).
+  - Left column (`lg:col-span-7 xl:col-span-8`): Dedicated to "Recipes (Published & Drafts)" showing all recipes (both published and draft recipes, not just published) via `getRecipes({ includeDrafts: true })` with search, filter, and view controls.
+  - Right column (`lg:col-span-5 xl:col-span-4`): Dedicated to "Category List" (`AdminCategoryList`) showing category thumbnails, live dish counters, and management actions.
+- [x] Compact Layout Adaptations (`components/admin/AdminRecipeList.tsx`, `components/admin/AdminCategoryList.tsx`):
+  - Added `compact?: boolean` prop to both components.
+  - In `AdminRecipeList`: Configured compact card grid (`grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5`) for optimal density alongside the right column.
+  - In `AdminCategoryList`: Configured compact layout (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-2 gap-4` with `p-4`) fitting smoothly inside the sidebar.
+- [x] Complete Recipe Ingestion & Type Safety (`lib/actions/recipe.ts`):
+  - Added `includeDrafts?: boolean` option to `getRecipes()`.
+  - Added strongly-typed `PopulatedRecipeDoc` interface, eliminating explicit `any` casts in Mongoose queries and satisfying strict lint rules.

@@ -27,6 +27,7 @@ type Props = {
   categories: Category[];
   initialCategoryFilter?: string;
   initialFeaturedFilter?: boolean;
+  compact?: boolean;
 };
 
 export default function AdminRecipeList({
@@ -34,6 +35,7 @@ export default function AdminRecipeList({
   categories,
   initialCategoryFilter,
   initialFeaturedFilter,
+  compact = false,
 }: Props) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [searchQuery, setSearchQuery] = useState("");
@@ -521,7 +523,13 @@ export default function AdminRecipeList({
       ) : (
         /* Recipe List: Card Grid View */
         filteredRecipes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+          <div
+            className={
+              compact
+                ? "grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
+            }
+          >
             {filteredRecipes.map((recipe) => (
               <div
                 key={recipe.id}
