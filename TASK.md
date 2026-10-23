@@ -604,3 +604,5 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Automatically clears the draft upon successful recipe publication so future recipe creations start fresh.
 - [x] Deduplicated Autosave Toggle Toast Notification (`components/admin/RecipeForm.tsx`):
   - Moved `showToast` and `localStorage` side effects outside of the React state updater function (`setAutoSaveEnabled`) so that toggling autosave fires strictly once per user interaction.
+- [x] Resolved TS2322 Notes Type Incompatibility (`lib/actions/recipe.ts`):
+  - Updated `PopulatedRecipeDoc.notes` to `string[] | string` and introduced `formatRecipeNotes` helper to normalize string or array notes into `string[] | undefined`, satisfying strict TypeScript type assignments against `Recipe[]`.

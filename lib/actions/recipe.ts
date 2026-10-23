@@ -61,6 +61,21 @@ function formatPopulatedAuthor(rawAuthor: unknown): RecipeAuthor {
 }
 
 /**
+ * Safely format populated or legacy recipe notes into string[] | undefined.
+ */
+function formatRecipeNotes(rawNotes: unknown): string[] | undefined {
+  if (Array.isArray(rawNotes)) {
+    return rawNotes.filter(
+      (n): n is string => typeof n === "string" && n.trim().length > 0
+    );
+  }
+  if (typeof rawNotes === "string" && rawNotes.trim().length > 0) {
+    return [rawNotes.trim()];
+  }
+  return undefined;
+}
+
+/**
  * Lean populated recipe document returned by Mongoose queries.
  */
 interface PopulatedRecipeDoc {
@@ -80,7 +95,7 @@ interface PopulatedRecipeDoc {
   isFeatured: boolean;
   ingredients: IIngredient[];
   instructions: IInstruction[];
-  notes?: string;
+  notes?: string[] | string;
   tags?: string[];
   author?: unknown;
   publishedDate?: string;
@@ -248,7 +263,7 @@ export async function getRecipes(options?: {
       isFeatured: doc.isFeatured,
       ingredients: doc.ingredients,
       instructions: doc.instructions,
-      notes: doc.notes,
+      notes: formatRecipeNotes(doc.notes),
       tags: doc.tags,
       author: formatPopulatedAuthor(doc.author),
       publishedDate: doc.publishedDate,
@@ -450,7 +465,7 @@ export async function findRecipeBySlug(
         isFeatured: doc.isFeatured,
         ingredients: doc.ingredients,
         instructions: doc.instructions,
-        notes: doc.notes,
+        notes: formatRecipeNotes(doc.notes),
         tags: doc.tags,
         author: formatPopulatedAuthor(doc.author),
         publishedDate: doc.publishedDate,
@@ -487,7 +502,7 @@ export async function getRelatedRecipes(
       .limit(limit)
       .lean();
 
-    let related = (sameCategoryDocs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
+    let related: Recipe[] = (sameCategoryDocs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
       id: doc._id ? doc._id.toString() : doc.slug,
       slug: doc.slug,
       title: doc.title,
@@ -504,10 +519,11 @@ export async function getRelatedRecipes(
       isFeatured: doc.isFeatured,
       ingredients: doc.ingredients,
       instructions: doc.instructions,
-      notes: doc.notes,
+      notes: formatRecipeNotes(doc.notes),
       tags: doc.tags,
       author: formatPopulatedAuthor(doc.author),
       publishedDate: doc.publishedDate,
+      status: doc.status || "published",
     }));
 
     if (related.length < limit) {
@@ -540,7 +556,7 @@ export async function getRelatedRecipes(
           isFeatured: doc.isFeatured,
           ingredients: doc.ingredients,
           instructions: doc.instructions,
-          notes: doc.notes,
+          notes: formatRecipeNotes(doc.notes),
           tags: doc.tags,
           author: formatPopulatedAuthor(doc.author),
           publishedDate: doc.publishedDate,
