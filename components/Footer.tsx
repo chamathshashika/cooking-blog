@@ -142,12 +142,6 @@ export default function Footer() {
             >
               Contact
             </Link>
-            <Link
-              href="/admin"
-              className="hover:text-ink dark:hover:text-amber-text font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-            >
-              Admin
-            </Link>
             <div className="border-l border-ink/10 dark:border-hairline pl-4">
               <ThemeToggle variant="minimal" />
             </div>
