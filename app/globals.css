@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
- 
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
 @theme {
+  /* Light Palette Brand Tokens */
   --color-cream: #fce9c0;
   --color-sunshine: #fdcb63;
   --color-sage: #8b9572;
@@ -10,6 +13,19 @@
   --color-muted: #6f675f;
   --color-star: #e8a317;
   --color-linen: #eee9dd;
+
+  /* Dark Palette Brand Tokens (Obsidian & Amber) */
+  --color-obsidian: #0a0b0e;
+  --color-surface: #12141a;
+  --color-panel: #1a1d24;
+  --color-amber-primary: #ff5e00;
+  --color-amber-secondary: #ffa800;
+  --color-gold: #fda600;
+  --color-success: #10b981;
+  --color-ice: #f8fafc;
+  --color-slate-muted: #94a3b8;
+  --color-amber-text: #ffb599;
+  --color-hairline: rgba(226, 232, 240, 0.08);
 
   --font-display: "Google Sans", sans-serif;
   --font-ui: "Roboto", sans-serif;
@@ -26,10 +42,40 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
+[data-theme="dark"],
+.dark {
+  color-scheme: dark;
+}
+
 body {
   background-color: #ffffff;
   color: #2a2622;
   font-family: var(--font-display);
+}
+
+.dark body {
+  background-color: #0a0b0e;
+  color: #f8fafc;
+}
+
+/* Dark Mode Photography & Image Dimming (reduces glare & high-contrast eye strain) */
+[data-theme="dark"] img,
+.dark img {
+  filter: brightness(0.86);
+  transition: filter 0.25s ease, transform 0.3s ease;
+}
+
+[data-theme="dark"] img:hover,
+.dark img:hover {
+  filter: brightness(1);
+}
+
+/* Exempt brand favicons and decorative vector icons from dimming */
+[data-theme="dark"] img[src*="favicon"],
+.dark img[src*="favicon"],
+[data-theme="dark"] img[data-no-dim],
+.dark img[data-no-dim] {
+  filter: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {

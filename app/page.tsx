@@ -5,11 +5,16 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import SectionHeading from "@/components/SectionHeading";
 import RecipeCard from "@/components/RecipeCard";
 import Footer from "@/components/Footer";
-import { categories } from "@/lib/data";
 import { getRecipes } from "@/lib/actions/recipe";
+import { getCategories } from "@/lib/actions/category";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const recipes = await getRecipes();
+  const [recipes, categories] = await Promise.all([
+    getRecipes(),
+    getCategories(),
+  ]);
   const explicitFeatured = recipes.filter((r) => r.isFeatured);
   const featuredRecipes =
     explicitFeatured.length >= 4
@@ -18,21 +23,21 @@ export default async function Home() {
   const recentRecipes = recipes.slice(0, 6);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">
       {/* 1. Header */}
       <Header />
 
       <main className="flex-1">
-        {/* Hero Banner with H1 on Cream Background */}
-        <section className="bg-cream pt-6 pb-12 sm:pb-16 text-center">
+        {/* Hero Banner with H1 on Cream/Surface Background */}
+        <section className="bg-cream dark:bg-surface pt-6 pb-12 sm:pb-16 text-center border-b border-transparent dark:border-hairline transition-colors duration-200">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted mb-2">
+            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted dark:text-amber-text mb-2">
               Authentic Island Flavors
             </p>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink max-w-2xl mx-auto leading-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice max-w-2xl mx-auto leading-tight">
               Sri Lankan Recipes & Food Stories
             </h1>
-            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto">
+            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto">
               Time-honored family recipes, vibrant tropical spices, and
               comforting homestyle cooking from the pearl of the Indian Ocean.
             </p>
@@ -90,9 +95,9 @@ export default async function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 px-4 bg-linen/20 border border-ink/10 max-w-lg mx-auto">
-              <p className="font-display text-xl text-ink mb-2">No recipes published yet</p>
-              <p className="font-display text-sm text-muted">
+            <div className="text-center py-16 px-4 bg-linen/20 dark:bg-panel border border-ink/10 dark:border-hairline max-w-lg mx-auto">
+              <p className="font-display text-xl text-ink dark:text-ice mb-2">No recipes published yet</p>
+              <p className="font-display text-sm text-muted dark:text-slate-muted">
                 Our kitchen is busy simmering authentic dishes. Check back soon for new recipes!
               </p>
             </div>

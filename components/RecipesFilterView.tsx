@@ -74,22 +74,22 @@ export default function RecipesFilterView({
   return (
     <div>
       {/* Search and Filters Bar */}
-      <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between border-b border-ink/10 pb-8">
+      <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between border-b border-ink/10 dark:border-hairline pb-8">
         {/* Search input */}
         <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted dark:text-slate-muted pointer-events-none" />
           <input
             type="search"
             placeholder="Search recipes, spices, ingredients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full min-h-[44px] rounded-none border border-ink/20 bg-linen/20 py-2.5 pl-10 pr-12 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+            className="w-full min-h-[44px] rounded-none border border-ink/20 dark:border-hairline bg-linen/20 dark:bg-panel py-2.5 pl-10 pr-12 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
               aria-label="Clear search"
-              className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               <X className="h-4 w-4" />
             </button>
@@ -97,10 +97,10 @@ export default function RecipesFilterView({
         </div>
 
         {/* Results Counter */}
-        <div className="flex items-center gap-2 font-ui text-xs text-muted">
-          <SlidersHorizontal className="h-3.5 w-3.5 text-sage" />
+        <div className="flex items-center gap-2 font-ui text-xs text-muted dark:text-slate-muted">
+          <SlidersHorizontal className="h-3.5 w-3.5 text-sage dark:text-amber-text" />
           <span>
-            Showing <strong className="text-ink">{filteredRecipes.length}</strong> of{" "}
+            Showing <strong className="text-ink dark:text-ice">{filteredRecipes.length}</strong> of{" "}
             {allRecipes.length} recipes
           </span>
         </div>
@@ -123,7 +123,7 @@ export default function RecipesFilterView({
               className={`shrink-0 min-h-[44px] flex items-center px-4 py-2 font-ui text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage ${
                 isSelected
                   ? "bg-sage text-white shadow-xs"
-                  : "bg-linen/40 text-ink/80 hover:bg-cream hover:text-ink border border-ink/10"
+                  : "bg-linen/40 dark:bg-panel text-ink/80 dark:text-slate-muted hover:bg-cream dark:hover:bg-surface hover:text-ink dark:hover:text-ice border border-ink/10 dark:border-hairline"
               }`}
             >
               {tab.label}
@@ -150,9 +150,9 @@ export default function RecipesFilterView({
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-linen/20 border border-ink/10 p-8 max-w-lg mx-auto">
-          <p className="font-display text-2xl text-ink mb-2">No matching recipes found</p>
-          <p className="font-display text-sm text-muted mb-6">
+        <div className="text-center py-20 bg-linen/20 dark:bg-panel border border-ink/10 dark:border-hairline p-8 max-w-lg mx-auto">
+          <p className="font-display text-2xl text-ink dark:text-ice mb-2">No matching recipes found</p>
+          <p className="font-display text-sm text-muted dark:text-slate-muted mb-6">
             We couldn&apos;t find any recipes matching your current filter. Try adjusting your
             search terms or selecting &quot;All Recipes&quot;.
           </p>
@@ -161,7 +161,7 @@ export default function RecipesFilterView({
               setSelectedCategory("all");
               setSearchQuery("");
             }}
-            className="inline-flex min-h-[44px] items-center gap-2 bg-sage px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="inline-flex min-h-[44px] items-center gap-2 bg-sage dark:bg-amber-primary px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark dark:hover:bg-amber-secondary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             Reset Filters
           </button>

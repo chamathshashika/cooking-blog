@@ -8,18 +8,16 @@ import Footer from "@/components/Footer";
 import RecipeCard from "@/components/RecipeCard";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import SubscribeBanner from "@/components/SubscribeBanner";
-import {
-  categories,
-  getCategoryBySlug,
-  getRecipesByCategory,
-} from "@/lib/data";
+import { getCategories, getCategoryBySlug } from "@/lib/actions/category";
+import { getRecipes } from "@/lib/actions/recipe";
 import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const categories = await getCategories();
   return categories.map((cat) => ({
     slug: cat.slug,
   }));
@@ -27,7 +25,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
 
   if (!category) {
     return {
@@ -56,48 +54,81 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const [category, allRecipes, allCategories] = await Promise.all([
+    getCategoryBySlug(slug),
+    getRecipes(),
+    getCategories(),
+  ]);
 
   if (!category) {
     notFound();
   }
 
-  const recipes = getRecipesByCategory(slug);
-  const otherCategories = categories.filter((c) => c.slug !== slug);
+  const target = slug.toLowerCase();
+  const recipes = allRecipes.filter((recipe) => {
+    const rCat = recipe.category.toLowerCase();
+    if (rCat === target) return true;
+    if (
+      (target === "dinner" || target === "curries" || target === "chicken-curries" || target === "seafood" || target === "meat") &&
+      (rCat === "dinner" ||
+        rCat === "entrees" ||
+        rCat === "seafood" ||
+        rCat === "meat" ||
+        rCat.includes("curry") ||
+        rCat.includes("curries"))
+    ) {
+      return true;
+    }
+    if (target === "desserts" && (rCat === "desserts" || rCat === "sweets")) return true;
+    if (target === "breakfast" && rCat === "breakfast") return true;
+    if (target === "appetizers" && rCat === "appetizers") return true;
+    if (target === "sides" && rCat === "sides") return true;
+    if (
+      target === "entrees" &&
+      (rCat === "entrees" || rCat === "dinner" || rCat === "seafood" || rCat === "meat" || rCat.includes("curry"))
+    ) {
+      return true;
+    }
+    if (target === "lunch" && (rCat === "lunch" || rCat === "entrees")) return true;
+    if (target === "drinks" && rCat === "drinks") return true;
+    return false;
+  });
+
+  const otherCategories = allCategories.filter((c) => c.slug !== slug);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">
       <Header />
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
             <Link
               href="/"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Home
             </Link>
             <span aria-hidden="true">/</span>
             <Link
               href="/category"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Categories
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-ink font-semibold">
+            <span className="text-ink dark:text-ice font-semibold">
               {category.displayName}
             </span>
           </div>
         </div>
 
         {/* Category Hero Banner */}
-        <section className="bg-cream py-12 md:py-16 text-center border-b border-ink/10">
+        <section className="bg-cream dark:bg-surface py-12 md:py-16 text-center border-b border-ink/10 dark:border-hairline transition-colors duration-200">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             {/* Category Avatar Thumbnail */}
-            <div className="mx-auto mb-5 relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full border-2 border-sage/40 bg-white shadow-xs">
+            <div className="mx-auto mb-5 relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full border-2 border-sage/40 dark:border-amber-primary/40 bg-white dark:bg-panel shadow-xs">
               <Image
                 src={getBlobDisplayUrl(category.image)}
                 alt={`${category.displayName} hero image`}
@@ -109,21 +140,21 @@ export default async function CategoryPage({ params }: Props) {
               />
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sunshine/30 text-ink font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
-              <Sparkles className="h-3 w-3 text-ink/70" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sunshine/30 dark:bg-panel text-ink dark:text-ice font-ui text-[10px] font-bold uppercase tracking-[0.12em] border border-transparent dark:border-hairline">
+              <Sparkles className="h-3 w-3 text-ink/70 dark:text-gold" />
               <span>Category Collection</span>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight">
               {category.displayName}
             </h1>
 
-            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto leading-relaxed">
               {category.description}
             </p>
 
-            <div className="mt-4 flex items-center justify-center gap-4 font-ui text-xs text-muted">
-              <span className="font-semibold uppercase tracking-wider text-sage">
+            <div className="mt-4 flex items-center justify-center gap-4 font-ui text-xs text-muted dark:text-slate-muted">
+              <span className="font-semibold uppercase tracking-wider text-sage dark:text-amber-text">
                 {recipes.length} {recipes.length === 1 ? "Recipe" : "Recipes"}{" "}
                 Available
               </span>
@@ -153,16 +184,16 @@ export default async function CategoryPage({ params }: Props) {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-linen/20 border border-ink/10 p-8 max-w-md mx-auto">
-              <p className="font-display text-lg text-ink mb-2">
+            <div className="text-center py-16 bg-linen/20 dark:bg-panel border border-ink/10 dark:border-hairline p-8 max-w-md mx-auto">
+              <p className="font-display text-lg text-ink dark:text-ice mb-2">
                 No recipes published in this category yet.
               </p>
-              <p className="font-display text-sm text-muted mb-6">
+              <p className="font-display text-sm text-muted dark:text-slate-muted mb-6">
                 Our kitchen is busy simmering authentic dishes. Check back soon!
               </p>
               <Link
                 href="/recipes"
-                className="inline-flex min-h-[44px] items-center gap-2 bg-sage px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="inline-flex min-h-[44px] items-center gap-2 bg-sage dark:bg-amber-primary px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark dark:hover:bg-amber-secondary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Browse All Recipes</span>
@@ -172,7 +203,7 @@ export default async function CategoryPage({ params }: Props) {
         </section>
 
         {/* Explore Other Categories Slider */}
-        <div className="border-t border-ink/10 bg-linen/20">
+        <div className="border-t border-ink/10 dark:border-hairline bg-linen/20 dark:bg-panel/30">
           <CategoryCarousel categories={otherCategories} />
         </div>
 

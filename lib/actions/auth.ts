@@ -1,37 +1,14 @@
 "use server";
 
-import crypto from "crypto";
 import { redirect } from "next/navigation";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 import { createSession, deleteSession } from "@/lib/session";
 import type { FormState, UserRole } from "@/lib/definitions";
 import { DEFAULT_USER_ROLE, hasAdminAccess } from "@/lib/definitions";
+import { hashPassword, verifyPassword } from "@/lib/password";
+import { sanitizeSqlInput, hasSqlInjection } from "@/lib/security";
 
-/**
- * Hash password with random salt using Node.js crypto scrypt.
- */
-function hashPassword(password: string): string {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${derivedKey}`;
-}
-
-/**
- * Timing-safe password verification.
- */
-function verifyPassword(password: string, storedHash: string): boolean {
-  try {
-    const [salt, key] = storedHash.split(":");
-    if (!salt || !key) return false;
-
-    const keyBuffer = Buffer.from(key, "hex");
-    const derivedKey = crypto.scryptSync(password, salt, 64);
-    return crypto.timingSafeEqual(keyBuffer, derivedKey);
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Server action to sign up a new user, following official Next.js documentation.
@@ -40,10 +17,18 @@ export async function signup(
   state: FormState,
   formData: FormData
 ): Promise<FormState> {
-  const name = (formData.get("name") as string)?.trim();
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
+  const rawName = formData.get("name");
+  const rawEmail = formData.get("email");
+  const name = typeof rawName === "string" ? sanitizeSqlInput(rawName) : "";
+  const email = typeof rawEmail === "string" ? sanitizeSqlInput(rawEmail).toLowerCase() : "";
+  const password = typeof formData.get("password") === "string" ? (formData.get("password") as string) : "";
+  const confirmPassword = typeof formData.get("confirmPassword") === "string" ? (formData.get("confirmPassword") as string) : "";
+
+  if (hasSqlInjection(name) || hasSqlInjection(email)) {
+    return {
+      message: "Invalid characters detected in form submission.",
+    };
+  }
 
   // Validation
   const errors: {
@@ -107,7 +92,8 @@ export async function signup(
       newUser._id.toString(),
       newUser.role,
       newUser.name,
-      newUser.email
+      newUser.email,
+      newUser.avatar || ""
     );
   } catch (error) {
     console.error("Signup error in server action:", error);
@@ -131,8 +117,16 @@ export async function login(
   state: FormState,
   formData: FormData
 ): Promise<FormState> {
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
-  const password = formData.get("password") as string;
+  const rawEmail = formData.get("email");
+  const rawPassword = formData.get("password");
+  const email = typeof rawEmail === "string" ? sanitizeSqlInput(rawEmail).toLowerCase() : "";
+  const password = typeof rawPassword === "string" ? rawPassword : "";
+
+  if (hasSqlInjection(email)) {
+    return {
+      message: "Invalid email or password.",
+    };
+  }
 
   const errors: {
     email?: string[];
@@ -186,7 +180,8 @@ export async function login(
       user._id.toString(),
       user.role,
       user.name,
-      user.email
+      user.email,
+      user.avatar || ""
     );
   } catch (error) {
     console.error("Login error in server action:", error);

@@ -6,9 +6,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Phase 10 (Site Status & Maintenance Modes: Coming Soon & Under Construction with Admin Bypass) Complete
+- **Active Phase**: Phase 12 (Dark Theme Palette Integration & Theme Mode Switcher) Complete
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
-- **Last Updated**: 2026-10-22
+- **Last Updated**: 2026-10-23
 
 ---
 
@@ -295,4 +295,314 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Vercel Blob Private Store Compatibility (`lib/actions/upload.ts`):
   - Added graceful fallback to `access: "private"` in `uploadRecipeImage` with `/api/blob` proxy routing, resolving private store upload constraints.
 
+### Phase 11: Newsletter Subscription Engine & Strict Brand Token Compliance
 
+- [x] Strict Brand Token Compliance & Hex Removal (`brandGuidelines.md`, `SKILL.md`):
+  - Refactored `app/coming-soon/page.tsx` and `app/under-construction/page.tsx` to use brand token `bg-linen/25` instead of raw hex values.
+  - Refactored `app/login/page.tsx`, `app/signup/page.tsx`, and `app/admin/layout.tsx` to use `bg-linen/20`.
+  - Refactored `components/admin/AdminHeader.tsx` to use `bg-white/95` and `bg-white` for mobile drawer.
+  - Refactored `components/admin/AdminRecipeList.tsx` input to `bg-linen/30`.
+  - Refactored `components/admin/SiteStatusManager.tsx` active card to `bg-sage/5`.
+  - Refactored `components/admin/AdminStats.tsx` accent border to brand token `border-t-star`.
+  - Refactored `components/ToastProvider.tsx` warning icon to brand token `text-star`.
+  - Refactored `app/global-error.tsx` root emergency shell to complete brand tokens (`bg-linen/30`, `text-ink`, `bg-sage`, `hover:bg-sage-dark`, `text-muted`, `border-ink/10`, `font-display`, `font-ui`).
+- [x] Subscriber Mongoose Schema (`lib/models/Subscriber.ts`):
+  - Created `Subscriber` schema with `name` (trimmed, max 100), `email` (normalized, lowercase, regex-validated, unique, indexed), `isActive` flag, and timestamps.
+- [x] Newsletter Server Action (`lib/actions/newsletter.ts`):
+  - Implemented `subscribeNewsletter` action adhering strictly to `AGENTS.md` §17.
+  - Normalizes and sanitizes inputs server-side.
+  - Prevents duplicate subscriptions and handles existing subscribers with friendly non-leaking confirmations.
+  - Guarantees zero subscriber data exposure to the client.
+- [x] Interactive Subscribe Banner Component (`components/SubscribeBanner.tsx`):
+  - Connected banner form to `subscribeNewsletter` server action using React's `useActionState`.
+  - Provided accessible loading spinner (`Loader2`), clear success confirmation badge (`CheckCircle2`), and accessible error alerts (`role="alert"`).
+  - Maintained 44px minimum touch targets and brand aesthetics (`bg-sunshine`, `bg-sage`, `text-ink`).
+
+### Phase 12: Dark Theme Palette Integration & Theme Mode Switcher
+
+- [x] Palette Extraction & Documentation (`brandGuidelines.md`):
+  - Analyzed dark palette image artifact (`media_1792692388835.jpg`) and extracted semantic color tokens:
+    - **Obsidian** (`#0A0B0E`): Deep canvas & root background.
+    - **Surface** (`#12141A`): Cards, elevated containers, dialogs, dropdowns.
+    - **Panel** (`#1A1D24`): Inputs, search bars, textareas, table heads.
+    - **Amber** (`#FF5E00` -> `#FFA800`): Vibrant hero accents & active brand elements.
+    - **Gold** (`#FDA600`): Pending states & star ratings.
+    - **Success** (`#10B981`): Success indicators & completed states.
+    - **Ice** (`#F8FAFC`): Primary high-contrast serif headings & text.
+    - **Muted** (`#94A3B8`): Secondary text, timestamps, captions, metadata.
+    - **Amber Text** (`#FFB599`): Brand links, warm highlights, interactive hover accents.
+    - **Hairline** (`rgba(226, 232, 240, 0.08)`): High-precision subtle borders & dividers.
+  - Documented Section 3.2 "Dark Theme Palette (Obsidian & Amber)" in `brandGuidelines.md` including contrast ratios, semantic rules, and Tailwind token mapping.
+- [x] Tailwind CSS v4 Theme Engine (`app/globals.css`):
+  - Configured `@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));` to ensure full compatibility with Tailwind v4 selector scoping.
+  - Defined design tokens as CSS custom variables: `--color-obsidian`, `--color-surface`, `--color-panel`, `--color-amber-primary`, `--color-amber-secondary`, `--color-gold`, `--color-success`, `--color-ice`, `--color-slate-muted`, `--color-amber-text`, `--color-hairline`.
+  - Set dark mode root defaults (`.dark body { background-color: var(--color-obsidian); color: var(--color-ice); }`).
+- [x] Theme State Engine & FOUC Prevention (`components/ThemeProvider.tsx`, `app/layout.tsx`):
+  - Built `ThemeProvider` supporting `"light" | "dark" | "system"` with cookie persistence (`theme=...`), `localStorage` sync, and system `matchMedia` listeners.
+  - Injected inline blocking FOUC-prevention script in `app/layout.tsx` `<head>` to evaluate preference before DOM render and prevent bright white flashes.
+- [x] Accessible Theme Mode Switcher Component (`components/ThemeToggle.tsx`):
+  - Designed interactive multi-mode toggle with Sun, Moon, and Monitor icons.
+  - Provided `default`, `minimal`, and `pill` variants meeting WCAG AA minimum 44×44px touch targets.
+  - Integrated into public `Header.tsx` (desktop bar & mobile navigation drawer), `Footer.tsx`, and studio `AdminHeader.tsx`.
+- [x] Whole-Website Dark Mode Integration:
+  - **Public Core Components**: `Header.tsx`, `Footer.tsx`, `RecipeCard.tsx`, `FeaturedRow.tsx`, `SubscribeBanner.tsx`, `CategoryCarousel.tsx`, `SectionHeading.tsx`, `IngredientsList.tsx`, `RecipesFilterView.tsx`, `ContactForm.tsx`, `StarRating.tsx`, `ToastProvider.tsx`.
+  - **Public Routes**: Home (`app/page.tsx`), Recipe Catalog (`app/recipes/page.tsx`), Recipe Detail (`app/recipes/[slug]/page.tsx`), Categories Overview (`app/category/page.tsx`), Category Detail (`app/category/[slug]/page.tsx`), About Us (`app/about/page.tsx`), Contact Us (`app/contact/page.tsx`).
+  - **Static & Error Pages**: Privacy Policy (`app/privacy/page.tsx`), Terms of Service (`app/terms/page.tsx`), 404 (`app/not-found.tsx`), 500 (`app/error.tsx`), Critical Shell (`app/global-error.tsx`), Maintenance (`app/coming-soon/page.tsx`, `app/under-construction/page.tsx`).
+  - **Auth & Studio Admin**: Login (`app/login/page.tsx`), Signup (`app/signup/page.tsx`), Auth Forms (`SignInForm.tsx`, `SignUpForm.tsx`), Admin Layout (`app/admin/layout.tsx`), Admin Header (`AdminHeader.tsx`), Overview (`app/admin/page.tsx`), Stats (`AdminStats.tsx`), Settings (`app/admin/settings/page.tsx`), Site Status Manager (`SiteStatusManager.tsx`), Recipe Management (`AdminRecipeList.tsx`), Category Management (`AdminCategoryList.tsx`), Recipe Editor & Creator (`RecipeForm.tsx`), Image Uploaders (`RecipeImageUploader.tsx`, `CategoryImageUploader.tsx`), Admin Recipe Pages (`app/admin/recipes/page.tsx`, `app/admin/recipes/new/page.tsx`, `app/admin/recipes/[slug]/edit/page.tsx`), Admin Category Page (`app/admin/categories/page.tsx`).
+- [x] Code Quality & Verification:
+  - Zero raw hex values committed; all dark mode styles strictly use semantic utility tokens (`dark:bg-obsidian`, `dark:bg-surface`, `dark:bg-panel`, `dark:text-ice`, `dark:text-slate-muted`, `dark:text-amber-text`, `dark:border-hairline`, `dark:bg-amber-primary`).
+  - Verified touch target accessibility (>= 44x44px) across all interactive theme toggles and input controls.
+- [x] Dark Mode Image Dimming & Visual Comfort (`app/globals.css`, `brandGuidelines.md`):
+  - Configured global dark mode image dimming (`filter: brightness(0.86)`) in `app/globals.css` with smooth transition (`transition: filter 0.25s ease`), preventing harsh high-contrast glare against the Obsidian `#0A0B0E` canvas.
+  - Implemented interactive hover restoration (`filter: brightness(1)`) so readers can inspect food photography with full clarity on interaction.
+  - Explicitly exempted brand favicons and vector icons (`img[src*="favicon"]`, `img[data-no-dim]`) from dimming.
+  - Documented rules in Section 8 of `brandGuidelines.md`.
+
+### Phase 13: Recipe Author Foreign Key (`ref: "User"`) & Query Population
+
+- [x] Single Author Foreign Key Schema (`lib/models/Recipe.ts`, `lib/models/User.ts`):
+  - Replaced legacy embedded author subdocument in `RecipeSchema` with a single `author: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true }`.
+  - Updated `IRecipe` TypeScript definition: `author: Types.ObjectId | IUser`.
+  - Added optional `avatar` and `bio` fields to `IUser` interface and `UserSchema` in `lib/models/User.ts`.
+- [x] Logged-In User Association in Server Actions (`lib/actions/recipe.ts`):
+  - Updated `createRecipe`: Obtains authenticated `session.userId` from `verifySession()` and associates `author: new Types.ObjectId(session.userId)`.
+  - Updated `updateRecipe`: Preserves author foreign key or normalizes legacy documents with `new Types.ObjectId(session.userId)`.
+  - Added `getOrCreateDefaultAuthorId()` fallback helper to guarantee seamless legacy migration and test-seeding without breaking constraints.
+- [x] Mongoose Author Query Population (`lib/actions/recipe.ts`):
+  - Updated `getRecipes()` with `.populate("author", "name email role avatar")`.
+  - Updated `findRecipeBySlug()` with `.populate("author", "name email role avatar")`.
+  - Created `formatPopulatedAuthor(rawAuthor)` to cleanly normalize populated user documents into the client-safe `RecipeAuthor` structure (`id`, `name`, `role`, `email`, `avatar`).
+- [x] Author Display Synchronization:
+  - Public Recipe Detail (`app/recipes/[slug]/page.tsx`): Displays populated author photo avatar, name ("By {recipe.author.name}"), role, and date published.
+  - Admin Recipe Studio (`app/admin/recipes/new/page.tsx`, `app/admin/recipes/[slug]/edit/page.tsx`, `components/admin/RecipeForm.tsx`): Displays the logged-in user's name as the recipe author.
+  - Admin Recipe Listing (`components/admin/AdminRecipeList.tsx`): Displays populated author name in both table and grid views.
+  - Category Showcase (`app/category/[slug]/page.tsx`): Dynamically fetches recipes using `getRecipes()` so database recipes and populated authors render seamlessly.
+
+### Phase 14: Interactive Star Ratings & Database Persistence
+
+- [x] Recipe Rating Mongoose Schema (`lib/models/RecipeRating.ts`, `lib/models/Recipe.ts`):
+  - Created lightweight `RecipeRating` model storing `recipeSlug` (indexed) and `rating` (1 to 5).
+  - Adjusted `author` field in `RecipeSchema` to `required: false` so document saves and rating updates are never blocked by author validation.
+- [x] Zero Author/Auth Check Rating Server Action (`lib/actions/recipe.ts`):
+  - Streamlined `rateRecipe(slug: string, rating: number)`:
+    - Zero user or author authentication required — any reader (guest or authenticated) can submit star ratings freely.
+    - Uses MongoDB `updateOne({ slug }, { $set: { rating: newAverage, ratingCount: newCount } })` to update metrics directly without triggering document-level author checks or validation errors.
+    - Computes moving average (`Math.round(newTotal / newCount * 10) / 10`) and increments `ratingCount`.
+    - Saves rating record in `RecipeRating` collection.
+    - Revalidates paths (`/recipes/[slug]`, `/recipes`, `/`).
+- [x] Interactive Star Rating Component (`components/RecipeRatingWidget.tsx`):
+  - Designed interactive 5-star rating widget following `brandGuidelines.md`:
+    - Accessible 44×44px touch targets with visible focus rings (`focus-visible:ring-sage`, `dark:focus-visible:ring-amber-primary`).
+    - Dynamic star hover preview with expressive feedback labels ("Could be better", "Fair", "Good", "Very good", "Outstanding! Authentic perfection").
+    - Client-side persistence using `localStorage` for immediate recognition on subsequent visits.
+    - Instant optimistic state updates, loading spinner feedback, and graceful error handling.
+    - Displays real-time aggregate score and total ratings recorded in the database.
+- [x] Recipe Detail Page Integration (`app/recipes/[slug]/page.tsx`):
+  - Added jump link (`Rate this recipe`) in the header rating block to scroll directly to the rating widget.
+  - Positioned `RecipeRatingWidget` directly below instructions and cook's notes for intuitive reader interaction.
+
+### Phase 15: Complete Mock Data Elimination & 100% Database-Driven Architecture
+
+- [x] Mock Data Stripping & TypeScript Refactoring (`lib/data.ts`):
+  - Stripped all hardcoded mock recipe data structures (`chickenCurry`, `stringHoppers`, `prawnCurry`, `muttonCurry`) and category arrays.
+  - Set `allRecipes = []` and `categories = []` as empty array fallbacks to prevent mock data leakage.
+  - Retained clean TypeScript interfaces (`Recipe`, `Category`, `Ingredient`, `Instruction`, `RecipeAuthor`).
+  - Refactored helper functions (`getRelatedRecipes`, `getRecipesByCategory`, `getCategoryCount`) to operate on passed-in arrays rather than global static state.
+- [x] Isolated Seed Data (`lib/seedData.ts`):
+  - Created dedicated `seedData.ts` containing initial default arrays (`seedCategories`, `seedRecipes`) used strictly on first boot when MongoDB collections contain 0 documents.
+- [x] 100% Database-Backed Server Actions (`lib/actions/recipe.ts`, `lib/actions/category.ts`):
+  - Removed all mock data imports and catch-block static fallbacks.
+  - Created `ensureRecipeAuthorsMigrated()` in `lib/actions/recipe.ts`: Safely migrates legacy embedded author subdocuments (`author: { name: ... }`) to valid `User` ObjectId references before executing `.populate()`, eliminating MongoDB `CastError` exceptions.
+  - Added database-backed `getCategoryBySlug(slug: string)` in `lib/actions/category.ts`.
+  - Added database-backed `getRelatedRecipes(currentSlug, category, limit)` in `lib/actions/recipe.ts`.
+  - Updated `rateRecipe()`: Queries and updates solely against MongoDB; rejects if recipe does not exist.
+- [x] Public Routes Database Migration:
+  - **Homepage** (`app/page.tsx`): Marked `dynamic = "force-dynamic"`. Fetches `[recipes, categories] = await Promise.all([getRecipes(), getCategories()])`.
+  - **All Recipes** (`app/recipes/page.tsx`): Marked `dynamic = "force-dynamic"`. Queries live recipes and categories from database.
+  - **Recipe Detail** (`app/recipes/[slug]/page.tsx`): Queries `findRecipeBySlug()` and `getRelatedRecipes()` directly from MongoDB.
+  - **Categories Overview** (`app/category/page.tsx`): Converted to async component. Dynamically aggregates recipe counts per category from MongoDB.
+  - **Category Detail** (`app/category/[slug]/page.tsx`): `generateStaticParams()`, `generateMetadata()`, and page body query `getCategories()`, `getCategoryBySlug()`, and `getRecipes()` from MongoDB.
+  - **Dynamic Sitemap** (`app/sitemap.ts`): Converted to async function querying `getRecipes()` and `getCategories()` from MongoDB to generate up-to-date XML index.
+  - **404 Not Found Page** (`app/not-found.tsx`): Converted to async component fetching categories from database.
+- [x] Admin Studio Migration:
+  - **Admin Studio Overview** (`app/admin/page.tsx`): Removed `@/lib/data` mock imports. Fetches `[recipes, categoriesList] = await Promise.all([getRecipes(), getCategories()])`.
+  - **Admin Categories Studio** (`app/admin/categories/page.tsx`): Removed `allRecipes` mock import. Passes live MongoDB recipes to `<AdminCategoryList>`.
+- [x] Live Verification & Testing:
+  - Verified live MongoDB query execution on `localhost:3000` across homepage (`/`), recipe catalog (`/recipes`), single recipe detail (`/recipes/traditional-sri-lankan-chicken-curry`), category pages (`/category`, `/category/breakfast`), and `sitemap.xml`.
+- [x] Hydration & Runtime Deprecation Fixes:
+  - Fixed client/server hydration mismatch in `components/admin/SiteStatusManager.tsx` caused by `new Date().toLocaleDateString()`:
+    - Implemented deterministic `formatDisplayDate(dateStr)` extracting UTC parts (`Oct 23, 2026`) identically across server and client locales.
+    - Added `suppressHydrationWarning` on the date display `<span>`.
+  - Replaced deprecated Mongoose `{ new: true }` option with `{ returnDocument: 'after' }` in `lib/actions/siteStatus.ts` and `lib/actions/category.ts`.
+  - Added `suppressHydrationWarning` to JSON-LD structured data `<script>` in `app/recipes/[slug]/page.tsx` to eliminate React script tag warnings.
+- [x] Site Status Mode Persistence Fix (`lib/actions/siteStatus.ts`):
+  - Removed temporary initialization override in `getSiteStatus()` that was resetting non-live modes (`coming_soon`, `under_construction`) back to `live` on page reload.
+  - Site status mode, custom headlines, and expected launch dates are now permanently preserved and read directly from MongoDB across page reloads.
+
+### Phase 16: Automated SEO-Friendly Slug Generation for Recipes & Categories
+
+- [x] Dedicated SEO Slug Generation Engine (`lib/slug.ts`):
+  - Built pure isomorphic slug generator adhering strictly to `AGENTS.md` (Sections 18 & 19 on SEO and readable, semantic URLs).
+  - Unicode NFD diacritics/accents normalization to guarantee clean ASCII output for Sri Lankan transliterated names (`ā` -> `a`, `é` -> `e`, `ñ` -> `n`).
+  - Contextual symbol conversion (`&` -> `and`, `+` -> `plus`, `@` -> `at`).
+  - Clean apostrophe/quote removal without extra hyphens (`Grandma's` -> `grandmas`).
+  - Elimination of special punctuation, consecutive hyphen collapsing, leading/trailing hyphen trimming, lowercase conversion, and smart length capping at 90 characters without cutting words.
+- [x] Live Real-Time Recipe Slug Generation (`components/admin/RecipeForm.tsx`):
+  - Updated `handleTitleChange` to generate SEO-friendly slugs in real-time as the recipe title is typed.
+  - Added interactive "Auto-Generate" button (`Sparkles` icon) allowing instantaneous one-click slug regeneration at any time.
+  - Added `onBlur` sanitization to ensure manual user edits conform to strict SEO URL standards.
+  - Added preview feedback showing live `/recipes/[slug]` path.
+- [x] Live Real-Time Category Slug Generation (`components/admin/AdminCategoryList.tsx`):
+  - Added real-time slug generation while typing category display name in the Create Category modal.
+  - Tracked `categorySlugManuallyEdited` state to respect intentional manual overrides.
+  - Added "Auto-Generate" button (`Sparkles` icon) and `onBlur` formatting with `/category/[slug]` preview.
+- [x] Server-Side Enforcement & Uniqueness Collision Resolver (`lib/actions/recipe.ts`, `lib/actions/category.ts`):
+  - `createRecipe` & `updateRecipe`: Enforces `generateSlug()` sanitization on all incoming slugs.
+  - Auto-resolves duplicate slug collisions (`while (await RecipeModel.exists({ slug })) { slug = `${baseSlug}-${counter}`; counter++; }`) so recipe publishing never crashes on duplicate names.
+  - `createCategory` & `updateCategory`: Enforces `generateSlug()` and auto-resolves collisions (`while (await CategoryModel.exists({ slug })) { slug = `${baseSlug}-${counter}`; counter++; }`).
+
+### Phase 17: Draft Recipe Exclusion from Public Website
+
+- [x] Public-by-Default Recipe Query Filtering (`lib/actions/recipe.ts`, `lib/data.ts`):
+  - Added `status?: "draft" | "published"` to core `Recipe` interface in `lib/data.ts`.
+  - Updated `getRecipes(options?: { includeDrafts?: boolean })` to filter `{ status: { $ne: "draft" } }` by default.
+  - Updated `getRelatedRecipes` to query `{ status: { $ne: "draft" } }` so draft recipes never appear as related items.
+  - Updated `rateRecipe` to reject ratings on recipes with `status === "draft"`.
+- [x] Protected Public Recipe Detail & SEO Metadata (`app/recipes/[slug]/page.tsx`):
+  - In `generateStaticParams()`: Only pre-renders published recipes.
+  - In `generateMetadata()`: Returns 404 "Recipe Not Found" metadata for any draft recipe so search engine crawlers never index draft recipes.
+  - In `RecipeDetailPage`: Validates reader authorization; unauthenticated guests and readers receive `notFound()` (404), while authenticated admins and editors can preview their draft with an informative "Draft Preview Mode" banner.
+- [x] Sitemap & Taxonomy Integration (`app/sitemap.ts`, `app/category/page.tsx`, `app/category/[slug]/page.tsx`):
+  - `app/sitemap.ts`: Excludes draft recipes from the public XML sitemap.
+  - `app/category/page.tsx` & `app/category/[slug]/page.tsx`: Only counts and displays published recipes.
+- [x] Admin Studio Status Controls & Filtering (`app/admin/recipes/page.tsx`, `app/admin/page.tsx`, `components/admin/AdminRecipeList.tsx`):
+  - Admin Studio routes fetch recipes with `includeDrafts: true`.
+  - Added Status filter tabs ("All", "Published", "Drafts") to `AdminRecipeList.tsx`.
+  - Rendered clear visual status badges ("Published" in sage green, "Draft" in warm amber) in both table and card views.
+
+### Phase 18: Recipe Asset & Image Cleanup on Deletion & Update
+
+- [x] Automatic Hero Image Blob Deletion (`lib/actions/recipe.ts`):
+  - In `deleteRecipe(slug)`: Retrieves the recipe document before/during deletion via `RecipeModel.findOneAndDelete({ slug })`.
+  - Safely deletes the associated hero image from Vercel Blob storage via `deleteBlobByUrl(deleted.image)`.
+  - Non-blob or static asset paths (`/images/...`) are safely skipped without error.
+  - Also purges all associated star rating entries in `RecipeRating` collection (`RecipeRating.deleteMany({ recipeSlug: slug })`).
+- [x] Replaced Image Cleanup on Recipe Update (`lib/actions/recipe.ts`):
+  - In `updateRecipe(originalSlug, data)`: If the user uploads/replaces the recipe's hero image, the previous blob asset is automatically removed from Vercel Blob storage.
+- [x] User Feedback & Confirmation Dialogs (`components/admin/AdminRecipeList.tsx`):
+  - Updated deletion confirmation prompt to explicitly notify users that the recipe, its ratings, and its image asset will be removed.
+  - Provides clear toast feedback upon successful deletion of both recipe and asset.
+- [x] Recipe Management UI Cleanup (`app/admin/recipes/page.tsx`):
+  - Removed "New Recipe" action link from the recipe management studio header in `app/admin/recipes/page.tsx` as requested.
+- [x] Recipe Form Brand-Compliant Green Publication Buttons (`components/admin/RecipeForm.tsx`):
+  - Updated Publication Status "Published" toggle button to use green in both light theme (`bg-sage hover:bg-sage-dark text-white`) and dark theme (`dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:border-emerald-500 text-white`) conforming to `brandGuidelines.md`.
+  - Maintained standard brand amber buttons (`dark:bg-amber-primary text-obsidian`) for primary submission actions.
+- [x] Admin Panel Dark Mode Green Active Navigation Buttons (`components/admin/AdminHeader.tsx`):
+  - Updated active navigation button styling in both desktop navbar and mobile drawer in `AdminHeader.tsx` to display green in dark mode (`dark:bg-emerald-600 text-white dark:focus-visible:ring-emerald-500`) matching `brandGuidelines.md`.
+
+### Phase 19: User Password & Profile Picture Management in Admin Studio
+
+- [x] Session & Data Layer Expansion (`lib/definitions.ts`, `lib/session.ts`, `lib/dal.ts`, `lib/actions/auth.ts`):
+  - Added optional `avatar?: string` to `SessionPayload` in `lib/definitions.ts`.
+  - Updated `createSession` in `lib/session.ts` to accept and serialize `avatar` into the signed session JWT cookie.
+  - Updated `verifySession` in `lib/dal.ts` to expose `avatar` from the decrypted session payload.
+  - Updated `login` and `signup` in `lib/actions/auth.ts` to populate user avatar directly into active session tokens on authentication.
+- [x] Pure Cryptographic Password Utilities (`lib/password.ts`):
+  - Extracted Node.js `scrypt` hashing (`hashPassword`) and timing-safe comparison (`verifyPassword`) into standalone module `lib/password.ts` for clean reusability across auth and profile actions without `"use server"` export constraints.
+- [x] Dedicated User Profile & Password Server Actions (`lib/actions/user.ts`):
+  - `getUserProfile()`: Securely queries authenticated user profile data from MongoDB with session verification.
+  - `updateUserProfile(data)`: Validates name length, updates name, bio, and avatar in MongoDB, cleans up replaced Vercel Blob avatars via `deleteBlobByUrl`, re-issues the active encrypted session cookie with updated credentials, and triggers automated path revalidation (`/admin`, `/admin/profile`, `/recipes`, `/`).
+  - `changePassword(data)`: Validates current password, enforces minimum 6-character length and match confirmation, checks timing-safe `verifyPassword` against stored MongoDB hash, hashes new password with random salt, and updates the database.
+- [x] Cloud Profile Picture Upload (`lib/actions/upload.ts`):
+  - Added `uploadAvatarImage(formData)` server action: Validates user session, enforces image format constraints (JPEG, PNG, WebP, AVIF, GIF) and 5MB size limit, uploads to `avatars/` directory in Vercel Blob with private store compatibility, and returns the accessible image URL.
+- [x] Interactive Profile Studio Component (`components/admin/AdminProfileForm.tsx`):
+  - Tabbed interface switching between "Profile & Picture" and "Change Password".
+  - **Avatar Uploader**: Live circular avatar preview with fallback initials, camera quick action, drag-and-drop file upload with progress indicator, direct URL input drawer, and one-click remove action.
+  - **Profile Details**: Editable display name with validation, read-only verified email indicator, role badge (`admin` / `editor`), and multi-line culinary bio textarea.
+  - **Password Change**: Current password with visibility toggle, new password with dynamic length indicator, confirm password with live matching validation, security best practices card, and toast notification feedback.
+- [x] Dedicated Admin Profile Route (`app/admin/profile/page.tsx`):
+  - Server Component protected by `verifyAdminSession()`.
+  - Breadcrumb navigation, page header, and seamless pre-population of authenticated user profile.
+- [x] Admin Header & Navigation Integration (`components/admin/AdminHeader.tsx`, `app/admin/layout.tsx`):
+  - Added "Profile" tab with `User` icon to desktop navbar and mobile drawer.
+  - Updated user profile section in desktop header and mobile drawer to render the user's avatar photo with circular crop, and linked directly to `/admin/profile`.
+  - Added "Profile" link in admin layout footer navigation.
+
+### Phase 20: Full-Screen Length UI for Admin Studio
+
+- [x] Full-Width Layout Container (`app/admin/layout.tsx`):
+  - Removed restrictive `max-w-[1240px]` and `mx-auto` constraints from `<main>`.
+  - Upgraded main content shell to fluid full width (`w-full px-4 sm:px-6 md:px-8 xl:px-12 py-6 sm:py-8`), allowing the admin UI to utilize the entire screen length/width on high-resolution displays.
+  - Aligned admin footer to full width (`w-full px-4 sm:px-6 md:px-8 xl:px-12`) with responsive spacing.
+- [x] Full-Width Studio Header (`components/admin/AdminHeader.tsx`):
+  - Removed `max-w-[1240px]` from both top micro-bar and primary navbar.
+  - Upgraded header content containers to `w-full px-4 sm:px-6 md:px-8 xl:px-12` for edge-to-edge alignment with the main viewport.
+- [x] Full-Width Status Banner (`components/admin/AdminSiteStatusBanner.tsx`):
+  - Replaced `max-w-[1240px]` with `w-full px-4 sm:px-6 md:px-8 xl:px-12` for fluid system status notice display.
+- [x] Responsive Card Grid Scaling (`components/admin/AdminRecipeList.tsx`, `components/admin/AdminCategoryList.tsx`):
+  - Upgraded recipe card grid from 3-columns to 5-columns on wide viewports (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6`).
+  - Upgraded category grid to 5-columns (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5`).
+  - Added wider image responsive sizes (`(min-width: 1536px) 20vw, (min-width: 1280px) 25vw, ...`) to prevent oversized stretched cards and maintain optimal food photography aspect ratios.
+- [x] Profile Studio Container Expansion (`components/admin/AdminProfileForm.tsx`):
+  - Expanded password and profile forms to `w-full max-w-4xl` to harmonize with full-width screen layouts.
+- [x] Verified Production Build:
+  - Clean TypeScript checks and successful `pnpm build` (22/22 pages generated).
+### Phase 21: Admin Studio Overview Side-by-Side Split Layout (All Recipes & Category List)
+
+- [x] Dual-Column Dashboard Architecture (`app/admin/page.tsx`):
+  - Converted admin overview from stacked vertical sections into a responsive split 2-column view (`grid grid-cols-1 lg:grid-cols-12 gap-8 items-start`).
+  - Left column (`lg:col-span-7 xl:col-span-8`): Dedicated to "Recipes (Published & Drafts)" showing all recipes (both published and draft recipes, not just published) via `getRecipes({ includeDrafts: true })` with search, filter, and view controls.
+  - Right column (`lg:col-span-5 xl:col-span-4`): Dedicated to "Category List" (`AdminCategoryList`) showing category thumbnails, live dish counters, and management actions.
+- [x] Compact Layout Adaptations (`components/admin/AdminRecipeList.tsx`, `components/admin/AdminCategoryList.tsx`):
+  - Added `compact?: boolean` prop to both components.
+  - In `AdminRecipeList`: Configured compact card grid (`grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5`) for optimal density alongside the right column.
+  - In `AdminCategoryList`: Configured compact layout (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-2 gap-4` with `p-4`) fitting smoothly inside the sidebar.
+- [x] Complete Recipe Ingestion & Type Safety (`lib/actions/recipe.ts`):
+  - Added `includeDrafts?: boolean` option to `getRecipes()`.
+  - Added strongly-typed `PopulatedRecipeDoc` interface, eliminating explicit `any` casts in Mongoose queries and satisfying strict lint rules.
+
+### Phase 22: Comprehensive Security Hardening (CSRF, Allowed HTTP Methods, SQL/NoSQL Injection, and JPEG/PNG Uploads)
+
+- [x] Universal CSRF Protection (`proxy.ts`, `lib/security.ts`, `lib/session.ts`):
+  - State-mutating requests (`POST`) are verified at the `proxy.ts` routing boundary using `verifyCsrfOrigin`.
+  - Validates `Origin` and `Referer` headers against the incoming request's `Host` / `x-forwarded-host`. Blocks cross-origin forging attempts with HTTP 403 Forbidden.
+  - Augmented by Next.js Server Actions native origin checks and `SameSite=lax`, `httpOnly: true` encrypted JWT session cookies in `lib/session.ts`.
+- [x] Strict HTTP Method Whitelisting (`proxy.ts`, `lib/security.ts`, `app/api/blob/route.ts`):
+  - Enforced `ALLOWED_HTTP_METHODS = ["GET", "POST", "HEAD"]` across all application routes in `proxy.ts`.
+  - Rejects unneeded or risky methods (`PUT`, `DELETE`, `PATCH`, `TRACE`, `CONNECT`) with HTTP 405 Method Not Allowed (`Allow: GET, POST, HEAD`).
+  - Hardened `/api/blob` stream proxy to reject non-GET requests with 405.
+- [x] Multi-Tier SQL & NoSQL Injection Protection (`lib/security.ts`, `lib/actions/recipe.ts`, `lib/actions/category.ts`, `lib/actions/auth.ts`, `lib/actions/newsletter.ts`, `lib/actions/user.ts`, `app/api/blob/route.ts`):
+  - `hasSqlInjection`: Scans input strings for SQL injection signatures, tautologies (`' OR '1'='1`), statement terminators, and comment indicators.
+  - `sanitizeSqlInput`: Strips null bytes and trims untrusted input strings.
+  - `sanitizeMongoInput`: Deeply strips MongoDB operator keys starting with `$` (`$gt`, `$ne`, `$where`, etc.) and dot notation to neutralize NoSQL operator injection.
+  - `escapeRegex`: Escapes special regex characters in dynamic pattern searches (e.g. category matching).
+  - Sanitized all database queries and parameters across recipes, categories, auth, user profiles, and newsletter subscriptions.
+  - Hardened `/api/blob` against SSRF by validating that target URLs match authorized Vercel Blob storage domains.
+- [x] Strict JPEG and PNG Only Image Uploads (`lib/security.ts`, `lib/actions/upload.ts`, `components/admin/RecipeImageUploader.tsx`, `components/admin/CategoryImageUploader.tsx`, `components/admin/AdminProfileForm.tsx`):
+  - Enforced server-side in `validateImageFile`:
+    1. MIME type validation: strictly `image/jpeg` and `image/png`.
+    2. File extension validation: strictly `.jpg`, `.jpeg`, and `.png`.
+    3. Binary magic bytes inspection (JPEG: `0xFF, 0xD8, 0xFF`, PNG: `0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A`) to prevent MIME spoofing and disguised payloads.
+  - Applied across `uploadRecipeImage`, `uploadCategoryImage`, and `uploadAvatarImage`.
+  - Updated all client dropzones and file inputs with `accept="image/jpeg,image/png,.jpg,.jpeg,.png"` and clear UI notices.
+
+### Phase 23: Recipe Create Autosave Process with User On/Off Toggle
+
+- [x] Autosave Engine & Local Storage Persistence (`components/admin/RecipeForm.tsx`):
+  - Created automatic draft saving mechanism that debounces form modifications (title, slug, category, hero photo, prep/cook/total times, servings, excerpt, intro, featured toggle, publication status, ingredients, instruction steps, notes, and tags) and serializes them to `localStorage` (`cooking_blog_recipe_create_draft`).
+  - Active on recipe creation (`!isEditing`) to safeguard authors against browser crashes, accidental tab closures, and network interruptions.
+- [x] User-Controlled Autosave On / Off Switch (`components/admin/RecipeForm.tsx`):
+  - Added interactive toggle switch in both the top header action bar and the sidebar settings card.
+  - Persists author preference in `localStorage` (`cooking_blog_recipe_create_autosave_enabled`) across sessions.
+  - Clear user feedback with toast confirmations when toggling ON vs OFF.
+- [x] Real-Time Status Indicator & Manual Save (`components/admin/RecipeForm.tsx`):
+  - Displays dynamic state: `Saving...` with animated spinner, `Saved [HH:MM:SS]` with green checkmark, or `OFF` with pause indicator.
+  - Provides a manual "Save Draft Now" button allowing authors to take instant snapshots at any moment.
+- [x] Unsaved Draft Recovery & Automatic Cleanup (`components/admin/RecipeForm.tsx`):
+  - Automatically detects previous unsaved drafts on page load and presents a recovery banner with dish title and timestamp.
+  - Includes one-click "Restore Draft" to populate all fields and "Discard" to purge stale drafts.
+  - Automatically clears the draft upon successful recipe publication so future recipe creations start fresh.
+- [x] Deduplicated Autosave Toggle Toast Notification (`components/admin/RecipeForm.tsx`):
+  - Moved `showToast` and `localStorage` side effects outside of the React state updater function (`setAutoSaveEnabled`) so that toggling autosave fires strictly once per user interaction.
+- [x] Resolved TS2322 Notes Type Incompatibility (`lib/actions/recipe.ts`):
+  - Updated `PopulatedRecipeDoc.notes` to `string[] | string` and introduced `formatRecipeNotes` helper to normalize string or array notes into `string[] | undefined`, satisfying strict TypeScript type assignments against `Recipe[]`.

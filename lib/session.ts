@@ -44,10 +44,11 @@ export async function createSession(
   userId: string,
   role: UserRole = DEFAULT_USER_ROLE,
   name = "Chef",
-  email = ""
+  email = "",
+  avatar = ""
 ) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const session = await encrypt({ userId, role, name, email, expiresAt });
+  const session = await encrypt({ userId, role, name, email, avatar, expiresAt });
   const cookieStore = await cookies();
 
   cookieStore.set(COOKIE_NAME, session, {

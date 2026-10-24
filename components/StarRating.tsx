@@ -21,8 +21,8 @@ export default function StarRating({ value, max = 5, className = "" }: Props) {
             key={i}
             className={`h-3.5 w-3.5 ${
               isFilled
-                ? "fill-star text-star"
-                : "fill-transparent text-gray-300"
+                ? "fill-star text-star dark:fill-gold dark:text-gold"
+                : "fill-transparent text-ink/20 dark:text-panel"
             }`}
             aria-hidden="true"
           />

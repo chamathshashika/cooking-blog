@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import RecipesFilterView from "@/components/RecipesFilterView";
-import { categories } from "@/lib/data";
 import { getRecipes } from "@/lib/actions/recipe";
+import { getCategories } from "@/lib/actions/category";
 
 export const metadata: Metadata = {
   title: "All Recipes | Authentic Sri Lankan Cooking | CeylonSpicer",
@@ -23,41 +23,46 @@ type Props = {
   searchParams?: Promise<{ category?: string; search?: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RecipesPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
   const initialCategory = resolvedSearchParams?.category || "all";
   const initialSearch = resolvedSearchParams?.search || "";
-  const allRecipes = await getRecipes();
+  const [allRecipes, categories] = await Promise.all([
+    getRecipes(),
+    getCategories(),
+  ]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">
       <Header />
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
             <Link
               href="/"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Home
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-ink font-semibold">Recipes</span>
+            <span className="text-ink dark:text-ice font-semibold">Recipes</span>
           </div>
         </div>
 
         {/* Hero Banner */}
-        <section className="bg-cream py-12 md:py-16 text-center border-b border-ink/10">
+        <section className="bg-cream dark:bg-surface py-12 md:py-16 text-center border-b border-ink/10 dark:border-hairline transition-colors duration-200">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted mb-2">
+            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted dark:text-amber-text mb-2">
               Island Culinary Heritage
             </p>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight">
               All Sri Lankan Recipes
             </h1>
-            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto leading-relaxed">
               Explore our complete library of authentic island dishes, fragrant
               slow-simmered curries, vibrant street foods, and festive holiday
               desserts.
@@ -79,7 +84,7 @@ export default async function RecipesPage({ searchParams }: Props) {
         </section>
 
         {/* Explore Categories Visual Carousel */}
-        <div className="border-t border-ink/10 bg-linen/20">
+        <div className="border-t border-ink/10 dark:border-hairline bg-linen/20 dark:bg-panel/30">
           <CategoryCarousel categories={categories} />
         </div>
 

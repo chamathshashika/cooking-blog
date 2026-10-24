@@ -45,12 +45,9 @@ export default function CategoryImageUploader({
 
   const handleFileSelect = async (file: File) => {
     // 1. Client-side validation
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+    const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
-      showToast(
-        "Invalid file format. Please select a JPG, PNG, WebP, AVIF, or GIF image.",
-        "error"
-      );
+      showToast("Invalid file format. Please select a JPG or PNG image.", "error");
       return;
     }
 
@@ -136,13 +133,13 @@ export default function CategoryImageUploader({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink">
+        <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
           Category Image *
         </label>
         <button
           type="button"
           onClick={() => setShowUrlInput(!showUrlInput)}
-          className="inline-flex items-center gap-1 font-ui text-[11px] font-semibold text-sage hover:text-sage-dark transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1 font-ui text-[11px] font-semibold text-sage dark:text-amber-text hover:text-sage-dark dark:hover:text-amber-primary transition-colors cursor-pointer"
         >
           <LinkIcon className="h-3 w-3" />
           <span>{showUrlInput ? "Hide Direct URL" : "Enter Direct URL"}</span>
@@ -160,14 +157,14 @@ export default function CategoryImageUploader({
           onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
           className={`sm:col-span-8 group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-4 text-center transition-all cursor-pointer ${
             dragActive
-              ? "border-sage bg-cream/40 scale-[1.01]"
-              : "border-ink/20 bg-linen/20 hover:border-sage/70 hover:bg-cream/20"
+              ? "border-sage dark:border-amber-primary bg-cream/40 dark:bg-amber-primary/10 scale-[1.01]"
+              : "border-ink/20 dark:border-hairline bg-linen/20 dark:bg-panel/30 hover:border-sage/70 dark:hover:border-amber-primary/70 hover:bg-cream/20 dark:hover:bg-panel/60"
           } ${disabled || isUploading ? "opacity-60 cursor-not-allowed" : ""}`}
         >
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
             disabled={disabled || isUploading}
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
@@ -179,35 +176,35 @@ export default function CategoryImageUploader({
 
           {isUploading ? (
             <div className="py-2.5 flex flex-col items-center justify-center gap-2">
-              <Loader2 className="h-7 w-7 animate-spin text-sage" />
-              <span className="font-ui text-xs font-bold text-ink">
+              <Loader2 className="h-7 w-7 animate-spin text-sage dark:text-amber-primary" />
+              <span className="font-ui text-xs font-bold text-ink dark:text-ice">
                 Uploading to Vercel Blob...
               </span>
-              <span className="font-ui text-[10px] text-muted">
+              <span className="font-ui text-[10px] text-muted dark:text-slate-muted">
                 Optimizing & storing securely in the cloud
               </span>
             </div>
           ) : (
             <div className="py-2 flex flex-col items-center justify-center gap-1.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-cream text-ink/80 group-hover:bg-sunshine group-hover:text-ink transition-colors">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-cream dark:bg-surface text-ink/80 dark:text-ice group-hover:bg-sunshine dark:group-hover:bg-amber-primary group-hover:text-ink dark:group-hover:text-obsidian transition-colors border border-transparent dark:border-hairline">
                 <Upload className="h-4 w-4" />
               </div>
-              <div className="font-ui text-xs font-semibold text-ink">
-                <span className="text-sage underline underline-offset-2">
+              <div className="font-ui text-xs font-semibold text-ink dark:text-ice">
+                <span className="text-sage dark:text-amber-text underline underline-offset-2">
                   Click to upload
                 </span>{" "}
                 or drag and drop
               </div>
-              <p className="font-ui text-[10px] text-muted">
-                JPG, PNG, WebP or AVIF (Max 5MB) • Hosted via @vercel/blob
+              <p className="font-ui text-[10px] text-muted dark:text-slate-muted">
+                JPG or PNG (Max 5MB) • Hosted via @vercel/blob
               </p>
             </div>
           )}
         </div>
 
         {/* Right: Live Circular Carousel Preview */}
-        <div className="sm:col-span-4 flex flex-col items-center justify-center rounded-xl border border-ink/10 bg-linen/30 p-3 text-center">
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-cream">
+        <div className="sm:col-span-4 flex flex-col items-center justify-center rounded-xl border border-ink/10 dark:border-hairline bg-linen/30 dark:bg-panel/40 p-3 text-center">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white dark:border-surface shadow-sm bg-cream dark:bg-surface">
             {displayUrl && !isImageBroken ? (
               localPreview?.startsWith("blob:") ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -229,19 +226,19 @@ export default function CategoryImageUploader({
                 />
               )
             ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center text-muted p-1">
-                <ImageIcon className="h-6 w-6 text-muted/60" />
-                <span className="text-[9px] font-ui text-muted mt-0.5">
+              <div className="flex h-full w-full flex-col items-center justify-center text-muted dark:text-slate-muted p-1">
+                <ImageIcon className="h-6 w-6 text-muted/60 dark:text-slate-muted/60" />
+                <span className="text-[9px] font-ui text-muted dark:text-slate-muted mt-0.5">
                   {isImageBroken ? "Invalid URL" : "No image"}
                 </span>
               </div>
             )}
           </div>
-          <span className="mt-2 font-ui text-[10px] font-bold uppercase tracking-wider text-ink/80">
+          <span className="mt-2 font-ui text-[10px] font-bold uppercase tracking-wider text-ink/80 dark:text-ice/80">
             Carousel Preview
           </span>
           {isVercelBlob && (
-            <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 font-ui text-[9px] font-medium text-emerald-700">
+            <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-transparent dark:border-emerald-800/40 px-2 py-0.5 font-ui text-[9px] font-medium text-emerald-700 dark:text-emerald-400">
               <CheckCircle2 className="h-2.5 w-2.5" />
               Vercel Blob
             </span>
@@ -251,12 +248,12 @@ export default function CategoryImageUploader({
 
       {/* Manual URL Input (Optional Fallback / Direct Editor) */}
       {showUrlInput && (
-        <div className="rounded-lg border border-ink/10 bg-white p-3 space-y-1.5 animate-in fade-in duration-200">
+        <div className="rounded-lg border border-ink/10 dark:border-hairline bg-white dark:bg-panel p-3 space-y-1.5 animate-in fade-in duration-200">
           <div className="flex items-center justify-between">
-            <span className="font-ui text-[11px] font-bold text-ink">
+            <span className="font-ui text-[11px] font-bold text-ink dark:text-ice">
               Direct Image URL
             </span>
-            <span className="font-ui text-[10px] text-muted">
+            <span className="font-ui text-[10px] text-muted dark:text-slate-muted">
               Auto-synced with file upload
             </span>
           </div>
@@ -271,7 +268,7 @@ export default function CategoryImageUploader({
               onImageChange(e.target.value);
             }}
             placeholder="https://... or uploaded blob URL"
-            className="w-full rounded-md border border-ink/20 px-3 py-1.5 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-60"
+            className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-3 py-1.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-60"
           />
         </div>
       )}

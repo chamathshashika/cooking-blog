@@ -1,10 +1,16 @@
 import type { MetadataRoute } from "next";
-import { getAllRecipes, categories } from "@/lib/data";
+import { getRecipes } from "@/lib/actions/recipe";
+import { getCategories } from "@/lib/actions/category";
 import { env } from "@/lib/env";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = env.NEXT_PUBLIC_SITE_URL;
   const currentDate = new Date();
+
+  const [recipes, categories] = await Promise.all([
+    getRecipes(),
+    getCategories(),
+  ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -63,7 +69,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const recipeRoutes: MetadataRoute.Sitemap = getAllRecipes().map((recipe) => ({
+  const recipeRoutes: MetadataRoute.Sitemap = recipes.map((recipe) => ({
     url: `${baseUrl}/recipes/${recipe.slug}`,
     lastModified: recipe.publishedDate
       ? new Date(recipe.publishedDate)

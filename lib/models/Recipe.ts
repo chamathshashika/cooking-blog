@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model, Types } from "mongoose";
+import { type IUser } from "@/lib/models/User";
 
 export interface IIngredient {
   name: string;
@@ -14,12 +15,6 @@ export interface IInstruction {
   step: number;
   title?: string;
   text: string;
-}
-
-export interface IAuthor {
-  name: string;
-  role: string;
-  avatar: string;
 }
 
 export interface IRecipe {
@@ -41,7 +36,7 @@ export interface IRecipe {
   instructions: IInstruction[];
   notes?: string[];
   tags?: string[];
-  author?: IAuthor;
+  author: Types.ObjectId | IUser;
   status: "draft" | "published";
   publishedDate?: string;
   createdAt?: Date;
@@ -66,15 +61,6 @@ const InstructionSchema = new Schema<IInstruction>(
     step: { type: Number, required: true },
     title: { type: String, trim: true },
     text: { type: String, required: true, trim: true },
-  },
-  { _id: false }
-);
-
-const AuthorSchema = new Schema<IAuthor>(
-  {
-    name: { type: String, trim: true },
-    role: { type: String, trim: true },
-    avatar: { type: String, trim: true },
   },
   { _id: false }
 );
@@ -170,12 +156,10 @@ const RecipeSchema = new Schema<IRecipe>(
       index: true,
     },
     author: {
-      type: AuthorSchema,
-      default: {
-        name: "Chef Amara Perera",
-        role: "Master Recipe Developer",
-        avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
-      },
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+      index: true,
     },
     status: {
       type: String,

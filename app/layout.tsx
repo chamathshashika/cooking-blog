@@ -81,6 +81,10 @@ import { decrypt } from "@/lib/session";
 import { getSiteStatus } from "@/lib/actions/siteStatus";
 import AdminSiteStatusBanner from "@/components/admin/AdminSiteStatusBanner";
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: {
@@ -140,20 +144,27 @@ export default async function RootLayout({
             __html: `@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k='ceylonspicer_theme';var s=localStorage.getItem(k);var p=window.matchMedia('(prefers-color-scheme: dark)').matches;var d=s==='dark'||(s!=='light'&&p);if(d){document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');document.documentElement.style.colorScheme='dark';}else{document.documentElement.classList.remove('dark');document.documentElement.setAttribute('data-theme','light');document.documentElement.style.colorScheme='light';}}catch(e){}})();`,
+          }}
+        />
         <GoogleAnalytics gaId="G-K0QQFXPCCD" />
       </head>
       <body
         suppressHydrationWarning
-        className="bg-white font-display text-ink antialiased min-h-screen flex flex-col"
+        className="bg-white dark:bg-obsidian font-display text-ink dark:text-ice antialiased min-h-screen flex flex-col transition-colors duration-200"
       >
-        {isAdmin && siteStatus.mode !== "live" && (
-          <AdminSiteStatusBanner
-            mode={siteStatus.mode}
-            headline={siteStatus.headline}
-          />
-        )}
-        <ToastProvider>{children}</ToastProvider>
-        <ScrollToTop />
+        <ThemeProvider>
+          {isAdmin && siteStatus.mode !== "live" && (
+            <AdminSiteStatusBanner
+              mode={siteStatus.mode}
+              headline={siteStatus.headline}
+            />
+          )}
+          <ToastProvider>{children}</ToastProvider>
+          <ScrollToTop />
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

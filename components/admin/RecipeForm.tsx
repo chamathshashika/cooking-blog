@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -12,15 +12,17 @@ import {
   Star,
   Check,
   Loader2,
-  HelpCircle,
   ExternalLink,
-  Tag,
   BookOpen,
   ChefHat,
   ChevronUp,
   ChevronDown,
   Sparkles,
   DollarSign,
+  Save,
+  RotateCcw,
+  CheckCircle2,
+  PauseCircle,
 } from "lucide-react";
 import {
   createRecipe,
@@ -30,6 +32,7 @@ import {
 import { useToast } from "@/components/ToastProvider";
 import RecipeImageUploader from "@/components/admin/RecipeImageUploader";
 import type { Category, Recipe } from "@/lib/data";
+import { generateSlug } from "@/lib/slug";
 
 type Props = {
   categories: Category[];
@@ -53,6 +56,29 @@ type InstructionStep = {
   text: string;
 };
 
+const AUTOSAVE_STORAGE_KEY = "cooking_blog_recipe_create_draft";
+const AUTOSAVE_ENABLED_KEY = "cooking_blog_recipe_create_autosave_enabled";
+
+type SavedDraftData = {
+  title: string;
+  slug: string;
+  category: string;
+  image: string;
+  prepTime: string;
+  cookTime: string;
+  totalTime: string;
+  servings: number;
+  excerpt: string;
+  intro: string;
+  isFeatured: boolean;
+  status: "draft" | "published";
+  ingredients: IngredientRow[];
+  instructions: InstructionStep[];
+  notes: string[];
+  tags: string[];
+  updatedAt: number;
+};
+
 export default function RecipeForm({
   categories,
   authorName = "Chef Amara Perera",
@@ -64,6 +90,13 @@ export default function RecipeForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEditing);
+
+  // Autosave State
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
+  const [discoveredDraft, setDiscoveredDraft] = useState<SavedDraftData | null>(null);
+  const isInitialMount = useRef(true);
 
   // Form State
   const [title, setTitle] = useState(initialRecipe?.title || "");
@@ -164,15 +197,208 @@ export default function RecipeForm({
   );
   const [newTag, setNewTag] = useState("");
 
-  // Auto-generate slug from title
+  // Load draft & preference on mount for recipe create
+  useEffect(() => {
+    if (isEditing) return;
+
+    const timeout = setTimeout(() => {
+      try {
+        const storedPref = localStorage.getItem(AUTOSAVE_ENABLED_KEY);
+        if (storedPref !== null) {
+          setAutoSaveEnabled(storedPref === "true");
+        }
+
+        const rawDraft = localStorage.getItem(AUTOSAVE_STORAGE_KEY);
+        if (rawDraft) {
+          const parsed = JSON.parse(rawDraft) as SavedDraftData;
+          if (
+            parsed &&
+            (parsed.title ||
+              parsed.excerpt ||
+              (parsed.ingredients && parsed.ingredients.some((i) => i.name)))
+          ) {
+            setDiscoveredDraft(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to read draft from localStorage:", e);
+      }
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [isEditing]);
+
+  // Toggle autosave on/off
+  const handleToggleAutoSave = () => {
+    const next = !autoSaveEnabled;
+    setAutoSaveEnabled(next);
+    try {
+      localStorage.setItem(AUTOSAVE_ENABLED_KEY, String(next));
+    } catch (err) {
+      console.warn("Failed to save autosave preference:", err);
+    }
+    showToast(
+      next
+        ? "Autosave enabled: your draft will save automatically."
+        : "Autosave paused.",
+      "info"
+    );
+  };
+
+  // Save current form state to localStorage
+  const saveDraftLocally = useCallback(() => {
+    if (isEditing) return;
+
+    // Skip if form is essentially empty
+    if (!title && !excerpt && ingredients.every((i) => !i.name)) {
+      return;
+    }
+
+    try {
+      setIsAutoSaving(true);
+      const draftData: SavedDraftData = {
+        title,
+        slug,
+        category,
+        image,
+        prepTime,
+        cookTime,
+        totalTime,
+        servings: Number(servings) || 4,
+        excerpt,
+        intro,
+        isFeatured,
+        status,
+        ingredients,
+        instructions,
+        notes,
+        tags,
+        updatedAt: Date.now(),
+      };
+      localStorage.setItem(AUTOSAVE_STORAGE_KEY, JSON.stringify(draftData));
+      const formatted = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      setLastSavedTime(formatted);
+    } catch (err) {
+      console.warn("Failed to autosave recipe draft:", err);
+    } finally {
+      setTimeout(() => {
+        setIsAutoSaving(false);
+      }, 350);
+    }
+  }, [
+    isEditing,
+    title,
+    slug,
+    category,
+    image,
+    prepTime,
+    cookTime,
+    totalTime,
+    servings,
+    excerpt,
+    intro,
+    isFeatured,
+    status,
+    ingredients,
+    instructions,
+    notes,
+    tags,
+  ]);
+
+  // Autosave debouncer
+  useEffect(() => {
+    if (isEditing) return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (!autoSaveEnabled) return;
+
+    const timer = setTimeout(() => {
+      saveDraftLocally();
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [
+    isEditing,
+    autoSaveEnabled,
+    saveDraftLocally,
+    title,
+    slug,
+    category,
+    image,
+    prepTime,
+    cookTime,
+    totalTime,
+    servings,
+    excerpt,
+    intro,
+    isFeatured,
+    status,
+    ingredients,
+    instructions,
+    notes,
+    tags,
+  ]);
+
+  // Restore draft handler
+  const handleRestoreDraft = () => {
+    if (!discoveredDraft) return;
+    setTitle(discoveredDraft.title || "");
+    setSlug(discoveredDraft.slug || "");
+    setCategory(discoveredDraft.category || categories[0]?.name || "Curries & Dinners");
+    setImage(discoveredDraft.image || "/images/recipes/sri-lankan-chicken-curry.jpg");
+    setPrepTime(discoveredDraft.prepTime || "20 min");
+    setCookTime(discoveredDraft.cookTime || "30 min");
+    setTotalTime(discoveredDraft.totalTime || "");
+    setServings(discoveredDraft.servings || 4);
+    setExcerpt(discoveredDraft.excerpt || "");
+    setIntro(discoveredDraft.intro || "");
+    setIsFeatured(Boolean(discoveredDraft.isFeatured));
+    setStatus(discoveredDraft.status || "draft");
+    if (discoveredDraft.ingredients && discoveredDraft.ingredients.length > 0) {
+      setIngredients(discoveredDraft.ingredients);
+    }
+    if (discoveredDraft.instructions && discoveredDraft.instructions.length > 0) {
+      setInstructions(discoveredDraft.instructions);
+    }
+    if (discoveredDraft.notes) setNotes(discoveredDraft.notes);
+    if (discoveredDraft.tags) setTags(discoveredDraft.tags);
+
+    const savedAt = new Date(discoveredDraft.updatedAt).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setLastSavedTime(savedAt);
+    setDiscoveredDraft(null);
+    showToast("Unsaved recipe draft restored!", "success");
+  };
+
+  // Discard draft handler
+  const handleDiscardDraft = () => {
+    try {
+      localStorage.removeItem(AUTOSAVE_STORAGE_KEY);
+    } catch {}
+    setDiscoveredDraft(null);
+    setLastSavedTime(null);
+    showToast("Unsaved draft discarded.", "info");
+  };
+
+  // Manual save draft handler
+  const handleManualSaveDraft = () => {
+    saveDraftLocally();
+    showToast("Draft saved locally!", "success");
+  };
+
+  // Auto-generate SEO-friendly slug from title
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (!slugManuallyEdited) {
-      const generated = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      setSlug(generated);
+      setSlug(generateSlug(val));
     }
   };
 
@@ -344,6 +570,11 @@ export default function RecipeForm({
       }
 
       if (result.success && result.slug) {
+        if (!isEditing) {
+          try {
+            localStorage.removeItem(AUTOSAVE_STORAGE_KEY);
+          } catch {}
+        }
         showToast(
           isEditing
             ? `Recipe "${title}" updated successfully!`
@@ -374,33 +605,96 @@ export default function RecipeForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-8 pb-16">
       {/* Top Header & Quick Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-ink/10 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-ink/10 dark:border-hairline pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <Link
               href="/admin/recipes"
-              className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-muted hover:text-ink transition-colors"
+              className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />
               <span>Back to Recipe Database</span>
             </Link>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl text-ink">
+          <h1 className="font-display text-2xl sm:text-3xl text-ink dark:text-ice">
             {isEditing ? `Edit: ${initialRecipe?.title || title}` : "Create Sri Lankan Recipe"}
           </h1>
-          <p className="mt-1 font-display text-xs sm:text-sm text-ink/80">
+          <p className="mt-1 font-display text-xs sm:text-sm text-ink/80 dark:text-slate-muted">
             {isEditing
               ? "Modify family culinary storytelling, ingredients checklist with affiliate partnerships, instructions, and hero photography."
               : "Publish authentic family culinary stories, ingredient checklists with affiliate partnerships, and step-by-step guidance."}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Autosave Switch & Indicator for Recipe Creation */}
+          {!isEditing && (
+            <div className="flex items-center gap-2.5 rounded-lg border border-ink/15 dark:border-hairline bg-white/90 dark:bg-panel px-3 py-1.5 shadow-2xs">
+              <button
+                type="button"
+                onClick={handleToggleAutoSave}
+                role="switch"
+                aria-checked={autoSaveEnabled}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-sage ${
+                  autoSaveEnabled ? "bg-sage dark:bg-emerald-600" : "bg-ink/20 dark:bg-hairline"
+                }`}
+                title={autoSaveEnabled ? "Autosave is ON (click to turn OFF)" : "Autosave is OFF (click to turn ON)"}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${
+                    autoSaveEnabled ? "translate-x-4" : "translate-x-0"
+                  }`}
+                />
+              </button>
+
+              <div className="flex items-center gap-1.5 font-ui text-[11px]">
+                <span className="font-bold uppercase tracking-wider text-ink dark:text-ice">
+                  Autosave
+                </span>
+                {autoSaveEnabled ? (
+                  <span className="flex items-center gap-1 text-muted dark:text-slate-muted">
+                    {isAutoSaving ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin text-sage dark:text-emerald-400" />
+                        <span>Saving...</span>
+                      </>
+                    ) : lastSavedTime ? (
+                      <>
+                        <CheckCircle2 className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                        <span className="hidden sm:inline">Saved {lastSavedTime}</span>
+                        <span className="sm:hidden">Saved</span>
+                      </>
+                    ) : (
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">ON</span>
+                    )}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-muted dark:text-slate-muted font-medium">
+                    <PauseCircle className="h-3 w-3" />
+                    <span>OFF</span>
+                  </span>
+                )}
+              </div>
+
+              {!autoSaveEnabled && (
+                <button
+                  type="button"
+                  onClick={handleManualSaveDraft}
+                  className="ml-1 inline-flex items-center gap-1 rounded bg-cream/70 dark:bg-surface px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-cream dark:hover:bg-panel transition-colors cursor-pointer"
+                  title="Save draft now"
+                >
+                  <Save className="h-2.5 w-2.5 text-sage dark:text-amber-primary" />
+                  <span>Save</span>
+                </button>
+              )}
+            </div>
+          )}
+
           {isEditing && initialRecipe && (
             <Link
               href={`/recipes/${initialRecipe.slug}`}
               target="_blank"
-              className="min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/20 bg-white px-3.5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted hover:text-ink hover:bg-linen/50 transition-colors"
+              className="min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-3.5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice hover:bg-linen/50 dark:hover:bg-panel transition-colors"
               title="Open public recipe in new tab"
             >
               <ExternalLink className="h-3.5 w-3.5" />
@@ -410,7 +704,7 @@ export default function RecipeForm({
 
           <Link
             href="/admin/recipes"
-            className="min-h-[44px] inline-flex items-center justify-center rounded-md border border-ink/20 bg-white px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-linen/50 transition-colors"
+            className="min-h-[44px] inline-flex items-center justify-center rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-4 py-2 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-linen/50 dark:hover:bg-panel transition-colors"
           >
             Cancel
           </Link>
@@ -418,7 +712,7 @@ export default function RecipeForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-md bg-sage px-6 py-2.5 font-ui text-xs font-bold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-50"
+            className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-6 py-2.5 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? (
               <>
@@ -435,21 +729,58 @@ export default function RecipeForm({
         </div>
       </div>
 
+      {/* Discovered Unsaved Draft Alert Banner */}
+      {!isEditing && discoveredDraft && (
+        <div className="rounded-xl border border-sunshine/50 dark:border-amber-primary/40 bg-sunshine/10 dark:bg-amber-primary/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-2xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="rounded-full bg-sunshine/30 dark:bg-amber-primary/20 p-2 text-ink dark:text-ice shrink-0">
+              <Sparkles className="h-4 w-4 text-ink dark:text-amber-text" />
+            </div>
+            <div>
+              <p className="font-display font-semibold text-sm sm:text-base text-ink dark:text-ice">
+                Unsaved recipe draft found
+              </p>
+              <p className="font-ui text-xs text-muted dark:text-slate-muted mt-0.5">
+                {discoveredDraft.title ? `"${discoveredDraft.title}"` : "Untitled dish"} • Last saved at {new Date(discoveredDraft.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ({new Date(discoveredDraft.updatedAt).toLocaleDateString()})
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleRestoreDraft}
+              className="inline-flex items-center gap-1.5 rounded-md bg-sage dark:bg-emerald-600 px-3.5 py-2 font-ui text-xs font-bold uppercase tracking-wider text-white shadow-2xs hover:bg-sage-dark dark:hover:bg-emerald-500 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Restore Draft</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDiscardDraft}
+              className="inline-flex items-center gap-1.5 rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-3 py-2 font-ui text-xs font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 transition-colors cursor-pointer"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Discard</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content Column (Left 2 Columns) */}
         <div className="lg:col-span-2 space-y-8">
           {/* Card 1: Essential Identity */}
-          <section className="rounded-xl border border-ink/15 bg-white p-6 sm:p-7 shadow-2xs space-y-5">
-            <div className="flex items-center gap-2 border-b border-ink/10 pb-3">
-              <ChefHat className="h-5 w-5 text-sage" />
-              <h2 className="font-display text-xl text-ink">Recipe Identity</h2>
+          <section className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-7 shadow-2xs space-y-5">
+            <div className="flex items-center gap-2 border-b border-ink/10 dark:border-hairline pb-3">
+              <ChefHat className="h-5 w-5 text-sage dark:text-amber-primary" />
+              <h2 className="font-display text-xl text-ink dark:text-ice">Recipe Identity</h2>
             </div>
 
             <div className="space-y-4">
               {/* Recipe Title */}
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                  Recipe Title <span className="text-red-600">*</span>
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
+                  Recipe Title <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -457,18 +788,34 @@ export default function RecipeForm({
                   placeholder="e.g. Jaffna Spiced Crab Curry with Lemongrass"
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full min-h-[44px] rounded-md border border-ink/20 px-3.5 py-2 font-display text-base text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="w-full min-h-[44px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2 font-display text-base text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
               </div>
 
               {/* URL Slug */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink">
-                    URL Slug
-                  </label>
-                  <span className="font-ui text-[10px] text-muted">
-                    https://ceylonspicer.com/recipes/<strong>{slug || "..."}</strong>
+                  <div className="flex items-center gap-2">
+                    <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
+                      URL Slug
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const regenerated = generateSlug(title);
+                        setSlug(regenerated);
+                        setSlugManuallyEdited(false);
+                        showToast("Slug regenerated from recipe title.", "info");
+                      }}
+                      title="Auto-generate SEO slug from title"
+                      className="inline-flex items-center gap-1 font-ui text-[10px] font-semibold uppercase tracking-wider text-sage dark:text-amber-primary hover:underline cursor-pointer"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      <span>Auto-Generate</span>
+                    </button>
+                  </div>
+                  <span className="font-ui text-[10px] text-muted dark:text-slate-muted hidden sm:inline">
+                    /recipes/<strong>{slug || "..."}</strong>
                   </span>
                 </div>
                 <input
@@ -478,15 +825,23 @@ export default function RecipeForm({
                     setSlugManuallyEdited(true);
                     setSlug(e.target.value);
                   }}
+                  onBlur={() => {
+                    if (slug) {
+                      setSlug(generateSlug(slug));
+                    }
+                  }}
                   placeholder="jaffna-spiced-crab-curry"
-                  className="w-full min-h-[42px] rounded-md border border-ink/20 bg-linen/20 px-3 py-2 font-mono text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="w-full min-h-[42px] rounded-md border border-ink/20 dark:border-hairline bg-linen/20 dark:bg-panel/50 px-3 py-2 font-mono text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
+                <p className="mt-1 font-ui text-[10px] text-muted dark:text-slate-muted">
+                  Auto-formatted with lowercase ASCII, hyphens, and optimized for search engine indexing.
+                </p>
               </div>
 
               {/* Excerpt */}
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                  Short Excerpt (Cards & Search Snippet) <span className="text-red-600">*</span>
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
+                  Short Excerpt (Cards & Search Snippet) <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <textarea
                   rows={3}
@@ -494,13 +849,13 @@ export default function RecipeForm({
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
                   placeholder="A fiery, fragrant northern Sri Lankan coastal delicacy enriched with drumstick leaves, roasted coriander, and rich coconut gravy..."
-                  className="w-full rounded-md border border-ink/20 px-3.5 py-2.5 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2.5 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
               </div>
 
               {/* Intro Narrative */}
               <div>
-                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+                <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                   Story / Kitchen Intro (Optional)
                 </label>
                 <textarea
@@ -508,20 +863,20 @@ export default function RecipeForm({
                   value={intro}
                   onChange={(e) => setIntro(e.target.value)}
                   placeholder="Share the origins of this dish, heritage memories, or what makes cooking it special in a Sri Lankan family kitchen..."
-                  className="w-full rounded-md border border-ink/20 px-3.5 py-2.5 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3.5 py-2.5 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
               </div>
             </div>
           </section>
 
           {/* Card 2: Featured Hero Photography */}
-          <section className="rounded-xl border border-ink/15 bg-white p-6 sm:p-7 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+          <section className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-7 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-ink/10 dark:border-hairline pb-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-sage" />
-                <h2 className="font-display text-xl text-ink">Food Photography</h2>
+                <Sparkles className="h-5 w-5 text-sage dark:text-amber-primary" />
+                <h2 className="font-display text-xl text-ink dark:text-ice">Food Photography</h2>
               </div>
-              <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted">
+              <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
                 Food Leads • Quiet UI
               </span>
             </div>
@@ -534,16 +889,16 @@ export default function RecipeForm({
           </section>
 
           {/* Card 3: Dynamic Ingredients Builder with Affiliate Links */}
-          <section className="rounded-xl border border-ink/15 bg-white p-6 sm:p-7 shadow-2xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 pb-3 gap-2">
+          <section className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-7 shadow-2xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-3 gap-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-sage" />
-                  <h2 className="font-display text-xl text-ink">
+                  <BookOpen className="h-5 w-5 text-sage dark:text-amber-primary" />
+                  <h2 className="font-display text-xl text-ink dark:text-ice">
                     Ingredients & Affiliate Links
                   </h2>
                 </div>
-                <p className="font-ui text-xs text-muted mt-0.5">
+                <p className="font-ui text-xs text-muted dark:text-slate-muted mt-0.5">
                   Attach affiliate links to spices and specialty equipment so readers can shop directly.
                 </p>
               </div>
@@ -551,18 +906,18 @@ export default function RecipeForm({
               <button
                 type="button"
                 onClick={addIngredient}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-cream/80 px-3.5 py-1.5 font-ui text-xs font-bold uppercase tracking-wider text-ink border border-ink/10 hover:bg-cream transition-colors self-start sm:self-auto"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-cream/80 dark:bg-panel px-3.5 py-1.5 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice border border-ink/10 dark:border-hairline hover:bg-cream dark:hover:bg-surface transition-colors self-start sm:self-auto"
               >
-                <Plus className="h-4 w-4 text-sage" />
+                <Plus className="h-4 w-4 text-sage dark:text-amber-primary" />
                 <span>Add Ingredient</span>
               </button>
             </div>
 
             {/* Affiliate Monetization Tip Banner */}
-            <div className="rounded-md border border-sunshine/50 bg-sunshine/15 p-3.5 flex items-start gap-3">
-              <DollarSign className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
-              <p className="font-ui text-xs text-ink/90 leading-relaxed">
-                <strong>Monetization Tip:</strong> Add your Amazon, spice merchant, or kitchen supplier affiliate links below. When visitors click <em>&ldquo;Shop&rdquo;</em> on the recipe checklist, the link safely opens in a new tab with FTC-compliant <code className="bg-white/80 px-1 py-0.5 rounded text-[10px]">rel=&ldquo;sponsored&rdquo;</code> tags.
+            <div className="rounded-md border border-sunshine/50 dark:border-amber-primary/30 bg-sunshine/15 dark:bg-amber-primary/10 p-3.5 flex items-start gap-3">
+              <DollarSign className="h-5 w-5 text-amber-700 dark:text-amber-text shrink-0 mt-0.5" />
+              <p className="font-ui text-xs text-ink/90 dark:text-ice leading-relaxed">
+                <strong>Monetization Tip:</strong> Add your Amazon, spice merchant, or kitchen supplier affiliate links below. When visitors click <em>&ldquo;Shop&rdquo;</em> on the recipe checklist, the link safely opens in a new tab with FTC-compliant <code className="bg-white/80 dark:bg-panel px-1 py-0.5 rounded text-[10px] text-ink dark:text-ice border border-transparent dark:border-hairline">rel=&ldquo;sponsored&rdquo;</code> tags.
               </p>
             </div>
 
@@ -576,21 +931,21 @@ export default function RecipeForm({
                     key={item.id}
                     className={`rounded-lg border p-4 transition-all ${
                       hasAffiliate
-                        ? "border-sage/40 bg-sage/5"
-                        : "border-ink/15 bg-linen/20"
+                        ? "border-sage/40 dark:border-amber-primary/40 bg-sage/5 dark:bg-amber-primary/5"
+                        : "border-ink/15 dark:border-hairline bg-linen/20 dark:bg-panel/40"
                     }`}
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
                       {/* Drag / Index */}
                       <div className="sm:col-span-1 flex items-center justify-center pt-2">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white border border-ink/15 font-ui text-[11px] font-bold text-muted">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-surface border border-ink/15 dark:border-hairline font-ui text-[11px] font-bold text-muted dark:text-slate-muted">
                           {index + 1}
                         </span>
                       </div>
 
                       {/* Amount / Quantity */}
                       <div className="sm:col-span-3">
-                        <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted mb-1">
+                        <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted mb-1">
                           Amount / Quantity
                         </label>
                         <input
@@ -600,14 +955,14 @@ export default function RecipeForm({
                           onChange={(e) =>
                             updateIngredient(item.id, "amount", e.target.value)
                           }
-                          className="w-full min-h-[40px] rounded-md border border-ink/20 bg-white px-2.5 py-1.5 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                          className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-2.5 py-1.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                         />
                       </div>
 
                       {/* Ingredient Name */}
                       <div className="sm:col-span-5">
-                        <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted mb-1">
-                          Ingredient Name <span className="text-red-600">*</span>
+                        <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted mb-1">
+                          Ingredient Name <span className="text-red-600 dark:text-red-400">*</span>
                         </label>
                         <input
                           type="text"
@@ -617,13 +972,13 @@ export default function RecipeForm({
                           onChange={(e) =>
                             updateIngredient(item.id, "name", e.target.value)
                           }
-                          className="w-full min-h-[40px] rounded-md border border-ink/20 bg-white px-3 py-1.5 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                          className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-1.5 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                         />
                       </div>
 
                       {/* Group (Optional) */}
                       <div className="sm:col-span-2">
-                        <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted mb-1">
+                        <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted mb-1">
                           Group (Opt.)
                         </label>
                         <input
@@ -633,7 +988,7 @@ export default function RecipeForm({
                           onChange={(e) =>
                             updateIngredient(item.id, "group", e.target.value)
                           }
-                          className="w-full min-h-[40px] rounded-md border border-ink/20 bg-white px-2.5 py-1.5 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                          className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-2.5 py-1.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                         />
                       </div>
 
@@ -643,7 +998,7 @@ export default function RecipeForm({
                           type="button"
                           onClick={() => removeIngredient(item.id)}
                           aria-label={`Remove ingredient ${index + 1}`}
-                          className="flex h-9 w-9 items-center justify-center rounded-md text-muted hover:text-red-600 hover:bg-red-50 transition-colors"
+                          className="flex h-9 w-9 items-center justify-center rounded-md text-muted dark:text-slate-muted hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -651,10 +1006,10 @@ export default function RecipeForm({
                     </div>
 
                     {/* Affiliate Link Row & Optional Checkbox */}
-                    <div className="mt-3 pt-3 border-t border-ink/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="mt-3 pt-3 border-t border-ink/10 dark:border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex-1 flex items-center gap-2">
                         <div className="relative flex-1">
-                          <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sage" />
+                          <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sage dark:text-amber-primary" />
                           <input
                             type="text"
                             placeholder="Add affiliate / shop link: https://amazon.com/... or https://spiceshop.lk/..."
@@ -666,7 +1021,7 @@ export default function RecipeForm({
                                 e.target.value
                               )
                             }
-                            className="w-full min-h-[38px] rounded-md border border-ink/20 bg-white pl-8 pr-3 py-1 font-mono text-xs text-ink placeholder:text-muted/70 focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                            className="w-full min-h-[38px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel pl-8 pr-3 py-1 font-mono text-xs text-ink dark:text-ice placeholder:text-muted/70 dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                           />
                         </div>
 
@@ -679,7 +1034,7 @@ export default function RecipeForm({
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex min-h-[38px] items-center gap-1 rounded-md border border-sage/40 bg-white px-2.5 py-1 font-ui text-[11px] font-bold uppercase tracking-wider text-sage hover:bg-sage hover:text-white transition-colors shrink-0"
+                            className="inline-flex min-h-[38px] items-center gap-1 rounded-md border border-sage/40 dark:border-amber-primary/40 bg-white dark:bg-surface px-2.5 py-1 font-ui text-[11px] font-bold uppercase tracking-wider text-sage dark:text-amber-text hover:bg-sage dark:hover:bg-amber-primary hover:text-white dark:hover:text-obsidian transition-colors shrink-0"
                             title="Test affiliate link destination"
                           >
                             <span>Test</span>
@@ -696,11 +1051,11 @@ export default function RecipeForm({
                           onChange={(e) =>
                             updateIngredient(item.id, "optional", e.target.checked)
                           }
-                          className="h-4 w-4 rounded accent-sage focus:ring-sage cursor-pointer"
+                          className="h-4 w-4 rounded accent-sage dark:accent-amber-primary focus:ring-sage dark:focus:ring-amber-primary cursor-pointer"
                         />
                         <label
                           htmlFor={`optional-${item.id}`}
-                          className="font-ui text-xs text-muted cursor-pointer select-none"
+                          className="font-ui text-xs text-muted dark:text-slate-muted cursor-pointer select-none"
                         >
                           Mark as optional
                         </label>
@@ -714,7 +1069,7 @@ export default function RecipeForm({
             <button
               type="button"
               onClick={addIngredient}
-              className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-ink/20 py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-muted hover:border-sage hover:text-sage hover:bg-sage/5 transition-all"
+              className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-ink/20 dark:border-hairline py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text hover:bg-sage/5 dark:hover:bg-amber-primary/5 transition-all"
             >
               <Plus className="h-4 w-4" />
               <span>Add Another Ingredient</span>
@@ -722,13 +1077,13 @@ export default function RecipeForm({
           </section>
 
           {/* Card 4: Step-by-Step Instructions */}
-          <section className="rounded-xl border border-ink/15 bg-white p-6 sm:p-7 shadow-2xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 pb-3 gap-2">
+          <section className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-7 shadow-2xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 dark:border-hairline pb-3 gap-2">
               <div>
-                <h2 className="font-display text-xl text-ink">
+                <h2 className="font-display text-xl text-ink dark:text-ice">
                   Preparation Steps & Method
                 </h2>
-                <p className="font-ui text-xs text-muted mt-0.5">
+                <p className="font-ui text-xs text-muted dark:text-slate-muted mt-0.5">
                   Clear, ordered directions for home cooks of any skill level.
                 </p>
               </div>
@@ -736,9 +1091,9 @@ export default function RecipeForm({
               <button
                 type="button"
                 onClick={addInstruction}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-cream/80 px-3.5 py-1.5 font-ui text-xs font-bold uppercase tracking-wider text-ink border border-ink/10 hover:bg-cream transition-colors self-start sm:self-auto"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-cream/80 dark:bg-panel px-3.5 py-1.5 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice border border-ink/10 dark:border-hairline hover:bg-cream dark:hover:bg-surface transition-colors self-start sm:self-auto"
               >
-                <Plus className="h-4 w-4 text-sage" />
+                <Plus className="h-4 w-4 text-sage dark:text-amber-primary" />
                 <span>Add Step</span>
               </button>
             </div>
@@ -747,10 +1102,10 @@ export default function RecipeForm({
               {instructions.map((step, index) => (
                 <div
                   key={step.id}
-                  className="rounded-lg border border-ink/15 bg-linen/20 p-4 space-y-3"
+                  className="rounded-lg border border-ink/15 dark:border-hairline bg-linen/20 dark:bg-panel/40 p-4 space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-ui text-xs font-bold uppercase tracking-wider text-sage">
+                    <span className="font-ui text-xs font-bold uppercase tracking-wider text-sage dark:text-amber-text">
                       Step {index + 1}
                     </span>
 
@@ -760,7 +1115,7 @@ export default function RecipeForm({
                         disabled={index === 0}
                         onClick={() => moveInstruction(index, "up")}
                         aria-label={`Move step ${index + 1} up`}
-                        className="p-1 text-muted hover:text-ink disabled:opacity-30 disabled:hover:text-muted"
+                        className="p-1 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice disabled:opacity-30 disabled:hover:text-muted"
                       >
                         <ChevronUp className="h-4 w-4" />
                       </button>
@@ -769,7 +1124,7 @@ export default function RecipeForm({
                         disabled={index === instructions.length - 1}
                         onClick={() => moveInstruction(index, "down")}
                         aria-label={`Move step ${index + 1} down`}
-                        className="p-1 text-muted hover:text-ink disabled:opacity-30 disabled:hover:text-muted"
+                        className="p-1 text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice disabled:opacity-30 disabled:hover:text-muted"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </button>
@@ -777,7 +1132,7 @@ export default function RecipeForm({
                         type="button"
                         onClick={() => removeInstruction(step.id)}
                         aria-label={`Remove step ${index + 1}`}
-                        className="p-1 text-muted hover:text-red-600 transition-colors ml-1"
+                        className="p-1 text-muted dark:text-slate-muted hover:text-red-600 dark:hover:text-red-400 transition-colors ml-1"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -785,7 +1140,7 @@ export default function RecipeForm({
                   </div>
 
                   <div>
-                    <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted mb-1">
+                    <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted mb-1">
                       Step Title (Optional)
                     </label>
                     <input
@@ -795,13 +1150,13 @@ export default function RecipeForm({
                       onChange={(e) =>
                         updateInstruction(step.id, "title", e.target.value)
                       }
-                      className="w-full min-h-[38px] rounded-md border border-ink/20 bg-white px-3 py-1.5 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                      className="w-full min-h-[38px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-1.5 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted mb-1">
-                      Instructions <span className="text-red-600">*</span>
+                    <label className="block font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted mb-1">
+                      Instructions <span className="text-red-600 dark:text-red-400">*</span>
                     </label>
                     <textarea
                       rows={3}
@@ -811,7 +1166,7 @@ export default function RecipeForm({
                       onChange={(e) =>
                         updateInstruction(step.id, "text", e.target.value)
                       }
-                      className="w-full rounded-md border border-ink/20 bg-white px-3 py-2 font-display text-sm text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                      className="w-full rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-2 font-display text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                     />
                   </div>
                 </div>
@@ -821,7 +1176,7 @@ export default function RecipeForm({
             <button
               type="button"
               onClick={addInstruction}
-              className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-ink/20 py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-muted hover:border-sage hover:text-sage hover:bg-sage/5 transition-all"
+              className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-ink/20 dark:border-hairline py-2.5 font-ui text-xs font-bold uppercase tracking-wider text-muted dark:text-slate-muted hover:border-sage dark:hover:border-amber-primary hover:text-sage dark:hover:text-amber-text hover:bg-sage/5 dark:hover:bg-amber-primary/5 transition-all"
             >
               <Plus className="h-4 w-4" />
               <span>Add Another Step</span>
@@ -829,8 +1184,8 @@ export default function RecipeForm({
           </section>
 
           {/* Card 5: Chef Notes & Culinary Tips */}
-          <section className="rounded-xl border border-ink/15 bg-white p-6 sm:p-7 shadow-2xs space-y-4">
-            <h2 className="font-display text-xl text-ink border-b border-ink/10 pb-3">
+          <section className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-7 shadow-2xs space-y-4">
+            <h2 className="font-display text-xl text-ink dark:text-ice border-b border-ink/10 dark:border-hairline pb-3">
               Chef Notes &amp; Tips
             </h2>
 
@@ -838,16 +1193,16 @@ export default function RecipeForm({
               {notes.map((note, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between gap-3 rounded-md bg-linen/30 border border-ink/10 px-3.5 py-2"
+                  className="flex items-center justify-between gap-3 rounded-md bg-linen/30 dark:bg-panel/50 border border-ink/10 dark:border-hairline px-3.5 py-2"
                 >
-                  <span className="font-display text-xs text-ink flex-1">
+                  <span className="font-display text-xs text-ink dark:text-ice flex-1">
                     {note}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeNote(index)}
                     aria-label={`Remove tip ${index + 1}`}
-                    className="text-muted hover:text-red-600 transition-colors"
+                    className="text-muted dark:text-slate-muted hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -867,38 +1222,39 @@ export default function RecipeForm({
                     addNote();
                   }
                 }}
-                className="flex-1 min-h-[42px] rounded-md border border-ink/20 px-3 py-1.5 font-display text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                className="flex-1 min-h-[42px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-1.5 font-display text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
               />
               <button
                 type="button"
                 onClick={addNote}
-                className="min-h-[42px] inline-flex items-center gap-1 rounded-md bg-linen px-4 py-1.5 font-ui text-xs font-bold uppercase tracking-wider text-ink hover:bg-cream transition-colors"
+                className="min-h-[42px] inline-flex items-center gap-1 rounded-md bg-linen dark:bg-panel border border-transparent dark:border-hairline px-4 py-1.5 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice hover:bg-cream dark:hover:bg-surface transition-colors"
               >
                 <span>Add Tip</span>
               </button>
             </div>
           </section>
+
         </div>
 
         {/* Sidebar Column (Right 1 Column) */}
         <div className="space-y-6">
           {/* Taxonomy & Category */}
-          <div className="rounded-xl border border-ink/15 bg-white p-6 shadow-2xs space-y-4">
-            <h3 className="font-display text-lg text-ink border-b border-ink/10 pb-2.5">
+          <div className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 shadow-2xs space-y-4">
+            <h3 className="font-display text-lg text-ink dark:text-ice border-b border-ink/10 dark:border-hairline pb-2.5">
               Category &amp; Taxonomy
             </h3>
 
             <div>
-              <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                Cuisine Category <span className="text-red-600">*</span>
+              <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
+                Cuisine Category <span className="text-red-600 dark:text-red-400">*</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full min-h-[44px] rounded-md border border-ink/20 px-3 py-2 font-ui text-xs uppercase tracking-wider text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage cursor-pointer"
+                className="w-full min-h-[44px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-2 font-ui text-xs uppercase tracking-wider text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary cursor-pointer"
               >
                 {categories.map((cat) => (
-                  <option key={cat.slug} value={cat.name}>
+                  <option key={cat.slug} value={cat.name} className="dark:bg-panel dark:text-ice">
                     {cat.displayName}
                   </option>
                 ))}
@@ -907,20 +1263,20 @@ export default function RecipeForm({
 
             {/* Tags */}
             <div className="pt-2">
-              <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+              <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                 Recipe Tags
               </label>
               <div className="flex flex-wrap gap-1.5 mb-2.5">
                 {tags.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-1 rounded-full bg-cream/70 border border-ink/10 px-2.5 py-0.5 font-ui text-[11px] font-semibold text-ink"
+                    className="inline-flex items-center gap-1 rounded-full bg-cream/70 dark:bg-panel border border-ink/10 dark:border-hairline px-2.5 py-0.5 font-ui text-[11px] font-semibold text-ink dark:text-ice"
                   >
                     <span>#{t}</span>
                     <button
                       type="button"
                       onClick={() => removeTag(t)}
-                      className="text-muted hover:text-ink"
+                      className="text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                       aria-label={`Remove tag ${t}`}
                     >
                       ×
@@ -940,12 +1296,12 @@ export default function RecipeForm({
                       addTag();
                     }
                   }}
-                  className="flex-1 min-h-[40px] rounded-md border border-ink/20 px-3 py-1 font-ui text-xs text-ink placeholder:text-muted focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="flex-1 min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-1 font-ui text-xs text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted/50 focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
                 <button
                   type="button"
                   onClick={addTag}
-                  className="min-h-[40px] rounded-md bg-linen px-3 font-ui text-xs font-bold uppercase text-ink hover:bg-cream"
+                  className="min-h-[40px] rounded-md bg-linen dark:bg-panel border border-transparent dark:border-hairline px-3 font-ui text-xs font-bold uppercase text-ink dark:text-ice hover:bg-cream dark:hover:bg-surface"
                 >
                   Add
                 </button>
@@ -954,46 +1310,46 @@ export default function RecipeForm({
           </div>
 
           {/* Timings & Servings */}
-          <div className="rounded-xl border border-ink/15 bg-white p-6 shadow-2xs space-y-4">
-            <h3 className="font-display text-lg text-ink border-b border-ink/10 pb-2.5">
+          <div className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 shadow-2xs space-y-4">
+            <h3 className="font-display text-lg text-ink dark:text-ice border-b border-ink/10 dark:border-hairline pb-2.5">
               Cooking Metrology
             </h3>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink mb-1">
+                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink dark:text-ice mb-1">
                   Prep Time
                 </label>
                 <div className="relative">
-                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
+                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted dark:text-slate-muted" />
                   <input
                     type="text"
                     value={prepTime}
                     onChange={(e) => setPrepTime(e.target.value)}
                     placeholder="20 min"
-                    className="w-full min-h-[40px] rounded-md border border-ink/20 pl-8 pr-2 py-1 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                    className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel pl-8 pr-2 py-1 font-ui text-xs text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink mb-1">
+                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink dark:text-ice mb-1">
                   Cook Time
                 </label>
                 <div className="relative">
-                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
+                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted dark:text-slate-muted" />
                   <input
                     type="text"
                     value={cookTime}
                     onChange={(e) => setCookTime(e.target.value)}
                     placeholder="30 min"
-                    className="w-full min-h-[40px] rounded-md border border-ink/20 pl-8 pr-2 py-1 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                    className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel pl-8 pr-2 py-1 font-ui text-xs text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink mb-1">
+                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink dark:text-ice mb-1">
                   Total Time
                 </label>
                 <input
@@ -1001,22 +1357,22 @@ export default function RecipeForm({
                   value={totalTime}
                   onChange={(e) => setTotalTime(e.target.value)}
                   placeholder="50 min"
-                  className="w-full min-h-[40px] rounded-md border border-ink/20 px-3 py-1 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                  className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel px-3 py-1 font-ui text-xs text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                 />
               </div>
 
               <div>
-                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink mb-1">
+                <label className="block font-ui text-[11px] font-bold uppercase tracking-wider text-ink dark:text-ice mb-1">
                   Servings
                 </label>
                 <div className="relative">
-                  <Users className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
+                  <Users className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted dark:text-slate-muted" />
                   <input
                     type="number"
                     min={1}
                     value={servings}
                     onChange={(e) => setServings(Number(e.target.value))}
-                    className="w-full min-h-[40px] rounded-md border border-ink/20 pl-8 pr-2 py-1 font-ui text-xs text-ink focus:border-sage focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                    className="w-full min-h-[40px] rounded-md border border-ink/20 dark:border-hairline bg-white dark:bg-panel pl-8 pr-2 py-1 font-ui text-xs text-ink dark:text-ice focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary"
                   />
                 </div>
               </div>
@@ -1024,26 +1380,26 @@ export default function RecipeForm({
           </div>
 
           {/* Visibility & Publishing */}
-          <div className="rounded-xl border border-ink/15 bg-white p-6 shadow-2xs space-y-4">
-            <h3 className="font-display text-lg text-ink border-b border-ink/10 pb-2.5">
+          <div className="rounded-xl border border-ink/15 dark:border-hairline bg-white dark:bg-surface p-6 shadow-2xs space-y-4">
+            <h3 className="font-display text-lg text-ink dark:text-ice border-b border-ink/10 dark:border-hairline pb-2.5">
               Publication Settings
             </h3>
 
             {/* Featured toggle */}
-            <div className="flex items-start gap-3 rounded-lg border border-sunshine/40 bg-sunshine/10 p-3.5">
+            <div className="flex items-start gap-3 rounded-lg border border-sunshine/40 dark:border-amber-primary/30 bg-sunshine/10 dark:bg-amber-primary/10 p-3.5">
               <input
                 type="checkbox"
                 id="isFeatured"
                 checked={isFeatured}
                 onChange={(e) => setIsFeatured(e.target.checked)}
-                className="h-4 w-4 rounded accent-sage mt-0.5 cursor-pointer"
+                className="h-4 w-4 rounded accent-sage dark:accent-amber-primary mt-0.5 cursor-pointer"
               />
               <label htmlFor="isFeatured" className="cursor-pointer select-none">
-                <div className="flex items-center gap-1 font-ui text-xs font-bold uppercase tracking-wider text-ink">
-                  <Star className="h-3.5 w-3.5 fill-sunshine text-ink" />
+                <div className="flex items-center gap-1 font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
+                  <Star className="h-3.5 w-3.5 fill-sunshine dark:fill-amber-primary text-ink dark:text-amber-text" />
                   <span>Feature on Hero Banner</span>
                 </div>
-                <p className="font-ui text-[11px] text-muted mt-0.5">
+                <p className="font-ui text-[11px] text-muted dark:text-slate-muted mt-0.5">
                   Showcase as one of the 4 featured cards at the top of the homepage.
                 </p>
               </label>
@@ -1051,17 +1407,17 @@ export default function RecipeForm({
 
             {/* Status toggle */}
             <div>
-              <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
+              <label className="block font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice mb-1.5">
                 Publication Status
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setStatus("published")}
-                  className={`min-h-[40px] rounded-md border font-ui text-xs font-bold uppercase tracking-wider transition-colors ${
+                  className={`min-h-[40px] rounded-md border font-ui text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                     status === "published"
-                      ? "border-sage bg-sage text-white"
-                      : "border-ink/20 bg-white text-muted hover:text-ink"
+                      ? "border-sage bg-sage text-white hover:bg-sage-dark dark:border-emerald-500 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 shadow-xs"
+                      : "border-ink/20 dark:border-hairline bg-white dark:bg-panel text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                   }`}
                 >
                   Published
@@ -1071,8 +1427,8 @@ export default function RecipeForm({
                   onClick={() => setStatus("draft")}
                   className={`min-h-[40px] rounded-md border font-ui text-xs font-bold uppercase tracking-wider transition-colors ${
                     status === "draft"
-                      ? "border-ink bg-ink text-white"
-                      : "border-ink/20 bg-white text-muted hover:text-ink"
+                      ? "border-ink bg-ink text-white dark:border-ice dark:bg-ice dark:text-obsidian"
+                      : "border-ink/20 dark:border-hairline bg-white dark:bg-panel text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice"
                   }`}
                 >
                   Draft
@@ -1080,9 +1436,57 @@ export default function RecipeForm({
               </div>
             </div>
 
-            <div className="pt-2 text-muted font-ui text-[11px]">
-              Author: <strong>{authorName}</strong>
+            <div className="pt-2 text-muted dark:text-slate-muted font-ui text-[11px]">
+              Author: <strong className="text-ink dark:text-ice">{authorName}</strong>
             </div>
+
+            {/* Autosave Sidebar Status & Manual Save for Recipe Create */}
+            {!isEditing && (
+              <div className="rounded-lg border border-ink/10 dark:border-hairline bg-linen/30 dark:bg-panel/40 p-3.5 space-y-2 mt-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-ui text-xs font-bold uppercase tracking-wider text-ink dark:text-ice">
+                    Autosave Status
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleToggleAutoSave}
+                    className={`font-ui text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded transition-colors cursor-pointer ${
+                      autoSaveEnabled
+                        ? "bg-sage/15 text-sage dark:text-emerald-400 hover:bg-sage/25"
+                        : "bg-ink/10 dark:bg-panel text-muted dark:text-slate-muted hover:bg-ink/20"
+                    }`}
+                  >
+                    {autoSaveEnabled ? "Active (ON)" : "Paused (OFF)"}
+                  </button>
+                </div>
+                <p className="font-ui text-[11px] text-muted dark:text-slate-muted">
+                  {autoSaveEnabled
+                    ? lastSavedTime
+                      ? `Draft automatically saved at ${lastSavedTime}.`
+                      : "Changes are automatically saved to your browser as you type."
+                    : "Autosave is paused. Click the toggle or 'Save Draft Now' to update your draft."}
+                </p>
+                <div className="pt-1 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={handleManualSaveDraft}
+                    className="inline-flex items-center gap-1.5 rounded border border-ink/15 dark:border-hairline bg-white dark:bg-surface px-2.5 py-1 font-ui text-[11px] font-semibold text-ink dark:text-ice hover:bg-linen/50 dark:hover:bg-panel transition-colors cursor-pointer"
+                  >
+                    <Save className="h-3 w-3 text-sage dark:text-amber-primary" />
+                    <span>Save Draft Now</span>
+                  </button>
+                  {lastSavedTime && (
+                    <button
+                      type="button"
+                      onClick={handleDiscardDraft}
+                      className="font-ui text-[10px] text-muted hover:text-red-600 dark:hover:text-red-400 cursor-pointer"
+                    >
+                      Clear Draft
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sticky Submit Button on Desktop */}
@@ -1090,7 +1494,7 @@ export default function RecipeForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-md bg-sage px-6 py-3 font-ui text-xs font-bold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-sage-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:opacity-50"
+              className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-md bg-sage dark:bg-amber-primary px-6 py-3 font-ui text-xs font-bold uppercase tracking-widest text-white dark:text-obsidian shadow-xs transition-all hover:bg-sage-dark dark:hover:bg-amber-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

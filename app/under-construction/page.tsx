@@ -13,17 +13,17 @@ export default async function UnderConstructionPage() {
   const status = await getSiteStatus();
 
   return (
-    <main className="min-h-screen bg-[#faf8f5] flex flex-col items-center justify-center px-4 relative overflow-hidden select-none">
+    <main className="min-h-screen bg-linen/25 dark:bg-obsidian flex flex-col items-center justify-center px-4 relative overflow-hidden select-none transition-colors">
       {/* Subtle warm ambient glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute h-80 w-80 rounded-full bg-sunshine/25 blur-3xl -z-10"
+        className="pointer-events-none absolute h-80 w-80 rounded-full bg-sunshine/25 dark:bg-amber-primary/10 blur-3xl -z-10"
       />
 
       <div className="text-center space-y-4 max-w-xl mx-auto">
         {/* Subtle Brand Wordmark */}
         <div className="flex items-center justify-center gap-2.5 mb-2">
-          <div className="relative h-8 w-8 overflow-hidden rounded-md border border-ink/10 bg-white p-1 shadow-2xs">
+          <div className="relative h-8 w-8 overflow-hidden rounded-md border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-1 shadow-2xs">
             <Image
               src="/favicon.ico"
               alt="CeylonSpicer logo"
@@ -33,25 +33,25 @@ export default async function UnderConstructionPage() {
               priority
             />
           </div>
-          <span className="font-display text-xl text-ink tracking-tight">
+          <span className="font-display text-xl text-ink dark:text-ice tracking-tight">
             CeylonSpicer
           </span>
         </div>
 
         {/* Prominent Under Construction Heading */}
-        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-ink tracking-tight">
+        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-ink dark:text-ice tracking-tight">
           Under Construction
         </h1>
 
         {/* Reassuring Subtitle Text */}
-        <p className="font-display text-base sm:text-lg text-muted leading-relaxed max-w-lg mx-auto">
+        <p className="font-display text-base sm:text-lg text-muted dark:text-slate-muted leading-relaxed max-w-lg mx-auto">
           {status.message ||
             "Our kitchen is currently undergoing a brief refresh. We'll be back simmering shortly with new recipes and culinary stories."}
         </p>
 
         {status.expectedLaunchDate && (
-          <p className="font-ui text-xs text-muted/80 uppercase tracking-widest pt-1">
-            Expected reopening: <strong className="text-ink">{status.expectedLaunchDate}</strong>
+          <p className="font-ui text-xs text-muted/80 dark:text-slate-muted/80 uppercase tracking-widest pt-1">
+            Expected reopening: <strong className="text-ink dark:text-ice">{status.expectedLaunchDate}</strong>
           </p>
         )}
       </div>
@@ -60,7 +60,7 @@ export default async function UnderConstructionPage() {
       <div className="absolute bottom-6 right-6">
         <Link
           href="/login"
-          className="font-ui text-[11px] text-muted/60 hover:text-ink transition-colors uppercase tracking-wider"
+          className="font-ui text-[11px] text-muted/60 dark:text-slate-muted/60 hover:text-ink dark:hover:text-amber-text transition-colors uppercase tracking-wider"
         >
           Chef Access
         </Link>

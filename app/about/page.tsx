@@ -40,37 +40,37 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-obsidian transition-colors duration-200">
       <Header />
 
       <main className="flex-1 pb-16">
         {/* Breadcrumb Navigation */}
-        <div className="border-b border-ink/10 bg-linen/30 py-3">
-          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted">
+        <div className="border-b border-ink/10 dark:border-hairline bg-linen/30 dark:bg-surface/50 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-2 px-4 sm:px-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
             <Link
               href="/"
-              className="hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               Home
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-ink font-semibold">About</span>
+            <span className="text-ink dark:text-ice font-semibold">About</span>
           </div>
         </div>
 
         {/* Hero Section */}
-        <section className="bg-cream py-14 md:py-20 text-center border-b border-ink/10">
+        <section className="bg-cream dark:bg-surface py-14 md:py-20 text-center border-b border-ink/10 dark:border-hairline transition-colors duration-200">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 text-sage font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
-              <Sparkles className="h-3.5 w-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 dark:bg-panel text-sage dark:text-amber-text font-ui text-[10px] font-bold uppercase tracking-[0.12em] border border-transparent dark:border-hairline">
+              <Sparkles className="h-3.5 w-3.5 text-sage dark:text-gold" />
               <span>Our Culinary Journey</span>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight max-w-3xl mx-auto">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight max-w-3xl mx-auto">
               Preserving the Warmth of Sri Lankan Home Cooking
             </h1>
 
-            <p className="mt-4 font-display text-base sm:text-lg text-ink/80 max-w-2xl mx-auto leading-relaxed">
+            <p className="mt-4 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-2xl mx-auto leading-relaxed">
               CeylonSpicer is a labor of love dedicated to the flavors of our
               island home—where the aroma of toasted spices, crackling curry
               leaves, and sweet coconut milk brings family and friends together.
@@ -81,7 +81,7 @@ export default function AboutPage() {
         {/* Brand Narrative Section */}
         <section className="mx-auto max-w-[1000px] px-4 sm:px-6 py-12 md:py-20">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
-            <div className="md:col-span-6 relative aspect-[4/3] overflow-hidden bg-linen border border-ink/10 shadow-xs">
+            <div className="md:col-span-6 relative aspect-[4/3] overflow-hidden bg-linen dark:bg-panel border border-ink/10 dark:border-hairline shadow-xs">
               <Image
                 src="/images/recipes/sri-lankan-chicken-curry.jpg"
                 alt="Traditional Sri Lankan clay pot cooking with spices"
@@ -91,11 +91,11 @@ export default function AboutPage() {
               />
             </div>
 
-            <div className="md:col-span-6 space-y-4 font-display text-ink/85 leading-relaxed">
-              <p className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-sage">
+            <div className="md:col-span-6 space-y-4 font-display text-ink/85 dark:text-slate-muted leading-relaxed">
+              <p className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-sage dark:text-amber-text">
                 Ayubowan & Welcome
               </p>
-              <h2 className="font-display text-2xl sm:text-3xl text-ink leading-snug">
+              <h2 className="font-display text-2xl sm:text-3xl text-ink dark:text-ice leading-snug">
                 Food That Tells the Story of an Island
               </h2>
               <p className="text-base">
@@ -117,15 +117,15 @@ export default function AboutPage() {
 
         {/* Pillars / Values Section */}
         <section
-          className="border-y border-ink/10 bg-linen/20 py-14 md:py-20"
+          className="border-y border-ink/10 dark:border-hairline bg-linen/20 dark:bg-panel/30 py-14 md:py-20"
           aria-label="Our Culinary Principles"
         >
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             <div className="text-center max-w-xl mx-auto mb-12">
-              <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted mb-2">
+              <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted dark:text-amber-text mb-2">
                 What Guides Us
               </p>
-              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-ink">
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-ink dark:text-ice">
                 Our Cooking Principles
               </h2>
             </div>
@@ -136,15 +136,15 @@ export default function AboutPage() {
                 return (
                   <div
                     key={item.title}
-                    className="border border-ink/10 bg-white p-6 sm:p-8 flex flex-col justify-start text-center sm:text-left shadow-xs"
+                    className="border border-ink/10 dark:border-hairline bg-white dark:bg-surface p-6 sm:p-8 flex flex-col justify-start text-center sm:text-left shadow-xs"
                   >
-                    <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-sage/10 text-sage mb-5">
+                    <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-sage/10 dark:bg-panel text-sage dark:text-gold mb-5">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="font-display text-xl text-ink mb-3">
+                    <h3 className="font-display text-xl text-ink dark:text-ice mb-3">
                       {item.title}
                     </h3>
-                    <p className="font-display text-sm text-ink/80 leading-relaxed">
+                    <p className="font-display text-sm text-ink/80 dark:text-slate-muted leading-relaxed">
                       {item.description}
                     </p>
                   </div>
@@ -156,10 +156,10 @@ export default function AboutPage() {
 
         {/* Explore Invitation */}
         <section className="mx-auto max-w-[900px] px-4 sm:px-6 py-14 md:py-20 text-center">
-          <h2 className="font-display text-3xl sm:text-4xl text-ink mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl text-ink dark:text-ice mb-4">
             Ready to Cook Something Wonderful?
           </h2>
-          <p className="font-display text-base text-ink/80 max-w-xl mx-auto mb-8 leading-relaxed">
+          <p className="font-display text-base text-ink/80 dark:text-slate-muted max-w-xl mx-auto mb-8 leading-relaxed">
             Whether you&apos;re crafting fresh string hoppers for breakfast or
             slow-simmering a rich chicken curry for dinner, we invite you into
             our kitchen.
@@ -167,14 +167,14 @@ export default function AboutPage() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/recipes"
-              className="inline-flex min-h-[44px] items-center gap-2 bg-sage px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark transition-colors shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              className="inline-flex min-h-[44px] items-center gap-2 bg-sage dark:bg-amber-primary px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark dark:hover:bg-amber-secondary transition-colors shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
             >
               <span>Explore All Recipes</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/category"
-              className="inline-flex min-h-[44px] items-center gap-2 border border-ink/20 bg-white px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-cream hover:border-ink/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              className="inline-flex min-h-[44px] items-center gap-2 border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink dark:text-ice hover:bg-cream dark:hover:bg-panel hover:border-ink/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               <span>Browse Categories</span>
             </Link>

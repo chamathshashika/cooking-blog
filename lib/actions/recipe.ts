@@ -1,11 +1,132 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { Types } from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
-import { RecipeModel, IRecipe, IIngredient, IInstruction } from "@/lib/models/Recipe";
+import { RecipeModel, IIngredient, IInstruction } from "@/lib/models/Recipe";
+import { RecipeRating } from "@/lib/models/RecipeRating";
+import { User } from "@/lib/models/User";
 import { verifySession } from "@/lib/dal";
 import { hasAdminAccess } from "@/lib/definitions";
-import { allRecipes as defaultRecipes, type Recipe } from "@/lib/data";
+import { type Recipe, type RecipeAuthor } from "@/lib/data";
+import { seedRecipes } from "@/lib/seedData";
+import { generateSlug } from "@/lib/slug";
+import { deleteBlobByUrl } from "@/lib/actions/upload";
+import {
+  sanitizeSqlInput,
+  sanitizeMongoInput,
+  escapeRegex,
+  hasSqlInjection,
+} from "@/lib/security";
+
+/**
+ * Safely format populated author document into RecipeAuthor.
+ */
+function formatPopulatedAuthor(rawAuthor: unknown): RecipeAuthor {
+  if (rawAuthor && typeof rawAuthor === "object") {
+    const a = rawAuthor as Record<string, unknown>;
+    const name =
+      typeof a.name === "string" && a.name.trim()
+        ? a.name.trim()
+        : "Chef Amara Perera";
+    const role =
+      a.role === "admin"
+        ? "Master Chef & Founder"
+        : a.role === "editor"
+        ? "Culinary Contributor"
+        : typeof a.role === "string" && a.role.trim()
+        ? a.role.trim()
+        : "Recipe Author";
+    const email = typeof a.email === "string" ? a.email : undefined;
+    const id = a._id ? a._id.toString() : undefined;
+    const avatar =
+      typeof a.avatar === "string" && a.avatar.trim()
+        ? a.avatar.trim()
+        : "/images/recipes/sri-lankan-chicken-curry.jpg";
+
+    return {
+      id,
+      name,
+      role,
+      email,
+      avatar,
+    };
+  }
+
+  return {
+    name: "Chef Amara Perera",
+    role: "Master Recipe Developer",
+    avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
+  };
+}
+
+/**
+ * Safely format populated or legacy recipe notes into string[] | undefined.
+ */
+function formatRecipeNotes(rawNotes: unknown): string[] | undefined {
+  if (Array.isArray(rawNotes)) {
+    return rawNotes.filter(
+      (n): n is string => typeof n === "string" && n.trim().length > 0
+    );
+  }
+  if (typeof rawNotes === "string" && rawNotes.trim().length > 0) {
+    return [rawNotes.trim()];
+  }
+  return undefined;
+}
+
+/**
+ * Lean populated recipe document returned by Mongoose queries.
+ */
+interface PopulatedRecipeDoc {
+  _id?: Types.ObjectId;
+  slug: string;
+  title: string;
+  category: string;
+  image: string;
+  rating: number;
+  ratingCount: number;
+  prepTime: string;
+  cookTime: string;
+  totalTime?: string;
+  servings: number;
+  excerpt: string;
+  intro?: string;
+  isFeatured: boolean;
+  ingredients: IIngredient[];
+  instructions: IInstruction[];
+  notes?: string[] | string;
+  tags?: string[];
+  author?: unknown;
+  publishedDate?: string;
+  status?: "draft" | "published";
+}
+
+/**
+ * Retrieve an existing admin or user ObjectId to use as a fallback author foreign key.
+ */
+async function getOrCreateDefaultAuthorId(): Promise<Types.ObjectId> {
+  let user = await User.findOne({ role: "admin" }).lean();
+  if (user && user._id) {
+    return user._id as Types.ObjectId;
+  }
+
+  user = await User.findOne().lean();
+  if (user && user._id) {
+    return user._id as Types.ObjectId;
+  }
+
+  const created = await User.create({
+    name: "Chef Amara Perera",
+    email: "chef.amara@ceylonspicer.com",
+    password: "$2a$10$defaultdummyhashedpasswordforchefamara",
+    role: "admin",
+    avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
+    bio: "Passionate about preserving authentic Sri Lankan heritage recipes.",
+  });
+
+  return created._id as Types.ObjectId;
+}
 
 export type CreateRecipeInput = {
   title: string;
@@ -44,19 +165,16 @@ export type RecipeActionResult = {
   error?: string;
 };
 
-/**
- * Fetch all recipes from MongoDB.
- * Seeds with default static recipes if database collection is empty.
- */
-export async function getRecipes(): Promise<Recipe[]> {
-  try {
-    await connectToDatabase();
-    let docs = await RecipeModel.find().lean().sort({ createdAt: -1 });
+let hasMigratedRecipeAuthors = false;
 
-    if (!docs || docs.length === 0) {
-      // Seed default recipes into MongoDB
+async function ensureRecipeAuthorsMigrated() {
+  if (hasMigratedRecipeAuthors) return;
+  try {
+    const totalCount = await RecipeModel.countDocuments();
+    if (totalCount === 0) {
+      const defaultAuthorId = await getOrCreateDefaultAuthorId();
       await RecipeModel.insertMany(
-        defaultRecipes.map((r) => ({
+        seedRecipes.map((r) => ({
           slug: r.slug,
           title: r.title,
           category: r.category,
@@ -74,19 +192,61 @@ export async function getRecipes(): Promise<Recipe[]> {
           instructions: r.instructions || [],
           notes: r.notes || [],
           tags: r.tags || [],
-          author: r.author || {
-            name: "Chef Amara Perera",
-            role: "Master Recipe Developer",
-            avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
-          },
+          author: defaultAuthorId,
           status: "published",
           publishedDate: r.publishedDate || new Date().toISOString().split("T")[0],
         }))
       );
-      docs = await RecipeModel.find().lean().sort({ createdAt: -1 });
+    } else {
+      const legacyCount = await RecipeModel.countDocuments({
+        $or: [
+          { "author.name": { $exists: true } },
+          { author: { $exists: false } },
+          { author: null },
+        ],
+      });
+      if (legacyCount > 0) {
+        const defaultAuthorId = await getOrCreateDefaultAuthorId();
+        await RecipeModel.updateMany(
+          {
+            $or: [
+              { "author.name": { $exists: true } },
+              { author: { $exists: false } },
+              { author: null },
+            ],
+          },
+          { $set: { author: defaultAuthorId } }
+        );
+      }
     }
+    hasMigratedRecipeAuthors = true;
+  } catch (err) {
+    console.error("ensureRecipeAuthorsMigrated error:", err);
+  }
+}
 
-    return docs.map((doc) => ({
+/**
+ * Fetch all recipes from MongoDB and populate the author foreign key.
+ * By default, returns ONLY published recipes ({ status: { $ne: "draft" } }).
+ * Pass options.includeDrafts = true (for Admin Studio) to include drafts.
+ */
+export async function getRecipes(options?: {
+  includeDrafts?: boolean;
+}): Promise<Recipe[]> {
+  try {
+    await connectToDatabase();
+    await ensureRecipeAuthorsMigrated();
+
+    const query = options?.includeDrafts
+      ? {}
+      : { status: { $ne: "draft" as const } };
+
+    const docs = await RecipeModel.find(query)
+      .populate("author", "name email role avatar")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return (docs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
       id: doc._id ? doc._id.toString() : doc.slug,
       slug: doc.slug,
       title: doc.title,
@@ -103,14 +263,15 @@ export async function getRecipes(): Promise<Recipe[]> {
       isFeatured: doc.isFeatured,
       ingredients: doc.ingredients,
       instructions: doc.instructions,
-      notes: doc.notes,
+      notes: formatRecipeNotes(doc.notes),
       tags: doc.tags,
-      author: doc.author,
+      author: formatPopulatedAuthor(doc.author),
       publishedDate: doc.publishedDate,
+      status: doc.status || "published",
     }));
   } catch (error) {
-    console.error("Failed to load recipes from database, using static fallback:", error);
-    return defaultRecipes;
+    console.error("Failed to load recipes from database:", error);
+    return [];
   }
 }
 
@@ -163,24 +324,12 @@ export async function createRecipe(
       data.excerpt?.trim() ||
       `${title} — an authentic, comforting Sri Lankan recipe made with aromatic spices and traditional ingredients.`;
 
-    // 3. Format or generate slug
-    let slug = data.slug?.trim().toLowerCase();
-    if (!slug) {
-      slug = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-    } else {
-      slug = slug
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-    }
-
-    if (!slug) {
+    // 3. Format or auto-generate SEO-friendly slug
+    const baseSlug = generateSlug(data.slug || title);
+    if (!baseSlug) {
       return {
         success: false,
-        error: "Could not generate a valid URL slug for this recipe.",
+        error: "Could not generate a valid SEO URL slug for this recipe.",
       };
     }
 
@@ -217,20 +366,23 @@ export async function createRecipe(
     // 6. Connect to database
     await connectToDatabase();
 
-    // 7. Check for duplicate slug
-    const existing = await RecipeModel.findOne({ slug }).lean();
-    if (existing) {
-      return {
-        success: false,
-        error: `A recipe with the slug "${slug}" already exists. Please choose a unique title or slug.`,
-      };
+    // 7. Auto-resolve duplicate slug for clean SEO URLs
+    let slug = baseSlug;
+    let counter = 2;
+    while (await RecipeModel.exists({ slug })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
     }
 
-    // 8. Author profile
-    const authorName = session.name || "Chef Amara Perera";
-    const authorRole = session.role === "admin" ? "Master Chef & Founder" : "Culinary Contributor";
+    // 8. Logged-in user is the single author; keep user ID as ObjectId foreign key
+    let authorId: Types.ObjectId;
+    if (session.userId && Types.ObjectId.isValid(session.userId)) {
+      authorId = new Types.ObjectId(session.userId);
+    } else {
+      authorId = await getOrCreateDefaultAuthorId();
+    }
 
-    // 9. Create recipe document
+    // 9. Create recipe document with author foreign key
     const created = await RecipeModel.create({
       slug,
       title,
@@ -249,11 +401,7 @@ export async function createRecipe(
       instructions: sanitizedInstructions,
       notes: (data.notes || []).map((n) => n.trim()).filter(Boolean),
       tags: (data.tags || []).map((t) => t.trim().toLowerCase()).filter(Boolean),
-      author: {
-        name: authorName,
-        role: authorRole,
-        avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
-      },
+      author: authorId,
       status: data.status || "published",
       publishedDate: new Date().toISOString().split("T")[0],
     });
@@ -289,8 +437,16 @@ export async function findRecipeBySlug(
   slug: string
 ): Promise<Recipe | undefined> {
   try {
+    const cleanSlug = sanitizeSqlInput(slug);
+    if (!cleanSlug || hasSqlInjection(cleanSlug)) {
+      return undefined;
+    }
+
     await connectToDatabase();
-    const doc = await RecipeModel.findOne({ slug }).lean();
+    await ensureRecipeAuthorsMigrated();
+    const doc = (await RecipeModel.findOne({ slug: cleanSlug })
+      .populate("author", "name email role avatar")
+      .lean()) as unknown as PopulatedRecipeDoc | null;
     if (doc) {
       return {
         id: doc._id ? doc._id.toString() : doc.slug,
@@ -309,17 +465,111 @@ export async function findRecipeBySlug(
         isFeatured: doc.isFeatured,
         ingredients: doc.ingredients,
         instructions: doc.instructions,
-        notes: doc.notes,
+        notes: formatRecipeNotes(doc.notes),
         tags: doc.tags,
-        author: doc.author,
+        author: formatPopulatedAuthor(doc.author),
         publishedDate: doc.publishedDate,
+        status: doc.status || "published",
       };
     }
+    return undefined;
   } catch (error) {
     console.error("Error looking up recipe by slug in MongoDB:", error);
+    return undefined;
   }
+}
 
-  return defaultRecipes.find((r) => r.slug === slug);
+/**
+ * Retrieve related recipes directly from MongoDB.
+ */
+export async function getRelatedRecipes(
+  currentSlug: string,
+  category: string,
+  limit: number = 3
+): Promise<Recipe[]> {
+  try {
+    await connectToDatabase();
+    await ensureRecipeAuthorsMigrated();
+    const cleanSlug = sanitizeSqlInput(currentSlug);
+    const cleanCategory = escapeRegex(sanitizeSqlInput(category));
+
+    const sameCategoryDocs = await RecipeModel.find({
+      slug: { $ne: cleanSlug },
+      category: { $regex: new RegExp(`^${cleanCategory}$`, "i") },
+      status: { $ne: "draft" as const },
+    })
+      .populate("author", "name email role avatar")
+      .limit(limit)
+      .lean();
+
+    let related: Recipe[] = (sameCategoryDocs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
+      id: doc._id ? doc._id.toString() : doc.slug,
+      slug: doc.slug,
+      title: doc.title,
+      category: doc.category,
+      image: doc.image,
+      rating: doc.rating,
+      ratingCount: doc.ratingCount,
+      prepTime: doc.prepTime,
+      cookTime: doc.cookTime,
+      totalTime: doc.totalTime,
+      servings: doc.servings,
+      excerpt: doc.excerpt,
+      intro: doc.intro,
+      isFeatured: doc.isFeatured,
+      ingredients: doc.ingredients,
+      instructions: doc.instructions,
+      notes: formatRecipeNotes(doc.notes),
+      tags: doc.tags,
+      author: formatPopulatedAuthor(doc.author),
+      publishedDate: doc.publishedDate,
+      status: doc.status || "published",
+    }));
+
+    if (related.length < limit) {
+      const remainingCount = limit - related.length;
+      const existingSlugs = [currentSlug, ...related.map((r) => r.slug)];
+      const otherDocs = await RecipeModel.find({
+        slug: { $nin: existingSlugs },
+        status: { $ne: "draft" as const },
+      })
+        .populate("author", "name email role avatar")
+        .limit(remainingCount)
+        .lean();
+
+      related = [
+        ...related,
+        ...(otherDocs as unknown as PopulatedRecipeDoc[]).map((doc) => ({
+          id: doc._id ? doc._id.toString() : doc.slug,
+          slug: doc.slug,
+          title: doc.title,
+          category: doc.category,
+          image: doc.image,
+          rating: doc.rating,
+          ratingCount: doc.ratingCount,
+          prepTime: doc.prepTime,
+          cookTime: doc.cookTime,
+          totalTime: doc.totalTime,
+          servings: doc.servings,
+          excerpt: doc.excerpt,
+          intro: doc.intro,
+          isFeatured: doc.isFeatured,
+          ingredients: doc.ingredients,
+          instructions: doc.instructions,
+          notes: formatRecipeNotes(doc.notes),
+          tags: doc.tags,
+          author: formatPopulatedAuthor(doc.author),
+          publishedDate: doc.publishedDate,
+          status: doc.status || "published",
+        })),
+      ];
+    }
+
+    return related;
+  } catch (error) {
+    console.error("Failed to fetch related recipes from database:", error);
+    return [];
+  }
 }
 
 export type UpdateRecipeInput = CreateRecipeInput;
@@ -342,8 +592,15 @@ export async function updateRecipe(
       };
     }
 
-    // 2. Validate basic input fields
-    const title = data.title?.trim();
+    // 2. Sanitize against NoSQL operator and SQL injection
+    const safeData = sanitizeMongoInput(data);
+    const cleanOriginalSlug = sanitizeSqlInput(originalSlug);
+    if (hasSqlInjection(cleanOriginalSlug)) {
+      return { success: false, error: "Invalid recipe identifier." };
+    }
+
+    // 3. Validate basic input fields
+    const title = safeData.title?.trim();
     if (!title || title.length < 3) {
       return {
         success: false,
@@ -374,18 +631,10 @@ export async function updateRecipe(
       data.excerpt?.trim() ||
       `${title} — an authentic, comforting Sri Lankan recipe made with aromatic spices and traditional ingredients.`;
 
-    // 3. Format or validate slug
-    let newSlug = data.slug?.trim().toLowerCase();
+    // 3. Format or validate SEO-friendly slug
+    let newSlug = generateSlug(data.slug || title);
     if (!newSlug) {
-      newSlug = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-    } else {
-      newSlug = newSlug
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+      newSlug = originalSlug;
     }
 
     await connectToDatabase();
@@ -438,6 +687,7 @@ export async function updateRecipe(
     const existingDoc = await RecipeModel.findOne({ slug: originalSlug });
 
     if (existingDoc) {
+      const previousImage = existingDoc.image;
       existingDoc.slug = newSlug;
       existingDoc.title = title;
       existingDoc.category = category;
@@ -456,9 +706,33 @@ export async function updateRecipe(
       if (data.status) {
         existingDoc.status = data.status;
       }
+      // Ensure author is set as ObjectId foreign key
+      if (
+        !existingDoc.author ||
+        !Types.ObjectId.isValid(existingDoc.author as unknown as string | Types.ObjectId)
+      ) {
+        existingDoc.author =
+          session.userId && Types.ObjectId.isValid(session.userId)
+            ? new Types.ObjectId(session.userId)
+            : await getOrCreateDefaultAuthorId();
+      }
       await existingDoc.save();
+
+      // Clean up previous image from blob storage if updated with a new image
+      if (previousImage && previousImage !== image) {
+        try {
+          await deleteBlobByUrl(previousImage);
+        } catch (imgErr) {
+          console.warn("Failed to delete old recipe image blob:", imgErr);
+        }
+      }
     } else {
-      // Upsert: Create a new document in MongoDB from the static recipe
+      // Upsert: Create a new document in MongoDB from the static recipe with logged user as author
+      const authorId =
+        session.userId && Types.ObjectId.isValid(session.userId)
+          ? new Types.ObjectId(session.userId)
+          : await getOrCreateDefaultAuthorId();
+
       await RecipeModel.create({
         slug: newSlug,
         title,
@@ -477,11 +751,7 @@ export async function updateRecipe(
         instructions: sanitizedInstructions,
         notes: (data.notes || []).map((n) => n.trim()).filter(Boolean),
         tags: (data.tags || []).map((t) => t.trim().toLowerCase()).filter(Boolean),
-        author: {
-          name: session.name || "Chef Amara Perera",
-          role: session.role === "admin" ? "Master Chef & Founder" : "Culinary Contributor",
-          avatar: "/images/recipes/sri-lankan-chicken-curry.jpg",
-        },
+        author: authorId,
         status: data.status || "published",
         publishedDate: new Date().toISOString().split("T")[0],
       });
@@ -531,7 +801,23 @@ export async function deleteRecipe(
     }
 
     await connectToDatabase();
-    await RecipeModel.findOneAndDelete({ slug });
+    const deleted = await RecipeModel.findOneAndDelete({ slug });
+
+    // 1. Delete associated hero image from blob storage
+    if (deleted && deleted.image) {
+      try {
+        await deleteBlobByUrl(deleted.image);
+      } catch (imgErr) {
+        console.warn("Failed to delete recipe image blob:", imgErr);
+      }
+    }
+
+    // 2. Clean up associated recipe ratings
+    try {
+      await RecipeRating.deleteMany({ recipeSlug: slug });
+    } catch (rateErr) {
+      console.warn("Failed to delete recipe ratings:", rateErr);
+    }
 
     revalidatePath("/admin/recipes");
     revalidatePath("/admin");
@@ -548,6 +834,86 @@ export async function deleteRecipe(
         error instanceof Error
           ? error.message
           : "An unexpected error occurred while deleting the recipe.",
+    };
+  }
+}
+
+export type RateRecipeResult = {
+  success: boolean;
+  newRating?: number;
+  newRatingCount?: number;
+  userRating?: number;
+  error?: string;
+};
+
+/**
+ * Server action allowing any user to submit a star rating (1-5).
+ * Does NOT require or check author or user authentication.
+ * Persists rating in MongoDB using direct field update and revalidates paths.
+ */
+export async function rateRecipe(
+  slug: string,
+  rating: number
+): Promise<RateRecipeResult> {
+  try {
+    const trimmedSlug = sanitizeSqlInput(slug);
+    if (!trimmedSlug || hasSqlInjection(trimmedSlug)) {
+      return { success: false, error: "Recipe slug is required." };
+    }
+
+    const starValue = Math.round(Number(rating));
+    if (isNaN(starValue) || starValue < 1 || starValue > 5) {
+      return { success: false, error: "Rating must be an integer between 1 and 5." };
+    }
+
+    await connectToDatabase();
+
+    // 1. Locate current recipe document to read current rating metrics
+    const recipeDoc = await RecipeModel.findOne({ slug: trimmedSlug }).lean();
+
+    if (!recipeDoc) {
+      return { success: false, error: "Recipe not found." };
+    }
+
+    if (recipeDoc.status === "draft") {
+      return { success: false, error: "Cannot rate an unpublished or draft recipe." };
+    }
+
+    // 2. Compute updated rating average and increment count
+    const oldCount = recipeDoc?.ratingCount || 0;
+    const oldRating = recipeDoc?.rating || 0;
+    const newCount = oldCount + 1;
+    const newTotal = (oldRating * oldCount) + starValue;
+    const newAverage = Math.max(1, Math.min(5, Math.round((newTotal / newCount) * 10) / 10));
+
+    // 3. Update ONLY rating and ratingCount (never touches, checks, or requires author)
+    await RecipeModel.updateOne(
+      { slug: trimmedSlug },
+      { $set: { rating: newAverage, ratingCount: newCount } }
+    );
+
+    // 4. Save rating record to RecipeRating
+    await RecipeRating.create({
+      recipeSlug: trimmedSlug,
+      rating: starValue,
+    });
+
+    // 5. Revalidate pages displaying recipe ratings
+    revalidatePath(`/recipes/${trimmedSlug}`);
+    revalidatePath("/recipes");
+    revalidatePath("/");
+
+    return {
+      success: true,
+      newRating: newAverage,
+      newRatingCount: newCount,
+      userRating: starValue,
+    };
+  } catch (error: unknown) {
+    console.error("Failed to rate recipe:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to record star rating.",
     };
   }
 }
