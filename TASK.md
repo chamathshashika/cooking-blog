@@ -606,3 +606,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Moved `showToast` and `localStorage` side effects outside of the React state updater function (`setAutoSaveEnabled`) so that toggling autosave fires strictly once per user interaction.
 - [x] Resolved TS2322 Notes Type Incompatibility (`lib/actions/recipe.ts`):
   - Updated `PopulatedRecipeDoc.notes` to `string[] | string` and introduced `formatRecipeNotes` helper to normalize string or array notes into `string[] | undefined`, satisfying strict TypeScript type assignments against `Recipe[]`.
+
+### Phase 24: Remove Admin Link from Site Footer
+
+- [x] Site Footer Navigation Cleanup (`components/Footer.tsx`):
+  - Removed the discreet "Admin" (`ADMIN`) navigation link from the bottom legal and utility bar in the public footer.
+  - Preserved Privacy, Terms, Contact links, and theme toggle alignment without layout shifts or orphan dividers.
