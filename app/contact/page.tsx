@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MapPin, Clock, MessageSquare, ArrowLeft } from "lucide-react";
+import { MessageSquare, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import SocialIcons from "@/components/SocialIcons";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact Us | CeylonSpicer",
   description:
-    "Get in touch with the CeylonSpicer kitchen. Share a family recipe, ask a spice question, or say hello.",
+    "Get in touch with CeylonSpicer. Share a family recipe, ask a spice question, or say hello.",
   openGraph: {
     title: "Contact Us | CeylonSpicer",
     description:
-      "Get in touch with the CeylonSpicer kitchen. Share a family recipe, ask a spice question, or say hello.",
+      "Get in touch with CeylonSpicer. Share a family recipe, ask a spice question, or say hello.",
   },
 };
 
@@ -53,111 +52,42 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Main Content Grid */}
-        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 py-12 md:py-16">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-            {/* Left: Minimal Contact Form (7 cols) */}
-            <div className="lg:col-span-7">
-              <h2 className="font-display text-2xl text-ink dark:text-ice mb-2">
-                Send Us a Message
-              </h2>
-              <p className="font-display text-sm text-muted dark:text-slate-muted mb-6 leading-relaxed">
-                Only the essentials needed—no account creation or clutter.
+        {/* Main Content */}
+        <div className="mx-auto max-w-[720px] px-4 sm:px-6 py-12 md:py-16">
+          <div className="mb-6">
+            <h2 className="font-display text-2xl text-ink dark:text-ice mb-2">
+              Send Us a Message
+            </h2>
+            <p className="font-display text-sm text-muted dark:text-slate-muted leading-relaxed">
+              Only the essentials needed—no account creation or clutter.
+            </p>
+          </div>
+
+          <ContactForm />
+
+          {/* Recipe shortcut card */}
+          <div className="mt-8 border border-ink/10 dark:border-hairline bg-cream/40 dark:bg-surface p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="font-display text-base text-ink dark:text-ice">
+                Looking for dinner inspiration?
               </p>
-              <ContactForm />
+              <p className="font-display text-xs text-muted dark:text-slate-muted">
+                Explore our full authentic Sri Lankan recipe catalog.
+              </p>
             </div>
-
-            {/* Right: Direct Information & Details (5 cols) */}
-            <div className="lg:col-span-5 flex flex-col gap-6">
-              <div className="border border-ink/10 dark:border-hairline bg-linen/20 dark:bg-panel p-6 sm:p-8">
-                <h3 className="font-display text-xl text-ink dark:text-ice mb-6">
-                  Kitchen Details
-                </h3>
-
-                <div className="space-y-6">
-                  {/* Email */}
-                  <div className="flex items-start gap-3.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sage/10 dark:bg-surface text-sage dark:text-gold mt-0.5">
-                      <Mail className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
-                        Direct Inquiries
-                      </p>
-                      <a
-                        href="mailto:hello@CeylonSpicer-recipes.com"
-                        className="font-display text-base text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text transition-colors"
-                      >
-                        hello@CeylonSpicer-recipes.com
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Location */}
-                  <div className="flex items-start gap-3.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sage/10 dark:bg-surface text-sage dark:text-gold mt-0.5">
-                      <MapPin className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
-                        Our Roots
-                      </p>
-                      <p className="font-display text-base text-ink dark:text-ice">
-                        Colombo & Galle, Sri Lanka
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Response Time */}
-                  <div className="flex items-start gap-3.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sage/10 dark:bg-surface text-sage dark:text-gold mt-0.5">
-                      <Clock className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
-                        Response Time
-                      </p>
-                      <p className="font-display text-sm text-ink/80 dark:text-slate-muted">
-                        We typically reply within 24–48 hours.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Social Connect */}
-                <div className="mt-8 pt-6 border-t border-ink/10 dark:border-hairline">
-                  <p className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted mb-3">
-                    Connect on Social
-                  </p>
-                  <SocialIcons size="sm" />
-                </div>
-              </div>
-
-              {/* Recipe shortcut card */}
-              <div className="border border-ink/10 dark:border-hairline bg-cream/40 dark:bg-surface p-6 flex items-center justify-between">
-                <div>
-                  <p className="font-display text-base text-ink dark:text-ice">
-                    Looking for dinner inspiration?
-                  </p>
-                  <p className="font-display text-xs text-muted dark:text-slate-muted">
-                    Explore our full recipe catalog.
-                  </p>
-                </div>
-                <Link
-                  href="/recipes"
-                  className="shrink-0 bg-sage dark:bg-amber-primary px-4 py-2 font-ui text-[10px] font-bold uppercase tracking-wider text-white hover:bg-sage/90 dark:hover:bg-amber-secondary transition-colors"
-                >
-                  View Recipes
-                </Link>
-              </div>
-            </div>
+            <Link
+              href="/recipes"
+              className="shrink-0 inline-flex items-center justify-center min-h-[44px] bg-sage dark:bg-amber-primary px-5 py-2.5 font-ui text-[11px] font-bold uppercase tracking-wider text-white dark:text-obsidian hover:bg-sage/90 dark:hover:bg-amber-secondary transition-colors"
+            >
+              View Recipes
+            </Link>
           </div>
 
           {/* Bottom Back Action */}
-          <div className="mt-16 pt-8 border-t border-ink/10 dark:border-hairline">
+          <div className="mt-12 pt-8 border-t border-ink/10 dark:border-hairline">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-sage dark:text-amber-text hover:text-ink dark:hover:text-ice transition-colors"
+              className="inline-flex min-h-[44px] items-center gap-2 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-sage dark:text-amber-text hover:text-ink dark:hover:text-ice transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Home</span>
