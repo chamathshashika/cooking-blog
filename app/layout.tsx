@@ -150,6 +150,10 @@ export default async function RootLayout({
           }}
         />
         <GoogleAnalytics gaId="G-K0QQFXPCCD" />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-9028339042320547"
+        ></meta>
       </head>
       <body
         suppressHydrationWarning
