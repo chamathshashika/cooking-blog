@@ -5,8 +5,9 @@ import {
   BookOpen,
   Utensils,
   AlertTriangle,
-  HeartHandshake,
+  Megaphone,
   ArrowLeft,
+  ExternalLink,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,11 +15,11 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Terms of Service | CeylonSpicer",
   description:
-    "Terms of service and fair usage guidelines for CeylonSpicer recipes, photography, and Sri Lankan culinary stories.",
+    "Terms of service, advertising disclosures, and fair usage guidelines for CeylonSpicer recipes, photography, and Sri Lankan culinary stories.",
   openGraph: {
     title: "Terms of Service | CeylonSpicer",
     description:
-      "Simple, fair guidelines for enjoying our Sri Lankan recipes, photography, and cooking guides.",
+      "Simple, fair guidelines for enjoying our Sri Lankan recipes, photography, advertising disclosures, and cooking guides.",
   },
 };
 
@@ -39,16 +40,16 @@ export default function TermsPage() {
         "Our original recipe texts, culinary essays, and food photography are protected. Please credit CeylonSpicer with a direct link when referencing our work.",
     },
     {
+      icon: Megaphone,
+      title: "Advertising & Affiliates",
+      description:
+        "We display ads through third-party ad networks and may feature curated affiliate links. Third-party ad content and external services are independently operated.",
+    },
+    {
       icon: AlertTriangle,
       title: "Allergens & Health",
       description:
         "Sri Lankan recipes frequently use coconut, nuts, seafood, and robust spices. Always verify ingredients to ensure they align with your dietary requirements.",
-    },
-    {
-      icon: HeartHandshake,
-      title: "Community Respect",
-      description:
-        "We are dedicated to celebrating culinary heritage. We welcome friendly food discussions, recipe tips, and constructive culinary feedback.",
     },
   ];
 
@@ -73,7 +74,7 @@ export default function TermsPage() {
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 dark:bg-sage/20 text-sage dark:text-sage-light font-ui text-[10px] font-bold uppercase tracking-[0.12em]">
               <FileText className="h-3.5 w-3.5" />
-              <span>Fair Usage Guidelines</span>
+              <span>Fair Usage & Disclosures</span>
             </div>
 
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight">
@@ -82,7 +83,7 @@ export default function TermsPage() {
 
             <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto leading-relaxed">
               Simple, fair guidelines for enjoying our authentic Sri Lankan
-              recipes, photography, and culinary stories.
+              recipes, food photography, advertising disclosures, and culinary stories.
             </p>
 
             <p className="mt-4 font-ui text-xs text-muted dark:text-slate-muted">
@@ -195,13 +196,42 @@ export default function TermsPage() {
 
             <section className="border-t border-ink/10 dark:border-hairline pt-8">
               <h2 className="font-display text-2xl text-ink dark:text-ice mb-3">
-                5. External Links & Third-Party Content
+                5. Advertisements, Affiliate Links & External Content
               </h2>
               <p>
-                Our articles may occasionally reference external sources,
-                historical culinary archives, or spice suppliers. We do not
-                control and are not responsible for the availability, accuracy,
-                or privacy policies of third-party websites.
+                To maintain our recipe database and keep our culinary content free of charge, CeylonSpicer displays
+                advertisements through authorized{" "}
+                <strong className="text-ink dark:text-ice">third-party advertising networks</strong>.
+              </p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>
+                  <strong className="text-ink dark:text-ice">Third-Party Advertisers:</strong> We do not endorse,
+                  guarantee, or make representations about products, services, or claims presented in advertisements
+                  served by third-party ad networks. Any dealings, purchases, or correspondence with advertisers are
+                  strictly between you and the respective third-party vendor.
+                </li>
+                <li>
+                  <strong className="text-ink dark:text-ice">Affiliate Links:</strong> Some recipes may feature
+                  affiliate product links for cooking tools and authentic spices. When you click these links and
+                  make a purchase, we may earn a small referral commission at zero additional cost to you.
+                </li>
+                <li>
+                  <strong className="text-ink dark:text-ice">External Websites:</strong> We occasionally link to
+                  cultural archives, spice producers, or reference websites. We do not control and are not
+                  responsible for the content, privacy practices, or availability of any third-party websites.
+                </li>
+              </ul>
+              <p className="mt-3">
+                For detailed information on how third-party advertising partners use cookies and
+                how you can manage ad preferences, please consult our{" "}
+                <Link
+                  href="/privacy"
+                  className="font-semibold text-sage dark:text-amber-text underline hover:text-ink dark:hover:text-ice inline-flex items-center gap-1"
+                >
+                  <span>Privacy Policy</span>
+                  <ExternalLink className="h-3 w-3 inline" />
+                </Link>
+                .
               </p>
             </section>
 
@@ -210,16 +240,22 @@ export default function TermsPage() {
                 6. Modifications & Contact
               </h2>
               <p>
-                We reserve the right to refine these terms as our platform
-                evolves. Any updates will be clearly posted on this page with an
-                updated timestamp.
+                We reserve the right to refine these terms as our platform and advertising partnerships evolve.
+                Any updates will be clearly posted on this page with an updated timestamp.
               </p>
               <p className="mt-2">
-                For questions regarding recipe licensing, content syndication,
-                or friendly feedback, please contact us at{" "}
+                For questions regarding recipe licensing, content syndication, or friendly feedback, please contact
+                us at{" "}
                 <span className="font-mono text-xs bg-cream dark:bg-panel px-2 py-0.5 border border-ink/10 dark:border-hairline text-ink dark:text-ice">
                   hello@CeylonSpicer-recipes.com
-                </span>
+                </span>{" "}
+                or via our{" "}
+                <Link
+                  href="/contact"
+                  className="font-semibold text-sage dark:text-amber-text underline hover:text-ink dark:hover:text-ice"
+                >
+                  Contact Page
+                </Link>
                 .
               </p>
             </section>

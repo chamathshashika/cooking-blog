@@ -6,9 +6,11 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Phase 12 (Dark Theme Palette Integration & Theme Mode Switcher) Complete
+- **Active Phase**: Phase 25 (Third-Party Advertising Compliance, Privacy Policy, Terms & Contact Updates) Complete
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
-- **Last Updated**: 2026-10-23
+- **Last Updated**: 2026-10-25
+
+
 
 ---
 
@@ -612,3 +614,24 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 - [x] Site Footer Navigation Cleanup (`components/Footer.tsx`):
   - Removed the discreet "Admin" (`ADMIN`) navigation link from the bottom legal and utility bar in the public footer.
   - Preserved Privacy, Terms, Contact links, and theme toggle alignment without layout shifts or orphan dividers.
+
+### Phase 25: Third-Party Advertising Compliance, Privacy Policy, Terms & Contact Updates
+
+- [x] Privacy Policy Advertising & Cookie Compliance (`app/privacy/page.tsx`):
+  - Updated metadata, summary cards, and detailed disclosures to satisfy digital advertising standards and reader transparency requirements.
+  - Replaced legacy "No Data Tracking" and "No Invasive Cookies" statements with comprehensive disclosures regarding authorized third-party advertising networks and cookie usage, without referencing specific vendor brand names.
+  - Included required disclosures that Google and third-party partners use cookies to serve ads based on user visits across CeylonSpicer and other internet sites.
+  - Integrated active opt-out links for Google Ads Settings (`https://www.google.com/settings/ads`), aboutads.info (`https://www.aboutads.info`), and the Network Advertising Initiative (NAI).
+  - Disclosed Google Analytics usage with link to the official Google Analytics Opt-out Browser Add-on.
+  - Clearly distinguished functional local storage (theme selection, interactive ingredients checklist, recipe ratings) from third-party advertising cookies.
+  - Added disclosures for voluntary newsletter subscription and affiliate culinary links.
+- [x] Terms of Service Advertising & Disclosures Update (`app/terms/page.tsx`):
+  - Added dedicated "Advertising & Affiliates" summary card.
+  - Expanded Section 5 to cover third-party advertisements via authorized ad networks, affiliate product links, and external website disclaimers without specific brand naming.
+  - Linked directly to the Privacy Policy for advertising cookie preferences.
+- [x] Contact Page Kitchen Details Removal (`app/contact/page.tsx`):
+  - Removed the "Kitchen Details" information card (inquiries, location, response times, and social connect).
+  - Re-centered the contact form in a focused, elegant single-column layout with the recipe exploration shortcut card and 44px minimum touch targets.
+  - Cleaned up unused Lucide icon imports (`Mail`, `MapPin`, `Clock`, `SocialIcons`).
+
+
