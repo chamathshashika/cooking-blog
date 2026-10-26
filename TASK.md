@@ -6,9 +6,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
 
 ## Current Status
 
-- **Active Phase**: Phase 25 (Third-Party Advertising Compliance, Privacy Policy, Terms & Contact Updates) Complete
+- **Active Phase**: Phase 26 (Internationalization & Language Switcher - English & Italian) Complete
 - **Status**: Production Ready & Fully Verified against `AGENTS.md` and `brandGuidelines.md`
-- **Last Updated**: 2026-10-25
+- **Last Updated**: 2026-10-26
 
 
 
@@ -633,5 +633,37 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - Removed the "Kitchen Details" information card (inquiries, location, response times, and social connect).
   - Re-centered the contact form in a focused, elegant single-column layout with the recipe exploration shortcut card and 44px minimum touch targets.
   - Cleaned up unused Lucide icon imports (`Mail`, `MapPin`, `Clock`, `SocialIcons`).
+
+### Phase 26: Internationalization & Language Switcher (English & Italian / Italy)
+
+- [x] Type-Safe i18n Dictionary Architecture (`lib/i18n/types.ts`, `lib/i18n/translations.ts`):
+  - Created strongly typed `Language = "en" | "it"` definitions and comprehensive `TranslationDictionary` interface.
+  - Implemented authentic Italian translations for common actions, navigation, dropdown categories, hero banners, search placeholders, newsletter subscription, recipe details, rating widgets, contact forms, and about stories.
+- [x] Client State & Cookie Synchronization (`components/LanguageProvider.tsx`, `app/layout.tsx`):
+  - Built `LanguageProvider` and `useLanguage` hook.
+  - Synchronizes preference across `localStorage` (`ceylonspicer_language`) and cookie (`ceylonspicer_language=en|it; path=/; max-age=31536000; SameSite=Lax`).
+  - Added initial server-side cookie detection in `app/layout.tsx` and dynamic `<html lang="...">` injection to prevent layout shifts or flash of unlocalized content.
+- [x] Brand-Aligned Compact Language Toggle UI (`components/LanguageToggle.tsx`):
+  - Refined segmented pill (`[ EN | IT ]`) to be noticeably smaller, sleeker, and unobtrusive (`h-7` pill container with `h-6 min-w-[24px]` inner buttons and `text-[10px]` tracking) to sit gracefully next to theme toggles, search buttons, and icons.
+  - Provided compact minimal and default variants with scaled-down globe icons and zero layout shift on mount.
+  - Integrated into `Header.tsx` (desktop utility bar & mobile header/drawer) and `Footer.tsx`.
+- [x] Dynamic Content Localization Engine & Database Translation Integration:
+  - Added `translations` schema support (`translations?: { it?: IRecipeTranslation; [locale: string]: IRecipeTranslation | undefined; }`) to Mongoose `RecipeSchema` in `lib/models/Recipe.ts`.
+  - Added `translations` field support to `Recipe` type in `lib/data.ts`.
+  - Created dynamic culinary translation engine (`lib/i18n/culinaryTranslator.ts`) providing lexical translation for culinary titles, cooking time formats, ingredients amounts/units, and instruction phrases as a graceful fallback for newly created user recipes.
+  - Updated `lib/actions/recipe.ts`:
+    - Persisted native Italian recipe translations directly into MongoDB documents for core recipes during migration.
+    - Updated `getRecipes()`, `findRecipeBySlug()`, and `getRelatedRecipes()` to fetch and return `translations: doc.translations`.
+    - Updated `createRecipe()` and `updateRecipe()` to accept and persist `translations`.
+  - Completely stripped all hardcoded mock recipe structures and fake categories from frontend files, honoring user-generated content principles.
+  - Implemented schema-aware `localizeRecipe()` in `lib/i18n/dynamicContent.ts`: prioritizes database-stored `recipe.translations.it` and uses dynamic culinary translation fallback when manual translations are not supplied.
+- [x] Component-Wide & Page-Level Multi-Language Integration:
+  - `RecipeCard.tsx`: Client-level reactive translation accepting `translations` prop so dish title, category, and cooking times switch instantly on toggle click across featured rows, grids, and related recipes.
+  - `FeaturedRow.tsx`, `RecipesFilterView.tsx`, `app/page.tsx`, `app/category/[slug]/page.tsx`, `app/recipes/[slug]/page.tsx`: Pass `translations={recipe.translations}` to `RecipeCard`.
+  - `CategoryCarousel.tsx`: Client-level reactive category name translation for all carousel items.
+  - `RecipesFilterView.tsx`: Client-level reactive filtering and bilingual search matching (Italian and English terms for title, excerpt, category, tags, and ingredients).
+  - `app/page.tsx`, `app/recipes/page.tsx`, `app/recipes/[slug]/page.tsx`, `app/category/page.tsx`, `app/category/[slug]/page.tsx`: Server-side cookie-driven localization of recipe data, category metadata, ingredients checklist, steps, and related dishes with live client revalidation.
+  - `Header.tsx`, `Footer.tsx`, `SubscribeBanner.tsx`, `IngredientsList.tsx`, `RecipeRatingWidget.tsx`, `ContactForm.tsx`, `app/about/page.tsx`, `app/contact/page.tsx`: Full UI string and feedback state localization.
+
 
 

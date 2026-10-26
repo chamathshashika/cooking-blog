@@ -5,6 +5,9 @@ import { Utensils, Flame, Sparkles, Heart, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SubscribeBanner from "@/components/SubscribeBanner";
+import { cookies } from "next/headers";
+import { translations } from "@/lib/i18n/translations";
+import type { Language } from "@/lib/i18n/types";
 
 export const metadata: Metadata = {
   title: "About Us | Authentic Sri Lankan Culinary Heritage | CeylonSpicer",
@@ -17,25 +20,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const cookieStore = await cookies();
+  const lang = (cookieStore.get("ceylonspicer_language")?.value as Language) || "en";
+  const dict = translations[lang] || translations.en;
+
   const pillars = [
     {
       icon: Utensils,
-      title: "Heirloom Family Recipes",
-      description:
-        "Every recipe shared on CeylonSpicer originates from generational Sri Lankan home kitchens—passed down through handwritten notebooks, simmered in clay pots, and perfected across family tables.",
+      title: dict.about.p1Title,
+      description: dict.about.p1Desc,
     },
     {
       icon: Flame,
-      title: "Mastery of Island Spices",
-      description:
-        "From true Ceylon cinnamon (Cinnamomum verum) and dark-roasted black curry powders to fragrant pandan and tempered mustard seeds, we demystify the bold aromatics of the island.",
+      title: dict.about.p2Title,
+      description: dict.about.p2Desc,
     },
     {
       icon: Heart,
-      title: "Warm, Welcoming Cooking",
-      description:
-        "We believe homestyle cooking should feel comforting and effortless. We break down traditional techniques with clear steps, measured ingredients, and practical kitchen tips.",
+      title: dict.about.p3Title,
+      description: dict.about.p3Desc,
     },
   ];
 
@@ -51,10 +55,10 @@ export default function AboutPage() {
               href="/"
               className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Home
+              {dict.nav.home}
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-ink dark:text-ice font-semibold">About</span>
+            <span className="text-ink dark:text-ice font-semibold">{dict.nav.about}</span>
           </div>
         </div>
 
@@ -63,17 +67,15 @@ export default function AboutPage() {
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-sage/10 dark:bg-panel text-sage dark:text-amber-text font-ui text-[10px] font-bold uppercase tracking-[0.12em] border border-transparent dark:border-hairline">
               <Sparkles className="h-3.5 w-3.5 text-sage dark:text-gold" />
-              <span>Our Culinary Journey</span>
+              <span>{dict.about.badge}</span>
             </div>
 
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight max-w-3xl mx-auto">
-              Preserving the Warmth of Sri Lankan Home Cooking
+              {dict.about.title}
             </h1>
 
             <p className="mt-4 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-2xl mx-auto leading-relaxed">
-              CeylonSpicer is a labor of love dedicated to the flavors of our
-              island home—where the aroma of toasted spices, crackling curry
-              leaves, and sweet coconut milk brings family and friends together.
+              {dict.about.subtitle}
             </p>
           </div>
         </section>
@@ -96,20 +98,19 @@ export default function AboutPage() {
                 Ayubowan & Welcome
               </p>
               <h2 className="font-display text-2xl sm:text-3xl text-ink dark:text-ice leading-snug">
-                Food That Tells the Story of an Island
+                {lang === "it"
+                  ? "Cibo che Racconta la Storia di un'Isola"
+                  : "Food That Tells the Story of an Island"}
               </h2>
               <p className="text-base">
-                Sri Lanka&apos;s culinary heritage is shaped by rich coastal
-                trade routes, ancient irrigation valleys, and diverse cultural
-                communities. From the fiery seafood curries of Jaffna and the
-                fragrant Dutch Burghers&apos; lamprais to comforting southern
-                ambul thiyal, each dish carries centuries of memories.
+                {lang === "it"
+                  ? "Il patrimonio culinario dello Sri Lanka è modellato da antiche rotte commerciali, fertili valli irrigate e una ricca diversità culturale. Dalle spezie tostate e piccanti ai curry aromatici di pesce e carne, ogni piatto porta con sé secoli di sapori e memorie familiari."
+                  : "Sri Lanka's culinary heritage is shaped by rich coastal trade routes, ancient irrigation valleys, and diverse cultural communities. From the fiery seafood curries of Jaffna and the fragrant Dutch Burghers' lamprais to comforting southern ambul thiyal, each dish carries centuries of memories."}
               </p>
               <p className="text-base">
-                At CeylonSpicer, our kitchen philosophy is simple: celebrate
-                authentic ingredients, honor the patience required for slow
-                roasting and gentle simmering, and make these beloved recipes
-                accessible to cooks around the world.
+                {lang === "it"
+                  ? "La nostra filosofia è semplice: celebrare ingredienti autentici, rispettare la pazienza della tostatura lenta e rendere queste ricette tradizionali accessibili e chiare per ogni appassionato di cucina."
+                  : "At CeylonSpicer, our kitchen philosophy is simple: celebrate authentic ingredients, honor the patience required for slow roasting and gentle simmering, and make these beloved recipes accessible to cooks around the world."}
               </p>
             </div>
           </div>
@@ -118,15 +119,15 @@ export default function AboutPage() {
         {/* Pillars / Values Section */}
         <section
           className="border-y border-ink/10 dark:border-hairline bg-linen/20 dark:bg-panel/30 py-14 md:py-20"
-          aria-label="Our Culinary Principles"
+          aria-label={dict.about.pillarsTitle}
         >
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             <div className="text-center max-w-xl mx-auto mb-12">
               <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted dark:text-amber-text mb-2">
-                What Guides Us
+                {lang === "it" ? "Cosa Ci Guida" : "What Guides Us"}
               </p>
               <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-ink dark:text-ice">
-                Our Cooking Principles
+                {dict.about.pillarsTitle}
               </h2>
             </div>
 
@@ -157,26 +158,28 @@ export default function AboutPage() {
         {/* Explore Invitation */}
         <section className="mx-auto max-w-[900px] px-4 sm:px-6 py-14 md:py-20 text-center">
           <h2 className="font-display text-3xl sm:text-4xl text-ink dark:text-ice mb-4">
-            Ready to Cook Something Wonderful?
+            {lang === "it"
+              ? "Pronti a Cucinare Qualcosa di Meraviglioso?"
+              : "Ready to Cook Something Wonderful?"}
           </h2>
           <p className="font-display text-base text-ink/80 dark:text-slate-muted max-w-xl mx-auto mb-8 leading-relaxed">
-            Whether you&apos;re crafting fresh string hoppers for breakfast or
-            slow-simmering a rich chicken curry for dinner, we invite you into
-            our kitchen.
+            {lang === "it"
+              ? "Che tu stia preparando string hoppers freschi per colazione o un ricco pollo al curry per cena, ti diamo il benvenuto nella nostra cucina."
+              : "Whether you're crafting fresh string hoppers for breakfast or slow-simmering a rich chicken curry for dinner, we invite you into our kitchen."}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/recipes"
               className="inline-flex min-h-[44px] items-center gap-2 bg-sage dark:bg-amber-primary px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark dark:hover:bg-amber-secondary transition-colors shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
             >
-              <span>Explore All Recipes</span>
+              <span>{dict.home.browseAll}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/category"
               className="inline-flex min-h-[44px] items-center gap-2 border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-7 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink dark:text-ice hover:bg-cream dark:hover:bg-panel hover:border-ink/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              <span>Browse Categories</span>
+              <span>{dict.nav.allCategories}</span>
             </Link>
           </div>
         </section>

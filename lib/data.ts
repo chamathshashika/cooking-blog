@@ -22,6 +22,19 @@ export type RecipeAuthor = {
   avatar: string;
 };
 
+export type RecipeTranslation = {
+  title?: string;
+  category?: string;
+  prepTime?: string;
+  cookTime?: string;
+  totalTime?: string;
+  excerpt?: string;
+  intro?: string;
+  ingredients?: Ingredient[];
+  instructions?: Instruction[];
+  notes?: string[];
+};
+
 export type Recipe = {
   id: string;
   slug: string;
@@ -44,6 +57,10 @@ export type Recipe = {
   author?: RecipeAuthor;
   publishedDate?: string;
   status?: "draft" | "published";
+  translations?: {
+    it?: RecipeTranslation;
+    [locale: string]: RecipeTranslation | undefined;
+  };
 };
 
 export type Category = {

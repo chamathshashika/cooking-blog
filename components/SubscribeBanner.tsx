@@ -3,8 +3,10 @@
 import { useActionState } from "react";
 import { subscribeNewsletter, type SubscribeResponse } from "@/lib/actions/newsletter";
 import { Loader2, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "./LanguageProvider";
 
 export default function SubscribeBanner() {
+  const { t } = useLanguage();
   const [state, formAction, isPending] = useActionState<SubscribeResponse | null, FormData>(
     subscribeNewsletter,
     null
@@ -12,18 +14,18 @@ export default function SubscribeBanner() {
 
   return (
     <section
-      aria-label="Subscribe to newsletter"
+      aria-label={t.subscribe.badge}
       className="w-full bg-sunshine dark:bg-panel dark:border-y dark:border-hairline py-12 md:py-16 text-center transition-colors duration-200"
     >
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <p className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-ink dark:text-amber-text">
-          Subscribe via email
+          {t.subscribe.badge}
         </p>
         <h2 className="mt-2 font-display text-3xl md:text-4xl text-ink dark:text-ice">
-          Never miss a recipe
+          {t.subscribe.title}
         </h2>
         <p className="mt-1 text-sm md:text-base font-display text-ink/80 dark:text-slate-muted max-w-lg mx-auto">
-          Get weekly Sri Lankan dishes, family spice blends, and cooking tips delivered straight to your inbox.
+          {t.subscribe.subtitle}
         </p>
 
         {state?.success ? (
@@ -39,19 +41,19 @@ export default function SubscribeBanner() {
             <input
               type="text"
               name="name"
-              placeholder="Your name"
+              placeholder={t.subscribe.namePlaceholder}
               required
               disabled={isPending}
-              aria-label="Your name"
+              aria-label={t.subscribe.namePlaceholder}
               className="min-h-[44px] h-11 w-full sm:w-48 bg-white dark:bg-surface px-3.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted/70 dark:placeholder:text-slate-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider border border-transparent dark:border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-60"
             />
             <input
               type="email"
               name="email"
-              placeholder="Your email address"
+              placeholder={t.subscribe.emailPlaceholder}
               required
               disabled={isPending}
-              aria-label="Your email address"
+              aria-label={t.subscribe.emailPlaceholder}
               className="min-h-[44px] h-11 w-full sm:w-64 bg-white dark:bg-surface px-3.5 font-ui text-xs text-ink dark:text-ice placeholder:text-muted/70 dark:placeholder:text-slate-muted/70 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-wider border border-transparent dark:border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary disabled:opacity-60"
             />
             <button
@@ -60,7 +62,7 @@ export default function SubscribeBanner() {
               className="min-h-[44px] h-11 w-full sm:w-auto bg-sage dark:bg-amber-primary px-7 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-150 hover:bg-sage-dark dark:hover:bg-amber-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-75 inline-flex items-center justify-center gap-2"
             >
               {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              <span>{isPending ? "Subscribing..." : "Sign Up"}</span>
+              <span>{isPending ? t.subscribe.subscribing : t.subscribe.button}</span>
             </button>
           </form>
         )}

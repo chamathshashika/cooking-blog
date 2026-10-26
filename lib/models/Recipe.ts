@@ -17,6 +17,19 @@ export interface IInstruction {
   text: string;
 }
 
+export interface IRecipeTranslation {
+  title?: string;
+  category?: string;
+  prepTime?: string;
+  cookTime?: string;
+  totalTime?: string;
+  excerpt?: string;
+  intro?: string;
+  ingredients?: IIngredient[];
+  instructions?: IInstruction[];
+  notes?: string[];
+}
+
 export interface IRecipe {
   _id?: Types.ObjectId;
   slug: string;
@@ -39,6 +52,10 @@ export interface IRecipe {
   author: Types.ObjectId | IUser;
   status: "draft" | "published";
   publishedDate?: string;
+  translations?: {
+    it?: IRecipeTranslation;
+    [locale: string]: IRecipeTranslation | undefined;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -170,6 +187,10 @@ const RecipeSchema = new Schema<IRecipe>(
     publishedDate: {
       type: String,
       default: () => new Date().toISOString().split("T")[0],
+    },
+    translations: {
+      type: Schema.Types.Mixed,
+      default: {},
     },
   },
   {
