@@ -36,6 +36,7 @@ export default function FeaturedRow({ recipes }: Props) {
               slug={recipe.slug}
               rating={recipe.rating}
               aspectRatio="3/4"
+              translations={recipe.translations}
               priority={index < 2}
             />
           ))}

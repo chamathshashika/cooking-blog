@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "./LanguageProvider";
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,10 +33,9 @@ export default function ContactForm() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sage/15 dark:bg-success/15 text-sage dark:text-success">
           <CheckCircle2 className="h-7 w-7" />
         </div>
-        <h3 className="font-display text-2xl text-ink dark:text-ice mb-2">Stuti! (Thank you)</h3>
+        <h3 className="font-display text-2xl text-ink dark:text-ice mb-2">{t.contact.thankYou}</h3>
         <p className="font-display text-sm text-ink/80 dark:text-slate-muted max-w-md mx-auto leading-relaxed mb-6">
-          Your message has been sent to our kitchen. We read every note and will get back to you
-          as soon as the pots are simmered down!
+          {t.contact.thankYouDesc}
         </p>
         <button
           onClick={() => {
@@ -43,7 +44,7 @@ export default function ContactForm() {
           }}
           className="inline-flex min-h-[44px] items-center gap-2 border border-ink/20 dark:border-hairline bg-white dark:bg-surface px-6 py-2.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-ink dark:text-ice hover:bg-cream dark:hover:bg-panel transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
         >
-          Send Another Note
+          {t.contact.sendAnother}
         </button>
       </div>
     );
@@ -58,7 +59,7 @@ export default function ContactForm() {
             htmlFor="contact-name"
             className="block font-ui text-[11px] font-bold uppercase tracking-[0.08em] text-ink dark:text-ice mb-2"
           >
-            Your Name <span className="text-red-500">*</span>
+            {t.contact.yourName} <span className="text-red-500">*</span>
           </label>
           <input
             id="contact-name"
@@ -77,7 +78,7 @@ export default function ContactForm() {
             htmlFor="contact-email"
             className="block font-ui text-[11px] font-bold uppercase tracking-[0.08em] text-ink dark:text-ice mb-2"
           >
-            Email Address <span className="text-red-500">*</span>
+            {t.contact.emailAddress} <span className="text-red-500">*</span>
           </label>
           <input
             id="contact-email"
@@ -96,13 +97,13 @@ export default function ContactForm() {
             htmlFor="contact-message"
             className="block font-ui text-[11px] font-bold uppercase tracking-[0.08em] text-ink dark:text-ice mb-2"
           >
-            Message <span className="text-red-500">*</span>
+            {t.contact.message} <span className="text-red-500">*</span>
           </label>
           <textarea
             id="contact-message"
             required
             rows={5}
-            placeholder="Share a recipe question, culinary tip, or say hello..."
+            placeholder={t.contact.messagePlaceholder}
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             className="w-full rounded-none border border-ink/20 dark:border-hairline bg-white dark:bg-surface py-2.5 px-3.5 font-ui text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:border-sage dark:focus:border-amber-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sage dark:focus-visible:ring-amber-primary resize-y"
@@ -117,7 +118,7 @@ export default function ContactForm() {
             className="w-full sm:w-auto inline-flex min-h-[44px] items-center justify-center gap-2 bg-sage dark:bg-amber-primary px-8 py-3 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-white hover:bg-sage-dark dark:hover:bg-amber-secondary transition-colors shadow-xs disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <Send className="h-3.5 w-3.5" />
-            <span>{loading ? "Sending..." : "Send Message"}</span>
+            <span>{loading ? t.contact.sending : t.contact.sendMessage}</span>
           </button>
         </div>
       </div>

@@ -2,19 +2,30 @@ import Header from "@/components/Header";
 import FeaturedRow from "@/components/FeaturedRow";
 import SubscribeBanner from "@/components/SubscribeBanner";
 import CategoryCarousel from "@/components/CategoryCarousel";
-import SectionHeading from "@/components/SectionHeading";
+import HomeHero from "@/components/HomeHero";
+import HomeRecentHeading from "@/components/HomeRecentHeading";
 import RecipeCard from "@/components/RecipeCard";
 import Footer from "@/components/Footer";
 import { getRecipes } from "@/lib/actions/recipe";
 import { getCategories } from "@/lib/actions/category";
+import { cookies } from "next/headers";
+import { localizeRecipes, localizeCategories } from "@/lib/i18n/dynamicContent";
+import type { Language } from "@/lib/i18n/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [recipes, categories] = await Promise.all([
+  const cookieStore = await cookies();
+  const lang = (cookieStore.get("ceylonspicer_language")?.value as Language) || "en";
+
+  const [rawRecipes, rawCategories] = await Promise.all([
     getRecipes(),
     getCategories(),
   ]);
+
+  const recipes = localizeRecipes(rawRecipes, lang);
+  const categories = localizeCategories(rawCategories, lang);
+
   const explicitFeatured = recipes.filter((r) => r.isFeatured);
   const featuredRecipes =
     explicitFeatured.length >= 4
@@ -29,20 +40,7 @@ export default async function Home() {
 
       <main className="flex-1">
         {/* Hero Banner with H1 on Cream/Surface Background */}
-        <section className="bg-cream dark:bg-surface pt-6 pb-12 sm:pb-16 text-center border-b border-transparent dark:border-hairline transition-colors duration-200">
-          <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-            <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted dark:text-amber-text mb-2">
-              Authentic Island Flavors
-            </p>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice max-w-2xl mx-auto leading-tight">
-              Sri Lankan Recipes & Food Stories
-            </h1>
-            <p className="mt-3 font-display text-base sm:text-lg text-ink/80 dark:text-slate-muted max-w-xl mx-auto">
-              Time-honored family recipes, vibrant tropical spices, and
-              comforting homestyle cooking from the pearl of the Indian Ocean.
-            </p>
-          </div>
-        </section>
+        <HomeHero />
 
         {/* 2. Featured Row (Overlaps the cream backdrop into white) */}
         {featuredRecipes.length > 0 && (
@@ -64,11 +62,7 @@ export default async function Home() {
           className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8 md:py-16"
           aria-label="Recent Recipes"
         >
-          <SectionHeading
-            title="Recent Recipes"
-            actionText="Browse all recipes"
-            actionHref="/recipes"
-          />
+          <HomeRecentHeading />
 
           {recentRecipes.length > 0 ? (
             <div
@@ -91,6 +85,7 @@ export default async function Home() {
                   aspectRatio="4/3"
                   prepTime={recipe.prepTime}
                   cookTime={recipe.cookTime}
+                  translations={recipe.translations}
                 />
               ))}
             </div>

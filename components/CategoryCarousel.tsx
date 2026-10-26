@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Category } from "@/lib/data";
 import { getBlobDisplayUrl, isBlobProxyUrl } from "@/lib/blob-util";
+import { useLanguage } from "./LanguageProvider";
+import { localizeCategory } from "@/lib/i18n/dynamicContent";
 
 type Props = {
   categories: Category[];
@@ -13,6 +15,7 @@ type Props = {
 
 export default function CategoryCarousel({ categories }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { language, t } = useLanguage();
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -27,13 +30,13 @@ export default function CategoryCarousel({ categories }: Props) {
   return (
     <section
       className="w-full py-16 md:py-24"
-      aria-label="Explore recipes by category"
+      aria-label={t.home.exploreByCategory}
     >
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="relative flex items-center justify-between mb-10">
           <div className="w-10" />
           <h2 className="text-center font-display text-3xl md:text-4xl text-ink dark:text-ice lowercase">
-            explore by category
+            {t.home.exploreByCategory}
           </h2>
           <div className="flex items-center gap-2">
             <button
@@ -59,27 +62,30 @@ export default function CategoryCarousel({ categories }: Props) {
           tabIndex={0}
           aria-label="Category scroll list"
         >
-          {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/category/${cat.slug}`}
-              className="group flex flex-col items-center shrink-0 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
-            >
-              <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 overflow-hidden rounded-full bg-cream dark:bg-panel border-2 border-transparent dark:border-hairline transition-all duration-200 group-hover:scale-105 group-hover:border-sage dark:group-hover:border-amber-primary">
-                <Image
-                  src={getBlobDisplayUrl(cat.image)}
-                  alt={`${cat.name} category`}
-                  fill
-                  sizes="(min-width: 768px) 128px, (min-width: 640px) 112px, 96px"
-                  unoptimized={isBlobProxyUrl(cat.image)}
-                  className="object-cover"
-                />
-              </div>
-              <span className="mt-3.5 font-display text-base md:text-lg lowercase text-ink dark:text-ice transition-colors group-hover:text-sage dark:group-hover:text-amber-text">
-                {cat.name}
-              </span>
-            </Link>
-          ))}
+          {categories.map((rawCat) => {
+            const cat = localizeCategory(rawCat, language);
+            return (
+              <Link
+                key={rawCat.slug}
+                href={`/category/${rawCat.slug}`}
+                className="group flex flex-col items-center shrink-0 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+              >
+                <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 overflow-hidden rounded-full bg-cream dark:bg-panel border-2 border-transparent dark:border-hairline transition-all duration-200 group-hover:scale-105 group-hover:border-sage dark:group-hover:border-amber-primary">
+                  <Image
+                    src={getBlobDisplayUrl(rawCat.image)}
+                    alt={`${cat.name} category`}
+                    fill
+                    sizes="(min-width: 768px) 128px, (min-width: 640px) 112px, 96px"
+                    unoptimized={isBlobProxyUrl(rawCat.image)}
+                    className="object-cover"
+                  />
+                </div>
+                <span className="mt-3.5 font-display text-base md:text-lg lowercase text-ink dark:text-ice transition-colors group-hover:text-sage dark:group-hover:text-amber-text">
+                  {cat.name}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
