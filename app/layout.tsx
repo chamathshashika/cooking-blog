@@ -82,6 +82,7 @@ import { getSiteStatus } from "@/lib/actions/siteStatus";
 import AdminSiteStatusBanner from "@/components/admin/AdminSiteStatusBanner";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { LanguageProvider } from "@/components/LanguageProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -94,9 +95,11 @@ export default async function RootLayout({
   const rawPath = headersList.get("x-pathname") || "";
   const pathname = rawPath.replace(/\/$/, "") || "/";
 
-  // Check admin session
+  // Check admin session and language cookie
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session")?.value;
+  const langCookie = cookieStore.get("ceylonspicer_language")?.value;
+  const initialLanguage = langCookie === "it" ? "it" : "en";
   const session = await decrypt(sessionCookie);
   const isAdmin = session?.role === "admin";
 
@@ -127,7 +130,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang={initialLanguage}
       suppressHydrationWarning
       className={`${dmSerif.variable} ${montserrat.variable}`}
     >
@@ -146,7 +149,7 @@ export default async function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='ceylonspicer_theme';var s=localStorage.getItem(k);var p=window.matchMedia('(prefers-color-scheme: dark)').matches;var d=s==='dark'||(s!=='light'&&p);if(d){document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');document.documentElement.style.colorScheme='dark';}else{document.documentElement.classList.remove('dark');document.documentElement.setAttribute('data-theme','light');document.documentElement.style.colorScheme='light';}}catch(e){}})();`,
+            __html: `(function(){try{var k='ceylonspicer_theme';var s=localStorage.getItem(k);var p=window.matchMedia('(prefers-color-scheme: dark)').matches;var d=s==='dark'||(s!=='light'&&p);if(d){document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');document.documentElement.style.colorScheme='dark';}else{document.documentElement.classList.remove('dark');document.documentElement.setAttribute('data-theme','light');document.documentElement.style.colorScheme='light';}var lk='ceylonspicer_language';var l=localStorage.getItem(lk);if(l==='it'||l==='en'){document.documentElement.lang=l;}}catch(e){}})();`,
           }}
         />
         <GoogleAnalytics gaId="G-K0QQFXPCCD" />
@@ -159,16 +162,18 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="bg-white dark:bg-obsidian font-display text-ink dark:text-ice antialiased min-h-screen flex flex-col transition-colors duration-200"
       >
-        <ThemeProvider>
-          {isAdmin && siteStatus.mode !== "live" && (
-            <AdminSiteStatusBanner
-              mode={siteStatus.mode}
-              headline={siteStatus.headline}
-            />
-          )}
-          <ToastProvider>{children}</ToastProvider>
-          <ScrollToTop />
-        </ThemeProvider>
+        <LanguageProvider initialLanguage={initialLanguage}>
+          <ThemeProvider>
+            {isAdmin && siteStatus.mode !== "live" && (
+              <AdminSiteStatusBanner
+                mode={siteStatus.mode}
+                headline={siteStatus.headline}
+              />
+            )}
+            <ToastProvider>{children}</ToastProvider>
+            <ScrollToTop />
+          </ThemeProvider>
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>

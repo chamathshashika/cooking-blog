@@ -1,8 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import SocialIcons from "./SocialIcons";
 import ThemeToggle from "./ThemeToggle";
+import LanguageToggle from "./LanguageToggle";
+import { useLanguage } from "./LanguageProvider";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="w-full bg-cream dark:bg-surface border-t border-ink/10 dark:border-hairline mt-auto transition-colors duration-200">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-14 md:py-16">
@@ -16,9 +22,7 @@ export default function Footer() {
               CeylonSpicer
             </Link>
             <p className="mt-3 max-w-sm font-display text-sm md:text-base text-ink/80 dark:text-slate-muted leading-relaxed">
-              A celebration of vibrant Sri Lankan home cooking. Dedicated to
-              sharing time-honored family recipes, island spices, and culinary
-              heritage.
+              {t.footer.brandNarrative}
             </p>
             <div className="mt-6">
               <SocialIcons size="md" />
@@ -28,7 +32,7 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-ink dark:text-ice mb-4">
-              Explore
+              {t.footer.explore}
             </h4>
             <ul className="space-y-2.5 font-ui text-xs uppercase tracking-wider text-muted dark:text-slate-muted">
               <li>
@@ -36,7 +40,7 @@ export default function Footer() {
                   href="/"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Home
+                  {t.nav.home}
                 </Link>
               </li>
               <li>
@@ -44,7 +48,7 @@ export default function Footer() {
                   href="/recipes"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  All Recipes
+                  {t.nav.allRecipes}
                 </Link>
               </li>
               <li>
@@ -52,7 +56,7 @@ export default function Footer() {
                   href="/about"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  About Us
+                  {t.nav.about}
                 </Link>
               </li>
               <li>
@@ -60,7 +64,7 @@ export default function Footer() {
                   href="/category/breakfast"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Breakfast Favorites
+                  {t.footer.breakfastFavorites}
                 </Link>
               </li>
               <li>
@@ -68,7 +72,7 @@ export default function Footer() {
                   href="/category/dinner"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Curry & Rice
+                  {t.footer.curryRice}
                 </Link>
               </li>
             </ul>
@@ -77,7 +81,7 @@ export default function Footer() {
           {/* Categories */}
           <div>
             <h4 className="font-ui text-[11px] font-bold uppercase tracking-[0.12em] text-ink dark:text-ice mb-4">
-              Categories
+              {t.footer.categories}
             </h4>
             <ul className="space-y-2.5 font-ui text-xs uppercase tracking-wider text-muted dark:text-slate-muted">
               <li>
@@ -85,7 +89,7 @@ export default function Footer() {
                   href="/category/appetizers"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Appetizers & Short Eats
+                  {t.nav.appetizers}
                 </Link>
               </li>
               <li>
@@ -93,7 +97,7 @@ export default function Footer() {
                   href="/category/entrees"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Main Entrees
+                  {t.nav.entrees}
                 </Link>
               </li>
               <li>
@@ -101,7 +105,7 @@ export default function Footer() {
                   href="/category/sides"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Sambols & Sides
+                  {t.nav.sides}
                 </Link>
               </li>
               <li>
@@ -109,7 +113,7 @@ export default function Footer() {
                   href="/category/desserts"
                   className="hover:text-ink dark:hover:text-amber-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 >
-                  Sweets & Desserts
+                  {t.nav.desserts}
                 </Link>
               </li>
             </ul>
@@ -121,28 +125,29 @@ export default function Footer() {
           <p className="font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
             &copy;{" "}
             <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
-            CeylonSpicer. Crafted with love for Sri Lankan cuisine.
+            {t.footer.copyright}
           </p>
           <div className="flex flex-wrap items-center gap-5 sm:gap-6 font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
             <Link
               href="/privacy"
               className="hover:text-ink dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Privacy
+              {t.footer.privacy}
             </Link>
             <Link
               href="/terms"
               className="hover:text-ink dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Terms
+              {t.footer.terms}
             </Link>
             <Link
               href="/contact"
               className="hover:text-ink dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Contact
+              {t.footer.contact}
             </Link>
-            <div className="border-l border-ink/10 dark:border-hairline pl-4">
+            <div className="flex items-center gap-2 border-l border-ink/10 dark:border-hairline pl-4">
+              <LanguageToggle variant="minimal" />
               <ThemeToggle variant="minimal" />
             </div>
           </div>

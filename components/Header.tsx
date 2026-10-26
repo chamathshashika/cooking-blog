@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, ChevronDown, Menu, X } from "lucide-react";
 import SocialIcons from "./SocialIcons";
 import ThemeToggle from "./ThemeToggle";
+import LanguageToggle from "./LanguageToggle";
+import { useLanguage } from "./LanguageProvider";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,6 +16,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,41 +38,50 @@ export default function Header() {
     };
   }, [mobileMenuOpen]);
 
-  const recipeSubLinks = [
-    { label: "ALL RECIPES", href: "/recipes" },
-    { label: "BREAKFAST DISHES", href: "/category/breakfast" },
-    { label: "CURRIES & DINNERS", href: "/category/dinner" },
-    { label: "SWEETS & TREATS", href: "/category/desserts" },
-  ];
+  const recipeSubLinks = useMemo(
+    () => [
+      { label: t.nav.allRecipes, href: "/recipes" },
+      { label: t.nav.breakfastDishes, href: "/category/breakfast" },
+      { label: t.nav.curriesDinners, href: "/category/dinner" },
+      { label: t.nav.sweetsTreats, href: "/category/desserts" },
+    ],
+    [t.nav]
+  );
 
-  const categorySubLinks = [
-    { label: "ALL CATEGORIES", href: "/category" },
-    { label: "BREAKFAST", href: "/category/breakfast" },
-    { label: "CURRIES & DINNERS", href: "/category/dinner" },
-    { label: "SWEETS & TREATS", href: "/category/desserts" },
-    { label: "APPETIZERS & SHORT EATS", href: "/category/appetizers" },
-    { label: "MAIN ENTREES", href: "/category/entrees" },
-    { label: "SIDES & SAMBOLS", href: "/category/sides" },
-    { label: "LUNCH PLATTERS", href: "/category/lunch" },
-    { label: "ISLAND DRINKS", href: "/category/drinks" },
-  ];
+  const categorySubLinks = useMemo(
+    () => [
+      { label: t.nav.allCategories, href: "/category" },
+      { label: t.nav.breakfast, href: "/category/breakfast" },
+      { label: t.nav.dinner, href: "/category/dinner" },
+      { label: t.nav.desserts, href: "/category/desserts" },
+      { label: t.nav.appetizers, href: "/category/appetizers" },
+      { label: t.nav.entrees, href: "/category/entrees" },
+      { label: t.nav.sides, href: "/category/sides" },
+      { label: t.nav.lunch, href: "/category/lunch" },
+      { label: t.nav.drinks, href: "/category/drinks" },
+    ],
+    [t.nav]
+  );
 
-  const navLinks = [
-    { label: "Home", href: "/" },
-    {
-      label: "Recipes",
-      href: "/recipes",
-      hasDropdown: true,
-      subLinks: recipeSubLinks,
-    },
-    {
-      label: "Categories",
-      href: "/category",
-      hasDropdown: true,
-      subLinks: categorySubLinks,
-    },
-    { label: "About", href: "/about" },
-  ];
+  const navLinks = useMemo(
+    () => [
+      { label: t.nav.home, href: "/" },
+      {
+        label: t.nav.recipes,
+        href: "/recipes",
+        hasDropdown: true,
+        subLinks: recipeSubLinks,
+      },
+      {
+        label: t.nav.categories,
+        href: "/category",
+        hasDropdown: true,
+        subLinks: categorySubLinks,
+      },
+      { label: t.nav.about, href: "/about" },
+    ],
+    [t.nav, recipeSubLinks, categorySubLinks]
+  );
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,15 +164,17 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Social Icons, Theme Toggle & Search */}
+          {/* Social Icons, Language Toggle, Theme Toggle & Search */}
           <div className="flex items-center gap-2 pl-4 border-l border-ink/10 dark:border-hairline">
             <SocialIcons size="sm" />
+
+            <LanguageToggle variant="pill" />
 
             <ThemeToggle />
 
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              aria-label="Search recipes"
+              aria-label={t.search.placeholder}
               className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center text-ink dark:text-ice transition-colors hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
               <Search className="h-4 w-4" />
@@ -168,12 +182,13 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Hamburger, Search & Theme Toggle */}
+        {/* Mobile Language Toggle, Theme Toggle, Search & Hamburger */}
         <div className="flex items-center gap-1 sm:gap-2 lg:hidden">
+          <LanguageToggle variant="pill" />
           <ThemeToggle />
           <button
             onClick={() => setSearchOpen(!searchOpen)}
-            aria-label="Search recipes"
+            aria-label={t.search.placeholder}
             className="flex min-h-[44px] min-w-[44px] h-11 w-11 items-center justify-center text-ink dark:text-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           >
             <Search className="h-5 w-5" />
@@ -204,7 +219,7 @@ export default function Header() {
             <Search className="h-4 w-4 text-muted dark:text-slate-muted shrink-0" />
             <input
               type="search"
-              placeholder="Search recipes, ingredients, spices (Press Enter)..."
+              placeholder={t.search.placeholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-transparent font-ui text-sm text-ink dark:text-ice placeholder:text-muted dark:placeholder:text-slate-muted focus:outline-none min-h-[44px]"
@@ -215,7 +230,7 @@ export default function Header() {
               onClick={() => setSearchOpen(false)}
               className="min-h-[44px] px-3 flex items-center font-ui text-xs uppercase text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Close
+              {t.common.close}
             </button>
           </div>
         </form>
@@ -246,7 +261,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(false)}
               className="min-h-[44px] flex items-center font-ui text-sm font-semibold uppercase tracking-[0.1em] text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Home
+              {t.nav.home}
             </Link>
 
             {/* Recipes Section with sub-items */}
@@ -256,7 +271,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="min-h-[44px] flex items-center font-ui text-sm font-semibold uppercase tracking-[0.1em] text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
               >
-                Recipes
+                {t.nav.recipes}
               </Link>
               <div className="pl-3 flex flex-col gap-1 mt-1 border-l-2 border-sage/40 dark:border-amber-primary/40">
                 {recipeSubLinks.map((subLink) => (
@@ -279,7 +294,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="min-h-[44px] flex items-center font-ui text-sm font-semibold uppercase tracking-[0.1em] text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
               >
-                Categories
+                {t.nav.categories}
               </Link>
               <div className="pl-3 flex flex-col gap-1 mt-1 border-l-2 border-sage/40 dark:border-amber-primary/40">
                 {categorySubLinks.map((subLink) => (
@@ -300,12 +315,15 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(false)}
               className="min-h-[44px] flex items-center font-ui text-sm font-semibold uppercase tracking-[0.1em] text-ink dark:text-ice hover:text-sage dark:hover:text-amber-text pt-2 border-t border-ink/10 dark:border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              About
+              {t.nav.about}
             </Link>
           </nav>
           <div className="mt-auto flex items-center justify-between border-t border-ink/10 dark:border-hairline p-6">
             <SocialIcons size="md" />
-            <ThemeToggle variant="pill" />
+            <div className="flex items-center gap-2">
+              <LanguageToggle variant="pill" />
+              <ThemeToggle variant="pill" />
+            </div>
           </div>
         </div>
       )}
