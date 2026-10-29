@@ -664,6 +664,9 @@ Tracking project milestones, tasks, and implementation progress based on [AGENTS
   - `RecipesFilterView.tsx`: Client-level reactive filtering and bilingual search matching (Italian and English terms for title, excerpt, category, tags, and ingredients).
   - `app/page.tsx`, `app/recipes/page.tsx`, `app/recipes/[slug]/page.tsx`, `app/category/page.tsx`, `app/category/[slug]/page.tsx`: Server-side cookie-driven localization of recipe data, category metadata, ingredients checklist, steps, and related dishes with live client revalidation.
   - `Header.tsx`, `Footer.tsx`, `SubscribeBanner.tsx`, `IngredientsList.tsx`, `RecipeRatingWidget.tsx`, `ContactForm.tsx`, `app/about/page.tsx`, `app/contact/page.tsx`: Full UI string and feedback state localization.
+- [x] Featured Recipe Cards Prep & Cook Time Display Parity (`components/FeaturedRow.tsx`):
+  - Passed `prepTime={recipe.prepTime}` and `cookTime={recipe.cookTime}` to `RecipeCard` in `FeaturedRow.tsx`.
+  - Resolved the discrepancy where featured recipe cards on the homepage previously omitted prep/cook times in English (because props were not supplied) while showing them in Italian (where `translations.it` provided them via `localizeRecipe`). Both languages now consistently display prep and cook times.
 
 
 

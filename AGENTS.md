@@ -56,6 +56,8 @@ Do not add another library when the existing stack can solve the problem.
 - Keep components reusable.
 - Make the smallest reasonable change.
 - Check the relevant Next.js documentation in `node_modules/next/dist/docs/` when available.
+- Do not read .env file.
+- Do not go out-side the project folder, only in project folder
 
 ---
 
