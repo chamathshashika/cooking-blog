@@ -16,6 +16,10 @@ import {
   getRelatedRecipes,
 } from "@/lib/actions/recipe";
 import { verifySession } from "@/lib/dal";
+import { cookies } from "next/headers";
+import { translations } from "@/lib/i18n/translations";
+import { localizeRecipe, localizeRecipes } from "@/lib/i18n/dynamicContent";
+import type { Language } from "@/lib/i18n/types";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -30,13 +34,17 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const recipe = await findRecipeBySlug(slug);
+  const cookieStore = await cookies();
+  const lang = (cookieStore.get("ceylonspicer_language")?.value as Language) || "en";
+  const rawRecipe = await findRecipeBySlug(slug);
 
-  if (!recipe || recipe.status === "draft") {
+  if (!rawRecipe || rawRecipe.status === "draft") {
     return {
       title: "Recipe Not Found | CeylonSpicer",
     };
   }
+
+  const recipe = localizeRecipe(rawRecipe, lang);
 
   return {
     title: `${recipe.title} - Sri Lankan Recipe | CeylonSpicer`,
@@ -53,15 +61,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RecipeDetailPage({ params }: Props) {
   const { slug } = await params;
-  const recipe = await findRecipeBySlug(slug);
+  const cookieStore = await cookies();
+  const lang = (cookieStore.get("ceylonspicer_language")?.value as Language) || "en";
+  const dict = translations[lang] || translations.en;
+  const rawRecipe = await findRecipeBySlug(slug);
 
-  if (!recipe) {
+  if (!rawRecipe) {
     notFound();
   }
 
   // Prevent draft recipe exposure on the public website (allow only admin/editor to preview)
   let isDraftPreview = false;
-  if (recipe.status === "draft") {
+  if (rawRecipe.status === "draft") {
     const session = await verifySession();
     if (!session.isAuth || (session.role !== "admin" && session.role !== "editor")) {
       notFound();
@@ -69,7 +80,9 @@ export default async function RecipeDetailPage({ params }: Props) {
     isDraftPreview = true;
   }
 
-  const related = await getRelatedRecipes(recipe.slug, recipe.category, 3);
+  const rawRelated = await getRelatedRecipes(rawRecipe.slug, rawRecipe.category, 3);
+  const recipe = localizeRecipe(rawRecipe, lang);
+  const related = localizeRecipes(rawRelated, lang);
 
   // Schema.org Recipe JSON-LD for rich SEO snippets
   const jsonLd = {
@@ -118,7 +131,7 @@ export default async function RecipeDetailPage({ params }: Props) {
 
       {isDraftPreview && (
         <div className="bg-amber-500/15 dark:bg-amber-500/25 border-b border-amber-500/30 px-4 py-2.5 text-center font-ui text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-200">
-          Draft Preview Mode — This recipe is unpublished and invisible to public website visitors.
+          {dict.recipeDetail.draftPreview}
         </div>
       )}
 
@@ -130,14 +143,14 @@ export default async function RecipeDetailPage({ params }: Props) {
               href="/"
               className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Home
+              {dict.nav.home}
             </Link>
             <span aria-hidden="true">/</span>
             <Link
               href="/recipes"
               className="hover:text-ink dark:hover:text-ice transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
             >
-              Recipes
+              {dict.nav.recipes}
             </Link>
             <span aria-hidden="true">/</span>
             <Link
@@ -159,7 +172,7 @@ export default async function RecipeDetailPage({ params }: Props) {
             className="inline-flex min-h-[44px] items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-wider text-muted dark:text-slate-muted hover:text-ink dark:hover:text-ice transition-colors mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>All Recipes</span>
+            <span>{dict.recipeDetail.backToRecipes}</span>
           </Link>
 
           {/* 1. Category Tag, Title & Rating Header */}
@@ -179,7 +192,7 @@ export default async function RecipeDetailPage({ params }: Props) {
               </span>
               {recipe.ratingCount && (
                 <span className="font-ui text-xs text-muted dark:text-slate-muted">
-                  ({recipe.ratingCount} reviews)
+                  ({recipe.ratingCount} {dict.common.reviews})
                 </span>
               )}
               <span aria-hidden="true" className="text-ink/20 dark:text-slate-muted/40">•</span>
@@ -187,7 +200,7 @@ export default async function RecipeDetailPage({ params }: Props) {
                 href="#rate-recipe"
                 className="font-ui text-xs font-semibold text-sage dark:text-amber-text hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-sage"
               >
-                Rate this recipe
+                {dict.recipeDetail.rateThisRecipe}
               </a>
             </div>
 
@@ -205,10 +218,17 @@ export default async function RecipeDetailPage({ params }: Props) {
                 </div>
                 <div className="text-left">
                   <p className="font-ui text-xs font-bold text-ink dark:text-ice">
-                    By {recipe.author.name}
+                    {lang === "it" ? "Di" : "By"} {recipe.author.name}
                   </p>
                   <p className="font-ui text-[10px] uppercase tracking-wider text-muted dark:text-slate-muted">
-                    {recipe.author.role} • {recipe.publishedDate}
+                    {lang === "it" && recipe.author.role === "Master Chef & Founder"
+                      ? "Capo Chef e Fondatore"
+                      : lang === "it" && recipe.author.role === "Culinary Contributor"
+                      ? "Collaboratore Culinario"
+                      : lang === "it" && recipe.author.role === "Master Recipe Developer"
+                      ? "Chef Sviluppatore di Ricette"
+                      : recipe.author.role}{" "}
+                    • {recipe.publishedDate}
                   </p>
                 </div>
               </div>
@@ -232,7 +252,7 @@ export default async function RecipeDetailPage({ params }: Props) {
             <div>
               <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
                 <Clock className="h-3 w-3 text-sage dark:text-gold" />
-                Prep Time
+                {dict.recipeDetail.prepTime}
               </p>
               <p className="mt-1 font-display text-lg text-ink dark:text-ice">
                 {recipe.prepTime}
@@ -241,7 +261,7 @@ export default async function RecipeDetailPage({ params }: Props) {
             <div>
               <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
                 <Clock className="h-3 w-3 text-sage dark:text-gold" />
-                Cook Time
+                {dict.recipeDetail.cookTime}
               </p>
               <p className="mt-1 font-display text-lg text-ink dark:text-ice">
                 {recipe.cookTime}
@@ -250,18 +270,20 @@ export default async function RecipeDetailPage({ params }: Props) {
             <div>
               <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
                 <Users className="h-3 w-3 text-sage dark:text-gold" />
-                Servings
+                {dict.recipeDetail.servings}
               </p>
               <p className="mt-1 font-display text-lg text-ink dark:text-ice">
-                {recipe.servings} people
+                {recipe.servings} {dict.common.servings}
               </p>
             </div>
             <div>
               <p className="font-ui text-[10px] font-bold uppercase tracking-widest text-muted dark:text-slate-muted flex items-center justify-center gap-1">
                 <ChefHat className="h-3 w-3 text-sage dark:text-gold" />
-                Cuisine
+                {lang === "it" ? "Cucina" : "Cuisine"}
               </p>
-              <p className="mt-1 font-display text-lg text-ink dark:text-ice">Sri Lankan</p>
+              <p className="mt-1 font-display text-lg text-ink dark:text-ice">
+                {lang === "it" ? "Singalese" : "Sri Lankan"}
+              </p>
             </div>
           </div>
 
@@ -306,7 +328,7 @@ export default async function RecipeDetailPage({ params }: Props) {
             <div className="lg:col-span-7 space-y-8">
               <div>
                 <h3 className="font-display text-2xl md:text-3xl text-ink dark:text-ice border-b border-ink/10 dark:border-hairline pb-3 mb-6">
-                  Instructions
+                  {dict.recipeDetail.instructions}
                 </h3>
 
                 <ol
@@ -340,7 +362,7 @@ export default async function RecipeDetailPage({ params }: Props) {
               {recipe.notes && recipe.notes.length > 0 && (
                 <div className="border-l-4 border-sunshine dark:border-gold bg-cream/30 dark:bg-panel p-6 md:p-8 mt-10">
                   <h4 className="font-display text-xl text-ink dark:text-ice mb-3">
-                    Cook&apos;s Notes & Tips
+                    {dict.recipeDetail.notesTips}
                   </h4>
                   <ul className="space-y-2.5 font-display text-sm md:text-base text-ink/90 dark:text-slate-muted list-disc list-inside">
                     {recipe.notes.map((note, idx) => (
@@ -370,7 +392,7 @@ export default async function RecipeDetailPage({ params }: Props) {
           <section className="mx-auto max-w-[1200px] px-4 sm:px-6 pt-16 md:pt-24">
             <div className="border-t border-ink/10 dark:border-hairline pt-10">
               <h2 className="font-display text-2xl md:text-3xl text-ink dark:text-ice mb-8 text-center sm:text-left">
-                You Might Also Like
+                {dict.recipeDetail.relatedRecipes}
               </h2>
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((relRecipe) => (
@@ -384,6 +406,7 @@ export default async function RecipeDetailPage({ params }: Props) {
                     aspectRatio="4/3"
                     prepTime={relRecipe.prepTime}
                     cookTime={relRecipe.cookTime}
+                    translations={relRecipe.translations}
                   />
                 ))}
               </div>

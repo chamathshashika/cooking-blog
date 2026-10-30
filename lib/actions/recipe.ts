@@ -100,6 +100,7 @@ interface PopulatedRecipeDoc {
   author?: unknown;
   publishedDate?: string;
   status?: "draft" | "published";
+  translations?: Record<string, any>;
 }
 
 /**
@@ -157,6 +158,7 @@ export type CreateRecipeInput = {
   notes?: string[];
   tags?: string[];
   status?: "draft" | "published";
+  translations?: Record<string, any>;
 };
 
 export type RecipeActionResult = {
@@ -171,7 +173,7 @@ async function ensureRecipeAuthorsMigrated() {
   if (hasMigratedRecipeAuthors) return;
   try {
     const totalCount = await RecipeModel.countDocuments();
-    if (totalCount === 0) {
+    if (totalCount === 0 && seedRecipes && seedRecipes.length > 0) {
       const defaultAuthorId = await getOrCreateDefaultAuthorId();
       await RecipeModel.insertMany(
         seedRecipes.map((r) => ({
@@ -216,6 +218,68 @@ async function ensureRecipeAuthorsMigrated() {
             ],
           },
           { $set: { author: defaultAuthorId } }
+        );
+      }
+
+      // Persist Italian translations directly into MongoDB documents
+      const italianTranslationsMap: Record<string, any> = {
+        "traditional-sri-lankan-chicken-curry": {
+          title: "Pollo al Curry Tradizionale dello Sri Lanka",
+          category: "Curry di Pollo",
+          prepTime: "40 minuti",
+          cookTime: "30 minuti",
+          totalTime: "70 minuti",
+          excerpt:
+            "Un ricco curry di pollo dello Sri Lanka preparato con spezie aromatiche, foglie di curry, pandan e latte di cocco. Servire con riso, pane o string hoppers.",
+          intro:
+            "Questo curry di pollo tradizionale dello Sri Lanka unisce spezie calde, erbe profumate e un ricco intingolo al latte di cocco. Il pollo viene marinato prima della cottura, poi sobbollito con cannella, cardamomo, chiodi di garofano e citronella.",
+        },
+        "sri-lankan-string-hoppers": {
+          title: "String Hoppers dello Sri Lanka (Idiyappam)",
+          category: "Colazione",
+          prepTime: "25 minuti",
+          cookTime: "10 minuti per infornata",
+          totalTime: "35 minuti",
+          excerpt:
+            "Morbidi nidi di spaghetti di farina di riso cotti al vapore. Gusta questa tipica colazione dello Sri Lanka con latte di cocco e il tuo curry preferito.",
+          intro:
+            "Gli string hoppers, chiamati anche idiyappam, sono una colazione popolarissima nello Sri Lanka. Si preparano premendo l'impasto di farina di riso in sottili filamenti e cuocendoli a vapore in piccoli nidi.",
+        },
+        "sri-lankan-prawn-curry": {
+          title: "Curry di Gamberi dello Sri Lanka",
+          category: "Frutti di Mare",
+          prepTime: "12 min",
+          cookTime: "18 min",
+          totalTime: "30 min",
+          excerpt:
+            "Un ricco e cremoso curry di gamberi dello Sri Lanka con spezie profumate. Pronto in 30 minuti e perfetto con riso al vapore o pane.",
+          intro:
+            "Questo curry di gamberi è una vera prelibatezza. Ha un colore vivace, un profumo meraviglioso e un sapore profondo. Le spezie dello Sri Lanka legano ogni ingrediente e si abbina splendidamente con riso al vapore.",
+        },
+        "sri-lankan-mutton-curry": {
+          title: "Curry di Montone dello Sri Lanka",
+          category: "Carne",
+          prepTime: "15 min",
+          cookTime: "33 min",
+          totalTime: "48 min",
+          excerpt:
+            "Un sostanzioso e confortevole curry di montone dello Sri Lanka, cotto a lungo fino a ottenere una salsa densa e saporita. Servire con riso al vapore o pane all'aglio tostato.",
+          intro:
+            "Un curry confortevole e ricco, ideale per ogni occasione. Il curry di montone dello Sri Lanka esiste in diverse versioni, e questa salsa densa e ristretta è una delle più amate.",
+        },
+      };
+
+      for (const [slugKey, transObj] of Object.entries(italianTranslationsMap)) {
+        await RecipeModel.updateOne(
+          {
+            slug: slugKey,
+            $or: [
+              { "translations.it": { $exists: false } },
+              { "translations.it": null },
+              { "translations.it.title": { $exists: false } },
+            ],
+          },
+          { $set: { "translations.it": transObj } }
         );
       }
     }
@@ -268,6 +332,7 @@ export async function getRecipes(options?: {
       author: formatPopulatedAuthor(doc.author),
       publishedDate: doc.publishedDate,
       status: doc.status || "published",
+      translations: doc.translations,
     }));
   } catch (error) {
     console.error("Failed to load recipes from database:", error);
@@ -404,6 +469,7 @@ export async function createRecipe(
       author: authorId,
       status: data.status || "published",
       publishedDate: new Date().toISOString().split("T")[0],
+      translations: data.translations || {},
     });
 
     // 10. Revalidate relevant Next.js routes
@@ -470,6 +536,7 @@ export async function findRecipeBySlug(
         author: formatPopulatedAuthor(doc.author),
         publishedDate: doc.publishedDate,
         status: doc.status || "published",
+        translations: doc.translations,
       };
     }
     return undefined;
@@ -524,6 +591,7 @@ export async function getRelatedRecipes(
       author: formatPopulatedAuthor(doc.author),
       publishedDate: doc.publishedDate,
       status: doc.status || "published",
+      translations: doc.translations,
     }));
 
     if (related.length < limit) {
@@ -561,6 +629,7 @@ export async function getRelatedRecipes(
           author: formatPopulatedAuthor(doc.author),
           publishedDate: doc.publishedDate,
           status: doc.status || "published",
+          translations: doc.translations,
         })),
       ];
     }
@@ -706,6 +775,9 @@ export async function updateRecipe(
       if (data.status) {
         existingDoc.status = data.status;
       }
+      if (data.translations) {
+        existingDoc.translations = data.translations;
+      }
       // Ensure author is set as ObjectId foreign key
       if (
         !existingDoc.author ||
@@ -754,6 +826,7 @@ export async function updateRecipe(
         author: authorId,
         status: data.status || "published",
         publishedDate: new Date().toISOString().split("T")[0],
+        translations: data.translations || {},
       });
     }
 

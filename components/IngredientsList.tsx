@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, ShoppingCart, ExternalLink } from "lucide-react";
 import type { Ingredient } from "@/lib/data";
+import { useLanguage } from "./LanguageProvider";
 
 type Props = {
   ingredients: Ingredient[];
@@ -10,6 +11,7 @@ type Props = {
 
 export default function IngredientsList({ ingredients }: Props) {
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
+  const { t } = useLanguage();
 
   const toggleItem = (index: number) => {
     setCheckedItems((prev) => ({
@@ -21,13 +23,13 @@ export default function IngredientsList({ ingredients }: Props) {
   return (
     <div className="bg-linen/40 dark:bg-panel p-6 md:p-8 border border-ink/5 dark:border-hairline transition-colors duration-200">
       <div className="flex items-baseline justify-between border-b border-ink/10 dark:border-hairline pb-3 mb-6">
-        <h3 className="font-display text-2xl text-ink dark:text-ice">Ingredients</h3>
+        <h3 className="font-display text-2xl text-ink dark:text-ice">{t.recipeDetail.ingredients}</h3>
         <span className="font-ui text-[11px] uppercase tracking-wider text-muted dark:text-slate-muted">
-          {ingredients.length} items
+          {ingredients.length} {t.common.items}
         </span>
       </div>
 
-      <ul className="space-y-2" role="list" aria-label="Recipe ingredients">
+      <ul className="space-y-2" role="list" aria-label={t.recipeDetail.ingredients}>
         {ingredients.map((item, index) => {
           const isChecked = !!checkedItems[index];
 
@@ -47,7 +49,7 @@ export default function IngredientsList({ ingredients }: Props) {
                 type="button"
                 role="checkbox"
                 aria-checked={isChecked}
-                aria-label={`Mark ${item.name} as prepared`}
+                aria-label={`${t.recipeDetail.markAsPrepared} ${item.name}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleItem(index);
@@ -78,7 +80,7 @@ export default function IngredientsList({ ingredients }: Props) {
                 <span>{item.name}</span>
                 {item.optional && (
                   <span className="text-xs text-muted/80 dark:text-slate-muted/80 italic ml-1.5 font-normal">
-                    (optional)
+                    {t.recipeDetail.optional}
                   </span>
                 )}
               </span>

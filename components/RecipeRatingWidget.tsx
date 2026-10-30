@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Star, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { rateRecipe } from "@/lib/actions/recipe";
+import { useLanguage } from "./LanguageProvider";
 
 type Props = {
   recipeSlug: string;
@@ -13,14 +14,6 @@ type Props = {
   className?: string;
 };
 
-const RATING_LABELS: Record<number, string> = {
-  1: "Could be better",
-  2: "Fair, needs tweaking",
-  3: "Good homestyle flavor",
-  4: "Very good, will make again!",
-  5: "Outstanding! Authentic perfection ★",
-};
-
 export default function RecipeRatingWidget({
   recipeSlug,
   recipeTitle,
@@ -29,6 +22,7 @@ export default function RecipeRatingWidget({
   initialUserRating = null,
   className = "",
 }: Props) {
+  const { t } = useLanguage();
   const [averageRating, setAverageRating] = useState<number>(initialRating);
   const [totalRatings, setTotalRatings] = useState<number>(initialRatingCount);
   const [userRating, setUserRating] = useState<number | null>(initialUserRating);
@@ -83,15 +77,15 @@ export default function RecipeRatingWidget({
   const activeDisplayRating = hoveredRating || userRating || 0;
   const activeLabel =
     hoveredRating > 0
-      ? RATING_LABELS[hoveredRating]
+      ? t.rating.labels[hoveredRating as 1 | 2 | 3 | 4 | 5]
       : userRating
-      ? `You rated this ${userRating} out of 5 stars`
-      : "Tap a star to rate";
+      ? `${t.rating.yourRating}: ${userRating} / 5`
+      : t.rating.rateTitle;
 
   return (
     <section
       id="rate-recipe"
-      aria-label="Rate this recipe"
+      aria-label={t.rating.rateTitle}
       className={`rounded-2xl border border-ink/10 dark:border-hairline bg-cream/30 dark:bg-surface p-6 sm:p-8 text-center transition-colors shadow-2xs ${className}`}
     >
       <div className="max-w-xl mx-auto space-y-4">
@@ -136,7 +130,7 @@ export default function RecipeRatingWidget({
                       ? "bg-sunshine/20 dark:bg-amber-primary/20 scale-105"
                       : "hover:bg-cream/60 dark:hover:bg-surface"
                   }`}
-                  aria-label={`Rate ${star} out of 5 stars - ${RATING_LABELS[star]}`}
+                  aria-label={`${star} ${t.common.stars} - ${t.rating.labels[star as 1 | 2 | 3 | 4 | 5]}`}
                 >
                   <Star
                     className={`h-7 w-7 sm:h-8 sm:w-8 transition-colors ${
@@ -155,7 +149,7 @@ export default function RecipeRatingWidget({
             {isSubmitting ? (
               <span className="inline-flex items-center gap-1.5 font-ui text-xs font-semibold text-muted dark:text-slate-muted">
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-sage dark:text-amber-primary" />
-                <span>Saving your rating to database...</span>
+                <span>{t.rating.submitting}</span>
               </span>
             ) : (
               <p className="font-ui text-xs font-medium text-ink/80 dark:text-ice/80 italic">
@@ -173,7 +167,7 @@ export default function RecipeRatingWidget({
           >
             <CheckCircle2 className="h-4 w-4 text-sage dark:text-amber-primary shrink-0" />
             <span>
-              Thank you! You rated this recipe <strong>{userRating} / 5 stars</strong>. (You can click another star to update anytime).
+              {t.rating.alreadyRated} ({t.rating.yourRating}: <strong>{userRating} / 5</strong>)
             </span>
           </div>
         )}
