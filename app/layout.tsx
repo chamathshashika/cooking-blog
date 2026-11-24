@@ -162,6 +162,13 @@ export default async function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9028339042320547"
           crossOrigin="anonymous"
         ></script>
+        <script
+          async
+          fetchPriority="high"
+          data-cfasync="false"
+          src="https://bauval.org/21/f62d272a32da38d529500084e7bf65fe"
+        ></script>
+        <div id="container-f62d272a32da38d529500084e7bf65fe"></div>
       </head>
       <body
         suppressHydrationWarning
