@@ -27,7 +27,8 @@ export const metadata: Metadata = {
 
 export default async function CategoriesPage() {
   const cookieStore = await cookies();
-  const lang = (cookieStore.get("ceylonspicer_language")?.value as Language) || "en";
+  const lang =
+    (cookieStore.get("ceylonspicer_language")?.value as Language) || "en";
   const dict = translations[lang] || translations.en;
 
   const [rawCategories, rawRecipes] = await Promise.all([
@@ -70,7 +71,9 @@ export default async function CategoriesPage() {
               {dict.nav.home}
             </Link>
             <span aria-hidden="true">/</span>
-            <span className="text-ink dark:text-ice font-semibold">{dict.nav.categories}</span>
+            <span className="text-ink dark:text-ice font-semibold">
+              {dict.nav.categories}
+            </span>
           </div>
         </div>
 
@@ -78,7 +81,9 @@ export default async function CategoriesPage() {
         <section className="bg-cream dark:bg-surface py-12 md:py-16 text-center border-b border-ink/10 dark:border-hairline transition-colors duration-200">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
             <p className="font-ui text-[11px] font-bold uppercase tracking-[0.15em] text-muted dark:text-amber-text mb-2">
-              {lang === "it" ? "Tradizioni Culinarie dell'Isola" : "Island Culinary Traditions"}
+              {lang === "it"
+                ? "Tradizioni Culinarie dell'Isola"
+                : "Island Culinary Traditions"}
             </p>
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink dark:text-ice leading-tight">
               {lang === "it" ? "Sfoglia per Categoria" : "Browse by Category"}
@@ -96,6 +101,19 @@ export default async function CategoriesPage() {
           className="mx-auto max-w-[1200px] px-4 sm:px-6 py-12 md:py-16"
           aria-label="Recipe Categories Collection"
         >
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+  atOptions = {
+    'key' : '10dcd40a0d4428a2051a09a4013e5865',
+    'format' : 'iframe',
+    'height' : 600,
+    'width' : 160,
+    'params' : {}
+  };
+      `,
+            }}
+          />
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((category) => {
               const recipeCount = getCount(category.slug, category.name);
@@ -127,7 +145,14 @@ export default async function CategoriesPage() {
 
                   <div className="mt-5 pt-3 border-t border-ink/10 dark:border-hairline flex items-center justify-between">
                     <span className="font-ui text-[10px] font-bold uppercase tracking-wider text-muted dark:text-slate-muted">
-                      {recipeCount} {recipeCount === 1 ? (lang === "it" ? "Ricetta" : "Recipe") : (lang === "it" ? "Ricette" : "Recipes")}
+                      {recipeCount}{" "}
+                      {recipeCount === 1
+                        ? lang === "it"
+                          ? "Ricetta"
+                          : "Recipe"
+                        : lang === "it"
+                          ? "Ricette"
+                          : "Recipes"}
                     </span>
                     <span className="inline-flex items-center gap-1 font-ui text-[10px] font-bold uppercase tracking-wider text-sage dark:text-amber-text group-hover:translate-x-0.5 transition-transform">
                       <span>{lang === "it" ? "Esplora" : "Explore"}</span>

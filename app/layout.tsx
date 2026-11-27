@@ -162,13 +162,25 @@ export default async function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9028339042320547"
           crossOrigin="anonymous"
         ></script>
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+          atOptions = {
+            'key' : '0ed95602f3ff2e4b2adf5153420e5e51',
+            'format' : 'iframe',
+            'height' : 300,
+            'width' : 160,
+            'params' : {}
+          };
+          `,
+          }}
+        />
         <script
           async
-          fetchPriority="high"
           data-cfasync="false"
-          src="https://bauval.org/21/f62d272a32da38d529500084e7bf65fe"
+          src="https://bauval.org/22/0ed95602f3ff2e4b2adf5153420e5e51"
         ></script>
-        <div id="container-f62d272a32da38d529500084e7bf65fe"></div>
       </head>
       <body
         suppressHydrationWarning
