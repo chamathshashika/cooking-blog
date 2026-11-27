@@ -101,19 +101,6 @@ export default async function CategoriesPage() {
           className="mx-auto max-w-[1200px] px-4 sm:px-6 py-12 md:py-16"
           aria-label="Recipe Categories Collection"
         >
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-  atOptions = {
-    'key' : '10dcd40a0d4428a2051a09a4013e5865',
-    'format' : 'iframe',
-    'height' : 600,
-    'width' : 160,
-    'params' : {}
-  };
-      `,
-            }}
-          />
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((category) => {
               const recipeCount = getCount(category.slug, category.name);
