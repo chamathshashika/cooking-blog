@@ -181,6 +181,7 @@ export default async function RootLayout({
           data-cfasync="false"
           src="https://bauval.org/22/0ed95602f3ff2e4b2adf5153420e5e51"
         ></script>
+        <div id="container-f62d272a32da38d529500084e7bf65fe"></div>
       </head>
       <body
         suppressHydrationWarning
